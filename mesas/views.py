@@ -6,7 +6,8 @@ import json
 from .models import Mesa
 
 def mesas_home(request):
-    mesas = Mesa.objects.all().order_by('numero_mesa')
+    # Filtrar apenas mesas que não estão encerradas
+    mesas = Mesa.objects.exclude(status='encerrada').order_by('numero_mesa')
     return render(request, 'home.html', {'mesas': mesas})
 
 @csrf_exempt
@@ -14,8 +15,22 @@ def criar_mesa(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
+            numero_mesa = data.get('numero_mesa')
+            
+            # Verificar se já existe uma mesa com o mesmo número que esteja aberta ou fechada
+            mesa_existente = Mesa.objects.filter(
+                numero_mesa=numero_mesa,
+                status__in=['aberta', 'fechada']
+            ).first()
+            
+            if mesa_existente:
+                return JsonResponse({
+                    'success': False,
+                    'message': f'Já existe uma mesa {numero_mesa} com status "{mesa_existente.get_status_display()}". Encerre a mesa existente antes de criar uma nova.'
+                }, status=400)
+            
             mesa = Mesa.objects.create(
-                numero_mesa=data.get('numero_mesa'),
+                numero_mesa=numero_mesa,
                 tipo_jogo=data.get('tipo_jogo'),
                 status=data.get('status', 'aberta'),
                 fichas_5=data.get('fichas_5', 0),
@@ -150,8 +165,21 @@ def editar_mesa_api(request, mesa_id):
             mesa = Mesa.objects.get(id=mesa_id)
             data = json.loads(request.body)
             
-            # Atualizar os campos da mesa
-            mesa.numero_mesa = data.get('numero_mesa')
+            # Verificar se já existe outra mesa com o mesmo número que esteja aberta ou fechada
+            numero_mesa = data.get('numero_mesa')
+            mesa_existente = Mesa.objects.filter(
+                numero_mesa=numero_mesa,
+                status__in=['aberta', 'fechada']
+            ).exclude(id=mesa_id).first()
+            
+            if mesa_existente:
+                return JsonResponse({
+                    'success': False,
+                    'message': f'Já existe uma mesa {numero_mesa} com status "{mesa_existente.get_status_display()}". Encerre a mesa existente antes de usar este número.'
+                }, status=400)
+            
+            # Atualizar os campos da mesa (exceto valor_inicial que não pode ser alterado)
+            mesa.numero_mesa = numero_mesa
             mesa.tipo_jogo = data.get('tipo_jogo')
             mesa.status = data.get('status')
             mesa.fichas_5 = data.get('fichas_5', 0)
@@ -178,4 +206,22 @@ def editar_mesa_api(request, mesa_id):
                 'success': False,
                 'message': str(e)
             }, status=400)
+    return JsonResponse({'success': False, 'message': 'Método não permitido'}, status=405) 
+
+@csrf_exempt
+def encerrar_mesa_api(request, mesa_id):
+    if request.method == 'POST':
+        try:
+            mesa = Mesa.objects.get(id=mesa_id)
+            mesa.status = 'encerrada'
+            mesa.save()
+            return JsonResponse({
+                'success': True,
+                'message': f'Mesa {mesa.numero_mesa} encerrada com sucesso!'
+            })
+        except Mesa.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'Mesa não encontrada'
+            }, status=404)
     return JsonResponse({'success': False, 'message': 'Método não permitido'}, status=405) 

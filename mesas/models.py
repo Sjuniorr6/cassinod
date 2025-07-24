@@ -29,7 +29,6 @@ class Mesa(models.Model):
     )
     
     numero_mesa = models.IntegerField(
-        unique=True,
         verbose_name='Número da Mesa'
     )
     
@@ -76,6 +75,20 @@ class Mesa(models.Model):
         verbose_name='Valor Total da Mesa'
     )
     
+    valor_inicial = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=0,
+        verbose_name='Valor Inicial da Mesa'
+    )
+    
+    saldo = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=0,
+        verbose_name='Saldo da Mesa'
+    )
+    
     data_criacao = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Data de Criação'
@@ -108,6 +121,14 @@ class Mesa(models.Model):
         return total
     
     def save(self, *args, **kwargs):
-        """Sobrescreve o método save para calcular automaticamente o valor total"""
-        self.valor_total = self.calcular_valor_total()
+        """Sobrescreve o método save para calcular automaticamente o valor total e saldo"""
+        # Se é uma nova mesa (não tem ID ainda), definir valor_inicial igual ao valor_total
+        if not self.pk:
+            self.valor_total = self.calcular_valor_total()
+            self.valor_inicial = self.valor_total
+        else:
+            # Para mesas existentes, apenas recalcular valor_total
+            self.valor_total = self.calcular_valor_total()
+        
+        self.saldo = self.valor_total - self.valor_inicial
         super().save(*args, **kwargs) 
