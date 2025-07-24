@@ -13,6 +13,9 @@ def mesas_home(request):
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
     
+    # Obter parâmetros de status do request
+    status_filtro = request.GET.get('status', '')
+    
     # Se não foram fornecidas datas, usar o último mês como padrão
     if not data_inicio or not data_fim:
         data_fim = timezone.now().date()
@@ -26,28 +29,33 @@ def mesas_home(request):
             data_fim = timezone.now().date()
             data_inicio = data_fim - timedelta(days=30)
     
-    # Filtrar apenas mesas que não estão encerradas
-    mesas = Mesa.objects.exclude(status='encerrada').order_by('numero_mesa')
+    # Filtrar mesas por status se especificado
+    if status_filtro and status_filtro in ['aberta', 'fechada', 'encerrada']:
+        mesas = Mesa.objects.filter(status=status_filtro).order_by('numero_mesa')
+    else:
+        # Filtrar apenas mesas que não estão encerradas (comportamento padrão)
+        mesas = Mesa.objects.exclude(status='encerrada').order_by('numero_mesa')
     
     # Calcular estatísticas gerais (sempre mostradas)
     mesas_ativas = Mesa.objects.filter(status='aberta').count()
     total_mesas = Mesa.objects.exclude(status='encerrada').count()
     
-    # Calcular receita total ESPECIFICAMENTE do período selecionado
-    # Filtra mesas que foram criadas ou atualizadas no período
-    mesas_periodo = Mesa.objects.filter(
-        models.Q(data_criacao__date__range=[data_inicio, data_fim]) |
-        models.Q(data_atualizacao__date__range=[data_inicio, data_fim])
-    ).exclude(status='encerrada')
-    
-    # Receita total do período (soma dos saldos das mesas no período)
-    receita_total = mesas_periodo.filter(
-        status__in=['aberta', 'fechada']
-    ).aggregate(
+    # Calcular receita total do período selecionado
+    # Filtrar mesas pelo período de data_criacao
+    mesas_periodo_query = Mesa.objects.filter(data_criacao__date__gte=data_inicio, data_criacao__date__lte=data_fim)
+
+    # Filtrar por status se necessário
+    if status_filtro and status_filtro in ['aberta', 'fechada', 'encerrada']:
+        mesas_periodo_query = mesas_periodo_query.filter(status=status_filtro)
+    # Se status_filtro for vazio ou 'todas', não filtra por status (pega todos)
+
+    mesas_periodo = mesas_periodo_query
+
+    receita_total = mesas_periodo.aggregate(
         total=models.Sum('saldo')
     )['total'] or 0
-    
-    # Se não há mesas no período, mostrar 0 (não usar todas as mesas)
+
+    # Se não há mesas no período, mostrar 0
     if not mesas_periodo.exists():
         receita_total = 0
     
@@ -66,12 +74,13 @@ def mesas_home(request):
     periodo_anterior_inicio = data_inicio - timedelta(days=(data_fim - data_inicio).days)
     periodo_anterior_fim = data_inicio - timedelta(days=1)
     
-    mesas_periodo_anterior = Mesa.objects.filter(
-        models.Q(data_criacao__date__range=[periodo_anterior_inicio, periodo_anterior_fim]) |
-        models.Q(data_atualizacao__date__range=[periodo_anterior_inicio, periodo_anterior_fim])
-    ).exclude(status='encerrada').filter(
-        status__in=['aberta', 'fechada']
-    ).aggregate(
+    # Calcular receita do período anterior com a mesma lógica do período atual
+    if status_filtro and status_filtro in ['aberta', 'fechada', 'encerrada']:
+        mesas_periodo_anterior_query = Mesa.objects.filter(status=status_filtro)
+    else:
+        mesas_periodo_anterior_query = Mesa.objects.exclude(status='encerrada')
+    
+    mesas_periodo_anterior = mesas_periodo_anterior_query.aggregate(
         total=models.Sum('saldo')
     )['total'] or 0
     
@@ -82,7 +91,7 @@ def mesas_home(request):
         variacao_percentual = 0 if receita_total == 0 else 100
     
     # Determinar se há filtro ativo
-    filtro_ativo = bool(data_inicio and data_fim)
+    filtro_ativo = bool(data_inicio and data_fim) or bool(status_filtro)
     
     context = {
         'mesas': mesas,
@@ -93,6 +102,7 @@ def mesas_home(request):
         'estoque_restante': estoque_restante,
         'data_inicio': data_inicio,
         'data_fim': data_fim,
+        'status_filtro': status_filtro,
         'variacao_percentual': variacao_percentual,
         'periodo_texto': f"de {data_inicio.strftime('%d/%m/%Y')} a {data_fim.strftime('%d/%m/%Y')}",
         'filtro_ativo': filtro_ativo,

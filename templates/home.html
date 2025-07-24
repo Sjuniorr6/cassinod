@@ -72,7 +72,7 @@
         <header class="main-header">
             <div class="flex flex-col items-center mb-4">
                 <div class="text-center mb-4">
-                    <h1 class="main-title">Cassino Diamante</h1>
+                    <h1 class="main-title">Saint Paul</h1>
                     <p class="main-subtitle">Sistema de Controle e Gestão</p>
                 </div>
                 <div class="flex gap-2">
@@ -104,35 +104,64 @@
                 <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                     <div>
                         <h3 class="text-lg font-bold text-gray-800 mb-2 flex items-center gap-2">
-                            Filtro de Período
-                            {% if filtro_ativo %}
+                            Filtros
+                            {% if filtro_ativo or status_filtro %}
                                 <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-bold rounded-full">
                                     ATIVO
                                 </span>
                             {% endif %}
                         </h3>
                         <p class="text-sm text-gray-600">
-                            {% if filtro_ativo %}
-                                Mostrando receita do período selecionado
+                            {% if filtro_ativo or status_filtro %}
+                                {% if filtro_ativo and status_filtro %}
+                                    Mostrando receita do período e status selecionados
+                                {% elif filtro_ativo %}
+                                    Mostrando receita do período selecionado
+                                {% elif status_filtro %}
+                                    Mostrando mesas com status "{{ status_filtro|title }}"
+                                {% endif %}
                             {% else %}
-                                Selecione o período para calcular a receita total
+                                Selecione o período e/ou status para filtrar
                             {% endif %}
                         </p>
                     </div>
-                    <form id="filtroDatas" class="flex flex-col sm:flex-row gap-4 items-end">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-semibold text-gray-700">Data Início</label>
-                            <input type="date" id="dataInicio" name="data_inicio" 
-                                   value="{{ data_inicio|date:'Y-m-d' }}"
-                                   class="px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md">
+                    <form id="filtroDatas" class="flex flex-col lg:flex-row gap-4 items-end">
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <div class="space-y-2">
+                                <label class="block text-sm font-semibold text-gray-700">Data Início</label>
+                                <input type="date" id="dataInicio" name="data_inicio" 
+                                       value="{{ data_inicio|date:'Y-m-d' }}"
+                                       class="px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-sm font-semibold text-gray-700">Data Fim</label>
+                                <input type="date" id="dataFim" name="data_fim" 
+                                       value="{{ data_fim|date:'Y-m-d' }}"
+                                       class="px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md">
+                            </div>
                         </div>
+                        
+                        <!-- Filtros de Status -->
                         <div class="space-y-2">
-                            <label class="block text-sm font-semibold text-gray-700">Data Fim</label>
-                            <input type="date" id="dataFim" name="data_fim" 
-                                   value="{{ data_fim|date:'Y-m-d' }}"
-                                   class="px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md">
+                            <label class="block text-sm font-semibold text-gray-700">Status das Mesas</label>
+                            <div class="flex gap-2">
+                                <button type="button" class="filtro-status px-3 py-2 text-xs font-semibold rounded-lg transition-all duration-300 {% if not status_filtro %}bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg{% else %}bg-gray-100 hover:bg-gray-200 text-gray-700{% endif %}" data-status="">
+                                    Todas
+                                </button>
+                                <button type="button" class="filtro-status px-3 py-2 text-xs font-semibold rounded-lg transition-all duration-300 {% if status_filtro == 'aberta' %}bg-gradient-to-r from-green-600 to-green-500 text-white shadow-lg{% else %}bg-gray-100 hover:bg-gray-200 text-gray-700{% endif %}" data-status="aberta">
+                                    Abertas
+                                </button>
+                                <button type="button" class="filtro-status px-3 py-2 text-xs font-semibold rounded-lg transition-all duration-300 {% if status_filtro == 'fechada' %}bg-gradient-to-r from-amber-600 to-amber-500 text-white shadow-lg{% else %}bg-gray-100 hover:bg-gray-200 text-gray-700{% endif %}" data-status="fechada">
+                                    Fechadas
+                                </button>
+                                <button type="button" class="filtro-status px-3 py-2 text-xs font-semibold rounded-lg transition-all duration-300 {% if status_filtro == 'encerrada' %}bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg{% else %}bg-gray-100 hover:bg-gray-200 text-gray-700{% endif %}" data-status="encerrada">
+                                    Encerradas
+                                </button>
+                            </div>
                         </div>
+                        
                         <div class="flex gap-2">
+                            <input type="hidden" id="statusFiltro" name="status" value="{{ status_filtro }}">
                             <button type="submit" class="px-6 py-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -159,14 +188,22 @@
                     {% if filtro_ativo %}
                         <div class="absolute top-2 right-2">
                             <div class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-full">
-                                FILTRO ATIVO
+                                {% if status_filtro %}
+                                    {{ status_filtro|upper }}
+                                {% else %}
+                                    FILTRO ATIVO
+                                {% endif %}
                             </div>
                         </div>
                     {% endif %}
                     <div class="text-2xl font-black text-red-600 mb-2" data-count="{{ receita_total|floatformat:0 }}">R$ 0</div>
                     <div class="text-sm text-gray-600 font-semibold mb-2">
                         {% if filtro_ativo %}
-                            Receita do Período
+                            {% if status_filtro %}
+                                Receita - {{ status_filtro|title }}
+                            {% else %}
+                                Receita do Período
+                            {% endif %}
                         {% else %}
                             Receita Total
                         {% endif %}
@@ -174,7 +211,12 @@
                     <div class="text-xs font-medium text-gray-600 mb-1">{{ periodo_texto }}</div>
                     {% if filtro_ativo %}
                         <div class="text-xs font-medium text-blue-600 mb-1">
-                            {{ mesas_periodo_count }} mesa{{ mesas_periodo_count|pluralize:"s" }} no período
+                            {{ mesas_periodo_count }} mesa{{ mesas_periodo_count|pluralize:"s" }}
+                            {% if status_filtro %}
+                                {{ status_filtro }}
+                            {% else %}
+                                no período
+                            {% endif %}
                         </div>
                     {% endif %}
                     <div class="text-xs font-medium {% if variacao_percentual >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
@@ -264,6 +306,7 @@
                         </div>
                         
                         <div class="flex gap-2 mt-3">
+                             {% if mesa.status != 'encerrada' %}
                              <button class="flex-1 py-2 px-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white text-xs font-bold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-1" 
                                      onclick="editarMesa({{ mesa.id }}, '{{ mesa.numero_mesa }}', '{{ mesa.tipo_jogo }}', '{{ mesa.status }}', {{ mesa.valor_inicial }}, {{ mesa.fichas_5 }}, {{ mesa.fichas_25 }}, {{ mesa.fichas_100 }}, {{ mesa.fichas_500 }}, {{ mesa.fichas_1000 }}, {{ mesa.fichas_5000 }}, {{ mesa.fichas_10000 }})">
                                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -271,6 +314,7 @@
                                  </svg>
                                  Editar
                              </button>
+                             {% endif %}
                              {% if mesa.status == 'aberta' %}
                                  <button class="flex-1 py-2 px-3 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white text-xs font-bold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 uppercase" 
                                          onclick="fecharMesa({{ mesa.id }})">
@@ -1293,12 +1337,22 @@
         url.searchParams.set('data_inicio', dataInicio.value);
         url.searchParams.set('data_fim', dataFim.value);
         
+        // Adicionar parâmetro de status se selecionado
+        if (statusFiltroInput.value) {
+            url.searchParams.set('status', statusFiltroInput.value);
+        } else {
+            url.searchParams.delete('status');
+        }
+        
         // Redirecionar com os filtros
         window.location.href = url.toString();
     });
 
     // Limpar filtro
     limparFiltro.addEventListener('click', () => {
+        // Limpar o input de status
+        statusFiltroInput.value = '';
+        
         // Redirecionar para a página sem parâmetros
         window.location.href = window.location.pathname;
     });
@@ -1308,6 +1362,43 @@
         if (dataInicio.value && !dataFim.value) {
             dataFim.value = dataInicio.value;
         }
+    });
+
+    // Gerenciar filtros de status
+    const filtrosStatus = document.querySelectorAll('.filtro-status');
+    const statusFiltroInput = document.getElementById('statusFiltro');
+
+    filtrosStatus.forEach(button => {
+        button.addEventListener('click', () => {
+            const status = button.getAttribute('data-status');
+            
+            // Atualizar o input hidden
+            statusFiltroInput.value = status;
+            
+            // Atualizar classes dos botões
+            filtrosStatus.forEach(btn => {
+                btn.classList.remove('bg-gradient-to-r', 'from-blue-600', 'to-blue-500', 'from-green-600', 'to-green-500', 'from-amber-600', 'to-amber-500', 'from-red-600', 'to-red-500', 'text-white', 'shadow-lg');
+                btn.classList.add('bg-gray-100', 'hover:bg-gray-200', 'text-gray-700');
+            });
+            
+            // Aplicar estilo ativo ao botão clicado
+            if (status === '') {
+                button.classList.remove('bg-gray-100', 'hover:bg-gray-200', 'text-gray-700');
+                button.classList.add('bg-gradient-to-r', 'from-blue-600', 'to-blue-500', 'text-white', 'shadow-lg');
+            } else if (status === 'aberta') {
+                button.classList.remove('bg-gray-100', 'hover:bg-gray-200', 'text-gray-700');
+                button.classList.add('bg-gradient-to-r', 'from-green-600', 'to-green-500', 'text-white', 'shadow-lg');
+            } else if (status === 'fechada') {
+                button.classList.remove('bg-gray-100', 'hover:bg-gray-200', 'text-gray-700');
+                button.classList.add('bg-gradient-to-r', 'from-amber-600', 'to-amber-500', 'text-white', 'shadow-lg');
+            } else if (status === 'encerrada') {
+                button.classList.remove('bg-gray-100', 'hover:bg-gray-200', 'text-gray-700');
+                button.classList.add('bg-gradient-to-r', 'from-red-600', 'to-red-500', 'text-white', 'shadow-lg');
+            }
+            
+            // Submeter o formulário automaticamente
+            filtroDatas.submit();
+        });
     });
 
     // Funções para modais de notificação
