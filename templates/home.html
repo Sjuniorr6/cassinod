@@ -16,6 +16,11 @@
 
     <!-- Main Content -->
     <div class="content-wrapper">
+        <!-- Botão mobile para abrir sidebar -->
+        <button id="mobileSidebarBtn" class="lg:hidden fixed top-4 left-4 z-50 w-12 h-12 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold text-xl rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center">
+            D
+        </button>
+        
         <header class="main-header">
             <h1 class="main-title">Cassino Diamante</h1>
             <p class="main-subtitle">Sistema de Controle e Gestão</p>
@@ -23,78 +28,99 @@
 
         <div class="cards-container">
             <!-- Cards de métricas -->
-            <div class="metrics-grid">
-                <div class="metric-card">
-                    <div class="metric-value" data-count="25000">R$ 0</div>
-                    <div class="metric-label">Receita Total</div>
-                    <div class="metric-change positive">+12% desde ontem</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-red-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="text-2xl font-black text-red-600 mb-2" data-count="25000">R$ 0</div>
+                    <div class="text-sm text-gray-600 font-semibold mb-2">Receita Total</div>
+                    <div class="text-xs font-medium text-green-600">+12% desde ontem</div>
                 </div>
-                <div class="metric-card">
-                    <div class="metric-value" data-count="10">0</div>
-                    <div class="metric-label">Jogadores Ativos</div>
-                    <div class="metric-change positive">+3 na última hora</div>
+                <div class="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-red-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="text-2xl font-black text-red-600 mb-2" data-count="10">0</div>
+                    <div class="text-sm text-gray-600 font-semibold mb-2">Jogadores Ativos</div>
+                    <div class="text-xs font-medium text-green-600">+3 na última hora</div>
                 </div>
-                <div class="metric-card">
-                    <div class="metric-value" data-count="2">0</div>
-                    <div class="metric-label">Mesas Ativas</div>
-                    <div class="metric-change negative">de 4 mesas no total</div>
+                <div class="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-red-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="text-2xl font-black text-red-600 mb-2" data-count="2">0</div>
+                    <div class="text-sm text-gray-600 font-semibold mb-2">Mesas Ativas</div>
+                    <div class="text-xs font-medium text-red-600">de 4 mesas no total</div>
                 </div>
-                <div class="metric-card">
-                    <div class="metric-value" data-count="87000">R$ 0</div>
-                    <div class="metric-label">Fichas Vendidas</div>
-                    <div class="metric-change neutral">Estoque restante: R$ 93.000</div>
+                <div class="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-red-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <div class="text-2xl font-black text-red-600 mb-2" data-count="87000">R$ 0</div>
+                    <div class="text-sm text-gray-600 font-semibold mb-2">Fichas Vendidas</div>
+                    <div class="text-xs font-medium text-gray-600">Estoque restante: R$ 93.000</div>
                 </div>
             </div>
 
             <!-- Mesas de Jogos -->
-            <div class="tables-grid">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4">
                 {% if mesas %}
                     {% for mesa in mesas %}
-                    <div class="table-card">
-                        <div class="table-header">
-                            <div class="table-name">{{ mesa.get_tipo_jogo_display }} {{ mesa.numero_mesa }}</div>
-                            <div class="table-status 
-                                {% if mesa.status == 'aberta' %}status-open
-                                {% elif mesa.status == 'fechada' %}status-closed
-                                {% else %}status-maintenance{% endif %}">
+                    <div class="bg-white/95 backdrop-blur-xl rounded-lg p-4 shadow-xl border border-red-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group min-h-[70px]">
+                        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="text-xs font-bold text-gray-800">{{ mesa.get_tipo_jogo_display }} {{ mesa.numero_mesa }}</div>
+                            <div class="px-2 py-1 rounded text-xs font-bold uppercase
+                                {% if mesa.status == 'aberta' %}bg-green-100 text-green-800
+                                {% elif mesa.status == 'fechada' %}bg-red-100 text-red-800
+                                {% else %}bg-yellow-100 text-yellow-800{% endif %}">
                                 {{ mesa.get_status_display|upper }}
                             </div>
                         </div>
-                        <div class="table-type">{{ mesa.tipo_jogo|title }}</div>
-                        <div class="table-stats">
-                            <div class="table-stat">
-                                <span>Receita:</span>
-                                <span class="stat-value">R$ {{ mesa.valor_total|floatformat:0 }}</span>
+                        
+                        <div class="text-xs text-red-600 font-semibold mb-2">{{ mesa.tipo_jogo|title }}</div>
+                        
+                        <div class="space-y-1 mb-2">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-gray-600">Receita:</span>
+                                <span class="font-bold text-green-600">R$ {{ mesa.valor_total|floatformat:0 }}</span>
                             </div>
-                            <div class="table-stat">
-                                <span>Jogadores:</span>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-gray-600">Jogadores:</span>
                                 <span>{% if mesa.status == 'aberta' %}4{% elif mesa.status == 'fechada' %}0{% else %}0{% endif %}</span>
                             </div>
-                            <div class="table-stat">
-                                <span>Fichas Vendidas:</span>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-gray-600">Fichas Vendidas:</span>
                             </div>
                         </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: {% if mesa.status == 'aberta' %}75{% elif mesa.status == 'fechada' %}100{% else %}0{% endif %}%"></div>
+                        
+                        <div class="w-full h-1 bg-gray-200 rounded-full mb-2 overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-300" 
+                                 style="width: {% if mesa.status == 'aberta' %}75{% elif mesa.status == 'fechada' %}100{% else %}0{% endif %}%"></div>
                         </div>
-                        <div class="table-last-update">
+                        
+                        <div class="text-xs text-gray-400 mb-3">
                             {% if mesa.status == 'aberta' %}5 minutos atrás
                             {% elif mesa.status == 'fechada' %}1 hora atrás
                             {% else %}3 horas atrás{% endif %}
                         </div>
+                        
                         {% if mesa.status == 'aberta' %}
-                            <button class="table-button" onclick="fecharMesa({{ mesa.id }})">Fechar Mesa</button>
+                            <button class="w-full py-2 px-3 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white text-xs font-bold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 uppercase" 
+                                    onclick="fecharMesa({{ mesa.id }})">
+                                Fechar Mesa
+                            </button>
                         {% else %}
-                            <button class="table-button secondary" onclick="abrirMesa({{ mesa.id }})">Abrir Mesa</button>
+                            <button class="w-full py-2 px-3 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-600 hover:to-amber-500 text-white text-xs font-bold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 uppercase" 
+                                    onclick="abrirMesa({{ mesa.id }})">
+                                Abrir Mesa
+                            </button>
                         {% endif %}
                     </div>
                     {% endfor %}
                 {% else %}
-                    <div class="table-card empty-state">
-                        <div class="empty-icon">🎰</div>
-                        <h3>Nenhuma Mesa Criada</h3>
-                        <p>Não há mesas no sistema ainda.</p>
-                        <button class="table-button" onclick="abrirModalCriarMesa()">Criar Primeira Mesa</button>
+                    <div class="col-span-full bg-white/95 backdrop-blur-xl rounded-2xl p-8 shadow-xl border border-red-500/10 text-center">
+                        <div class="text-4xl mb-4">🎰</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Nenhuma Mesa Criada</h3>
+                        <p class="text-gray-600 mb-6">Não há mesas no sistema ainda.</p>
+                        <button class="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300" 
+                                onclick="abrirModalCriarMesa()">
+                            Criar Primeira Mesa
+                        </button>
                     </div>
                 {% endif %}
             </div>
@@ -140,9 +166,19 @@
     // Event listener para clicar no logo
     logoClickable.addEventListener('click', toggleSidebar);
 
+    // Event listener para o botão mobile
+    const mobileSidebarBtn = document.getElementById('mobileSidebarBtn');
+    if (mobileSidebarBtn) {
+        mobileSidebarBtn.addEventListener('click', () => {
+            if (isMobile()) {
+                openSidebar();
+            }
+        });
+    }
+
     // Fechar sidebar no mobile ao clicar fora
     document.addEventListener('click', (e) => {
-        if (isMobile() && !sidebar.contains(e.target)) {
+        if (isMobile() && !sidebar.contains(e.target) && !mobileSidebarBtn.contains(e.target)) {
             closeSidebar();
         }
     });
@@ -184,8 +220,8 @@
         });
     }, { threshold: 0.3 });
 
-    // Observar cards de métricas
-    const metricCards = document.querySelectorAll('.metric-card');
+    // Observar cards de métricas (agora usando classes Tailwind)
+    const metricCards = document.querySelectorAll('.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4 > div');
     metricCards.forEach(card => {
         observer.observe(card);
     });
