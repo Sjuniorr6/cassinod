@@ -1,19 +1,43 @@
 {% extends 'base.html' %}
+{% include 'components/_sidebar.html' %}
 {% block title %}Cassino Diamante | Painel{% endblock %}
 {% block extra_head %}
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
         .bg-cassino {
             background: url('/static/images/estilo-de-vida-fotorrealista-cassino.jpg') center center/cover no-repeat;
             position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh;
             z-index: 0;
         }
+
         .bg-overlay {
-            background: rgba(179,0,0,0.75);
+            
             position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh;
             z-index: 1;
+            backdrop-filter: blur(3px);
         }
+
         .main-content {
             position: relative;
             z-index: 2;
@@ -21,307 +45,808 @@
             min-height: 100vh;
             width: 100vw;
         }
-        .card-hover {
-            transition: transform 0.2s cubic-bezier(.4,0,.2,1), box-shadow 0.2s cubic-bezier(.4,0,.2,1);
-        }
-        .card-hover:hover {
-            transform: scale(1.035);
-            box-shadow: 0 8px 32px rgba(220,38,38,0.10);
-            z-index: 2;
-        }
-        .modal {
-            display: none;
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(25px);
+            border-right: 1px solid rgba(220, 38, 38, 0.08);
+            display: flex;
+            flex-direction: column;
+            padding: 2.5rem 2rem;
+            color: #1f2937;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            min-height: 100vh;
             position: fixed;
-            z-index: 1000;
             left: 0;
             top: 0;
-            width: 100%;
+            z-index: 50;
+            box-shadow: 
+                0 25px 50px -12px rgba(220, 38, 38, 0.12),
+                0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+        }
+
+        .sidebar.closed {
+            width: 85px;
+            padding: 2.5rem 1.25rem;
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 3.5rem;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .logo {
+            width: 72px;
+            height: 72px;
+            border-radius: 24px;
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 30%, #f87171 70%, #fca5a5 100%);
+            color: #fff;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-weight: 800;
+            box-shadow: 
+                0 10px 40px rgba(220, 38, 38, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+            transition: all 0.4s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+            box-shadow: 
+                0 15px 50px rgba(220, 38, 38, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+        }
+
+        .sidebar.closed .logo {
+            width: 56px;
+            height: 56px;
+            font-size: 1.5rem;
+            border-radius: 18px;
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+
+        .brand-subtitle {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .sidebar.closed .brand-name,
+        .sidebar.closed .brand-subtitle {
+            display: none;
+        }
+
+        /* Navigation */
+        nav {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-item {
+            margin-bottom: 0.75rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            text-decoration: none;
+            border-radius: 20px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.95rem;
+            position: relative;
+            overflow: hidden;
+            background: transparent;
+            border: 1px solid transparent;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(220, 38, 38, 0.08) 0%, 
+                rgba(248, 113, 113, 0.06) 50%,
+                rgba(220, 38, 38, 0.08) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            border-radius: 20px;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
             height: 100%;
-            background-color: rgba(0,0,0,0.5);
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            border-radius: 0 2px 2px 0;
         }
-        .modal-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 2rem;
-            border-radius: 1rem;
-            width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
+
+        .nav-link:hover::before,
+        .nav-link.active::before {
+            opacity: 1;
         }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            opacity: 1;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #dc2626;
+            transform: translateX(4px);
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-text {
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.closed .nav-text {
+            display: none;
+        }
+
+        .sidebar.closed .nav-link {
+            padding: 1rem;
+            justify-content: center;
+        }
+
+        .sidebar.closed .nav-icon {
+            margin-right: 0;
+            width: 90px;
+            height: 40px;
+        }
+
+        /* Main Content */
+        .content-wrapper {
+            margin-left: 300px;
+            transition: margin-left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            flex: 1;
+            position: relative;
+            z-index: 2;
+        }
+
+        .sidebar.closed ~ .content-wrapper {
+            margin-left: 85px;
+        }
+
+        .main-header {
+            padding: 3rem 2rem 2rem 2rem;
+            text-align: center;
+        }
+
+        .main-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: white;
+            text-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.4),
+                0 2px 10px rgba(220, 38, 38, 0.3);
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #ffffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+        }
+
+        .main-subtitle {
+            font-size: 1.35rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* Cards Container */
+        .cards-container {
+            padding: 0 2rem 2rem 2rem;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(25px);
+            border-radius: 20px;
+            padding: 1rem;
+            box-shadow: 
+                0 12px 40px rgba(220, 38, 38, 0.12),
+                0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(220, 38, 38, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #dc2626, #ef4444, #f87171);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .metric-card:hover::before {
+            opacity: 1;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 
+                0 25px 80px rgba(220, 38, 38, 0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.95) inset;
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .metric-value {
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: #dc2626;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-change {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .metric-change.positive {
+            color: #059669;
+        }
+
+        .metric-change.negative {
+            color: #dc2626;
+        }
+
+        .metric-change.neutral {
+            color: #6b7280;
+        }
+
+        /* Tables Grid */
+        .tables-grid {
+              display: grid;
+    /* antes: minmax(200px, 1fr) */
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.75rem;
+        }
+
+        .table-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(25px);
+            border-radius: 16px;
+            padding: 0.75rem;
+            box-shadow: 
+                0 12px 40px rgba(220, 38, 38, 0.12),
+                0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(220, 38, 38, 0.08);
+            min-height: 120px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .table-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #dc2626, #ef4444, #f87171);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .table-card:hover::before {
+            opacity: 1;
+        }
+
+        .table-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 
+                0 25px 80px rgba(220, 38, 38, 0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.95) inset;
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .table-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .table-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-open {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-closed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-maintenance {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .table-type {
+            font-size: 0.8rem;
+            color: #dc2626;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .table-stats {
+            margin-bottom: 0.75rem;
+        }
+
+        .table-stat {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.4rem;
+            font-size: 0.8rem;
+        }
+
+        .table-stat span:first-child {
+            color: #6b7280;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: #059669;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f59e0b, #fbbf24);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .table-last-update {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-bottom: 1rem;
+        }
+
+        .table-button {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 0.875rem;
             cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
         }
-        .close:hover {
-            color: #000;
+
+        .table-button:hover {
+            background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4);
+        }
+
+        .table-button.secondary {
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+
+        .table-button.secondary:hover {
+            background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                left: -300px;
+            }
+            
+            .sidebar.mobile-open {
+                left: 0;
+            }
+            
+            .content-wrapper {
+                margin-left: 0;
+            }
+            
+            .sidebar.closed ~ .content-wrapper {
+                margin-left: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+            
+            .tables-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .cards-container {
+                padding: 0 1.5rem 1.5rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .cards-container {
+                padding: 0 1rem 1rem 1rem;
+            }
         }
     </style>
 {% endblock %}
+
 {% block content %}
 <div class="bg-cassino"></div>
 <div class="bg-overlay"></div>
-<div class="main-content">
-    {% include 'components/_sidbar.html' %}
-    <main class="flex-1 flex flex-col items-center justify-start pt-12 px-4 gap-3">
-        <header class="w-full max-w-7xl mb-6">
-            <h1 class="text-4xl font-extrabold text-white drop-shadow mb-2">Cassino Diamante</h1>
-            <p class="text-lg text-white/90">Sistema de Controle e Gestão</p>
-        </header>
-        <!-- Cards de métricas -->
-        <div class="w-full max-w-7xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 mb-8">
-            <div class="bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center card-hover">
-                <div class="text-green-600 font-bold text-3xl">R$ 25.000</div>
-                <div class="text-gray-500">Receita Total</div>
-                <div class="text-green-500 text-xs mt-1">+12% desde ontem</div>
-            </div>
-            <div class="bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center card-hover">
-                <div class="text-blue-600 font-bold text-3xl">10</div>
-                <div class="text-gray-500">Jogadores Ativos</div>
-                <div class="text-blue-500 text-xs mt-1">+3 na última hora</div>
-            </div>
-            <div class="bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center card-hover">
-                <div class="text-red-600 font-bold text-3xl">2</div>
-                <div class="text-gray-500">Mesas Ativas</div>
-                <div class="text-red-500 text-xs mt-1">de 4 mesas no total</div>
-            </div>
-            <div class="bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center card-hover">
-                <div class="text-yellow-600 font-bold text-3xl">R$ 87.000</div>
-                <div class="text-gray-500">Fichas Vendidas</div>
-                <div class="text-yellow-500 text-xs mt-1">Estoque restante: R$ 93.000</div>
-            </div>
-        </div>
-        <div class="w-full max-w-7xl flex justify-between mb-6">
-            <button id="btnCriarMesa" class="bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-3 rounded-lg shadow transition flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                </svg>
-                + Nova Mesa
-            </button>
-            <button class="bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-3 rounded-lg shadow transition flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-                Configurações Gerais
-            </button>
-        </div>
-    </main>
-</div>
 
-<!-- Modal para criar mesa -->
-<div id="modalCriarMesa" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-            <svg class="w-6 h-6 mr-3 text-red-600" fill="currentColor" viewBox="0 0 24 24">
-                <rect x="2" y="4" width="20" height="16" rx="2" ry="2" stroke="currentColor" stroke-width="1" fill="none"/>
-                <rect x="4" y="6" width="16" height="12" fill="currentColor"/>
-                <text x="12" y="14" text-anchor="middle" fill="white" font-size="8" font-weight="bold">+</text>
-            </svg>
-            Criar Nova Mesa
-        </h2>
-        
-        <form id="formCriarMesa" class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                        <svg class="w-4 h-4 mr-2 text-red-600" fill="currentColor" viewBox="0 0 24 24">
-                            <rect x="2" y="4" width="20" height="16" rx="2" ry="2" stroke="currentColor" stroke-width="1" fill="none"/>
-                            <rect x="4" y="6" width="16" height="12" fill="currentColor"/>
-                            <text x="12" y="14" text-anchor="middle" fill="white" font-size="6" font-weight="bold">A</text>
-                        </svg>
-                        Tipo de Jogo
-                    </label>
-                    <select name="tipo_jogo" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
-                        <option value="">Selecione o jogo</option>
-                        <option value="poker">Poker</option>
-                        <option value="caribenho">Poker Caribenho</option>
-                        <option value="ultimate">Poker Ultimate</option>
-                        <option value="baccarat">Baccarat</option>
-                        <option value="roleta">Roleta</option>
-                    </select>
+<div class="main-content">
+    {% include 'components/_sidebar.html' %}
+
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        <header class="main-header">
+            <h1 class="main-title">Cassino Diamante</h1>
+            <p class="main-subtitle">Sistema de Controle e Gestão</p>
+        </header>
+
+        <div class="cards-container">
+            <!-- Cards de métricas -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value" data-count="25000">R$ 0</div>
+                    <div class="metric-label">Receita Total</div>
+                    <div class="metric-change positive">+12% desde ontem</div>
                 </div>
-                
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                        <svg class="w-4 h-4 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                            <rect x="2" y="4" width="20" height="16" rx="2" ry="2" stroke="currentColor" stroke-width="1" fill="none"/>
-                            <rect x="4" y="6" width="16" height="12" fill="currentColor"/>
-                            <text x="12" y="14" text-anchor="middle" fill="white" font-size="8" font-weight="bold">#</text>
-                        </svg>
-                        Número da Mesa
-                    </label>
-                    <input type="number" name="numero_mesa" required min="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                <div class="metric-card">
+                    <div class="metric-value" data-count="10">0</div>
+                    <div class="metric-label">Jogadores Ativos</div>
+                    <div class="metric-change positive">+3 na última hora</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" data-count="2">0</div>
+                    <div class="metric-label">Mesas Ativas</div>
+                    <div class="metric-change negative">de 4 mesas no total</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" data-count="87000">R$ 0</div>
+                    <div class="metric-label">Fichas Vendidas</div>
+                    <div class="metric-change neutral">Estoque restante: R$ 93.000</div>
                 </div>
             </div>
-            
-            <div class="border-t pt-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                    <svg class="w-5 h-5 mr-2 text-red-600" fill="currentColor" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="none"/>
-                        <circle cx="12" cy="12" r="6" fill="currentColor"/>
-                    </svg>
-                    Fichas
-                </h3>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                            <svg class="w-4 h-4 mr-2 text-red-600" fill="currentColor" viewBox="0 0 24 24">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="none"/>
-                                <circle cx="12" cy="12" r="6" fill="currentColor"/>
-                            </svg>
-                            R$ 5
-                        </label>
-                        <input type="number" name="fichas_5" value="0" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+
+            <!-- Mesas de Jogos -->
+            <div class="tables-grid">
+                {% if mesas %}
+                    {% for mesa in mesas %}
+                    <div class="table-card">
+                        <div class="table-header">
+                            <div class="table-name">{{ mesa.get_tipo_jogo_display }} {{ mesa.numero_mesa }}</div>
+                            <div class="table-status 
+                                {% if mesa.status == 'aberta' %}status-open
+                                {% elif mesa.status == 'fechada' %}status-closed
+                                {% else %}status-maintenance{% endif %}">
+                                {{ mesa.get_status_display|upper }}
+                            </div>
+                        </div>
+                        <div class="table-type">{{ mesa.tipo_jogo|title }}</div>
+                        <div class="table-stats">
+                            <div class="table-stat">
+                                <span>Receita:</span>
+                                <span class="stat-value">R$ {{ mesa.valor_total|floatformat:0 }}</span>
+                            </div>
+                            <div class="table-stat">
+                                <span>Jogadores:</span>
+                                <span>{% if mesa.status == 'aberta' %}4{% elif mesa.status == 'fechada' %}0{% else %}0{% endif %}</span>
+                            </div>
+                            <div class="table-stat">
+                                <span>Fichas Vendidas:</span>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: {% if mesa.status == 'aberta' %}75{% elif mesa.status == 'fechada' %}100{% else %}0{% endif %}%"></div>
+                        </div>
+                        <div class="table-last-update">
+                            {% if mesa.status == 'aberta' %}5 minutos atrás
+                            {% elif mesa.status == 'fechada' %}1 hora atrás
+                            {% else %}3 horas atrás{% endif %}
+                        </div>
+                        {% if mesa.status == 'aberta' %}
+                            <button class="table-button" onclick="fecharMesa({{ mesa.id }})">Fechar Mesa</button>
+                        {% else %}
+                            <button class="table-button secondary" onclick="abrirMesa({{ mesa.id }})">Abrir Mesa</button>
+                        {% endif %}
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                            <svg class="w-4 h-4 mr-2 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="none"/>
-                                <circle cx="12" cy="12" r="6" fill="currentColor"/>
-                            </svg>
-                            R$ 25
-                        </label>
-                        <input type="number" name="fichas_25" value="0" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                    {% endfor %}
+                {% else %}
+                    <div class="table-card empty-state">
+                        <div class="empty-icon">🎰</div>
+                        <h3>Nenhuma Mesa Criada</h3>
+                        <p>Não há mesas no sistema ainda.</p>
+                        <button class="table-button" onclick="abrirModalCriarMesa()">Criar Primeira Mesa</button>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                            <svg class="w-4 h-4 mr-2 text-black" fill="currentColor" viewBox="0 0 24 24">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="none"/>
-                                <circle cx="12" cy="12" r="6" fill="currentColor"/>
-                            </svg>
-                            R$ 100
-                        </label>
-                        <input type="number" name="fichas_100" value="0" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                            <svg class="w-4 h-4 mr-2 text-pink-600" fill="currentColor" viewBox="0 0 24 24">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="none"/>
-                                <circle cx="12" cy="12" r="6" fill="currentColor"/>
-                            </svg>
-                            R$ 500
-                        </label>
-                        <input type="number" name="fichas_500" value="0" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                            <svg class="w-4 h-4 mr-2 text-yellow-600" fill="currentColor" viewBox="0 0 24 24">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="none"/>
-                                <circle cx="12" cy="12" r="6" fill="currentColor"/>
-                            </svg>
-                            R$ 1.000
-                        </label>
-                        <input type="number" name="fichas_1000" value="0" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                            <svg class="w-4 h-4 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="none"/>
-                                <circle cx="12" cy="12" r="6" fill="currentColor"/>
-                            </svg>
-                            R$ 5.000
-                        </label>
-                        <input type="number" name="fichas_5000" value="0" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
-                            <svg class="w-4 h-4 mr-2 text-pink-600" fill="currentColor" viewBox="0 0 24 24">
-                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="none"/>
-                                <circle cx="12" cy="12" r="6" fill="currentColor"/>
-                            </svg>
-                            R$ 10.000
-                        </label>
-                        <input type="number" name="fichas_10000" value="0" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
-                    </div>
-                </div>
+                {% endif %}
             </div>
-            
-            <div class="flex justify-end space-x-4 pt-6 border-t">
-                <button type="button" id="btnCancelar" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition flex items-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                    Cancelar
-                </button>
-                <button type="submit" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
-                    Criar Mesa
-                </button>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
 <script>
-// Modal functionality
-const modal = document.getElementById('modalCriarMesa');
-const btnCriarMesa = document.getElementById('btnCriarMesa');
-const btnCancelar = document.getElementById('btnCancelar');
-const closeBtn = document.querySelector('.close');
-const form = document.getElementById('formCriarMesa');
+    const sidebar = document.getElementById('sidebar');
+    const logoClickable = document.getElementById('logoClickable');
 
-// Abrir modal
-btnCriarMesa.onclick = function() {
-    modal.style.display = "block";
-}
+    // Função para verificar se é mobile
+    const isMobile = () => window.innerWidth <= 1024;
 
-// Fechar modal
-function closeModal() {
-    modal.style.display = "none";
-    form.reset();
-}
-
-closeBtn.onclick = closeModal;
-btnCancelar.onclick = closeModal;
-
-// Fechar modal ao clicar fora
-window.onclick = function(event) {
-    if (event.target == modal) {
-        closeModal();
-    }
-}
-
-// Enviar formulário
-form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(form);
-    const data = {};
-    
-    for (let [key, value] of formData.entries()) {
-        data[key] = parseInt(value) || value;
-    }
-    
-    fetch('/mesas/criar/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert(data.message);
-            closeModal();
-            // Recarregar a página para mostrar a nova mesa
-            location.reload();
+    // Função para abrir sidebar
+    function openSidebar() {
+        if (isMobile()) {
+            sidebar.classList.add('mobile-open');
+            sidebar.classList.remove('closed');
         } else {
-            alert('Erro: ' + data.message);
+            sidebar.classList.remove('closed');
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Erro ao criar mesa. Tente novamente.');
+    }
+
+    // Função para fechar sidebar
+    function closeSidebar() {
+        if (isMobile()) {
+            sidebar.classList.remove('mobile-open');
+        } else {
+            sidebar.classList.add('closed');
+        }
+    }
+
+    // Toggle sidebar
+    function toggleSidebar() {
+        if (sidebar.classList.contains('closed')) {
+            openSidebar();
+        } else {
+            closeSidebar();
+        }
+    }
+
+    // Event listener para clicar no logo
+    logoClickable.addEventListener('click', toggleSidebar);
+
+    // Fechar sidebar no mobile ao clicar fora
+    document.addEventListener('click', (e) => {
+        if (isMobile() && !sidebar.contains(e.target)) {
+            closeSidebar();
+        }
     });
-});
+
+    // Animar contadores
+    function animateCounter(element) {
+        const target = parseInt(element.getAttribute('data-count'));
+        const duration = 2000;
+        const step = target / (duration / 16);
+        let current = 0;
+
+        const timer = setInterval(() => {
+            current += step;
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+            
+            if (element.textContent.includes('R$')) {
+                element.textContent = 'R$ ' + Math.floor(current).toLocaleString();
+            } else {
+                element.textContent = Math.floor(current).toLocaleString();
+            }
+        }, 16);
+    }
+
+    // Observer para animar contadores quando os cards entram na tela
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const counters = entry.target.querySelectorAll('[data-count]');
+                counters.forEach((counter, index) => {
+                    setTimeout(() => {
+                        animateCounter(counter);
+                    }, index * 200);
+                });
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.3 });
+
+    // Observar cards de métricas
+    const metricCards = document.querySelectorAll('.metric-card');
+    metricCards.forEach(card => {
+        observer.observe(card);
+    });
+
+    // Função para fechar mesa
+    function fecharMesa(mesaId) {
+        if (confirm('Tem certeza que deseja fechar esta mesa?')) {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            fetch(`/mesas/api/fechar/${mesaId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erro ao fechar mesa. Tente novamente.');
+            });
+        }
+    }
+
+    // Função para abrir mesa
+    function abrirMesa(mesaId) {
+        if (confirm('Tem certeza que deseja abrir esta mesa?')) {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            fetch(`/mesas/api/abrir/${mesaId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Erro: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erro ao abrir mesa. Tente novamente.');
+            });
+        }
+    }
+
+    // Função para abrir modal de criar mesa
+    function abrirModalCriarMesa() {
+        alert('Funcionalidade de criar mesa será implementada em breve!');
+    }
+
+    // Inicializar sidebar fechada no desktop
+    if (!isMobile()) {
+        sidebar.classList.add('closed');
+    }
 </script>
 {% endblock %} 

@@ -133,7 +133,6 @@ dmypy.json
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-media/
 
 # Static files (CSS, JavaScript, Images)
 # Uncomment the next line if you want to ignore static files
