@@ -2,13 +2,104 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.db import models
+from django.utils import timezone
+from datetime import datetime, timedelta
 import json
 from .models import Mesa
 
 def mesas_home(request):
+    # Obter parâmetros de data do request
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+    
+    # Se não foram fornecidas datas, usar o último mês como padrão
+    if not data_inicio or not data_fim:
+        data_fim = timezone.now().date()
+        data_inicio = data_fim - timedelta(days=30)
+    else:
+        try:
+            data_inicio = datetime.strptime(data_inicio, '%Y-%m-%d').date()
+            data_fim = datetime.strptime(data_fim, '%Y-%m-%d').date()
+        except ValueError:
+            # Se as datas não são válidas, usar o último mês
+            data_fim = timezone.now().date()
+            data_inicio = data_fim - timedelta(days=30)
+    
     # Filtrar apenas mesas que não estão encerradas
     mesas = Mesa.objects.exclude(status='encerrada').order_by('numero_mesa')
-    return render(request, 'home.html', {'mesas': mesas})
+    
+    # Calcular estatísticas gerais (sempre mostradas)
+    mesas_ativas = Mesa.objects.filter(status='aberta').count()
+    total_mesas = Mesa.objects.exclude(status='encerrada').count()
+    
+    # Calcular receita total ESPECIFICAMENTE do período selecionado
+    # Filtra mesas que foram criadas ou atualizadas no período
+    mesas_periodo = Mesa.objects.filter(
+        models.Q(data_criacao__date__range=[data_inicio, data_fim]) |
+        models.Q(data_atualizacao__date__range=[data_inicio, data_fim])
+    ).exclude(status='encerrada')
+    
+    # Receita total do período (soma dos saldos das mesas no período)
+    receita_total = mesas_periodo.filter(
+        status__in=['aberta', 'fechada']
+    ).aggregate(
+        total=models.Sum('saldo')
+    )['total'] or 0
+    
+    # Se não há mesas no período, mostrar 0 (não usar todas as mesas)
+    if not mesas_periodo.exists():
+        receita_total = 0
+    
+    # Calcular total de fichas vendidas (soma dos valores totais de mesas abertas)
+    fichas_vendidas = Mesa.objects.filter(status='aberta').aggregate(
+        total=models.Sum('valor_total')
+    )['total'] or 0
+    
+    # Estoque restante (valor total de todas as mesas menos fichas vendidas)
+    estoque_restante = Mesa.objects.aggregate(
+        total=models.Sum('valor_total')
+    )['total'] or 0
+    estoque_restante -= fichas_vendidas
+    
+    # Calcular variação percentual (comparar com período anterior)
+    periodo_anterior_inicio = data_inicio - timedelta(days=(data_fim - data_inicio).days)
+    periodo_anterior_fim = data_inicio - timedelta(days=1)
+    
+    mesas_periodo_anterior = Mesa.objects.filter(
+        models.Q(data_criacao__date__range=[periodo_anterior_inicio, periodo_anterior_fim]) |
+        models.Q(data_atualizacao__date__range=[periodo_anterior_inicio, periodo_anterior_fim])
+    ).exclude(status='encerrada').filter(
+        status__in=['aberta', 'fechada']
+    ).aggregate(
+        total=models.Sum('saldo')
+    )['total'] or 0
+    
+    # Calcular variação percentual
+    if mesas_periodo_anterior > 0:
+        variacao_percentual = ((receita_total - mesas_periodo_anterior) / mesas_periodo_anterior) * 100
+    else:
+        variacao_percentual = 0 if receita_total == 0 else 100
+    
+    # Determinar se há filtro ativo
+    filtro_ativo = bool(data_inicio and data_fim)
+    
+    context = {
+        'mesas': mesas,
+        'mesas_ativas': mesas_ativas,
+        'total_mesas': total_mesas,
+        'receita_total': receita_total,
+        'fichas_vendidas': fichas_vendidas,
+        'estoque_restante': estoque_restante,
+        'data_inicio': data_inicio,
+        'data_fim': data_fim,
+        'variacao_percentual': variacao_percentual,
+        'periodo_texto': f"de {data_inicio.strftime('%d/%m/%Y')} a {data_fim.strftime('%d/%m/%Y')}",
+        'filtro_ativo': filtro_ativo,
+        'mesas_periodo_count': mesas_periodo.count()  # Quantidade de mesas no período
+    }
+    
+    return render(request, 'home.html', context)
 
 @csrf_exempt
 def criar_mesa(request):

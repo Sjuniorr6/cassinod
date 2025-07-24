@@ -47,6 +47,10 @@
             transform: scale(0.95) translateY(-20px);
             opacity: 0;
         }
+        
+        #filtroContainer, #metricasContainer {
+            transition: opacity 0.3s ease-in-out;
+        }
     </style>
 {% endblock %}
 
@@ -66,28 +70,121 @@
         </button>
         
         <header class="main-header">
-            <h1 class="main-title">Cassino Diamante</h1>
-            <p class="main-subtitle">Sistema de Controle e Gestão</p>
+            <div class="flex flex-col items-center mb-4">
+                <div class="text-center mb-4">
+                    <h1 class="main-title">Cassino Diamante</h1>
+                    <p class="main-subtitle">Sistema de Controle e Gestão</p>
+                </div>
+                <div class="flex gap-2">
+                    <button id="toggleFiltro" class="px-2 py-1 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white text-xs font-semibold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                        </svg>
+                        <span id="filtroText">Esconder Filtro</span>
+                    </button>
+                    <button id="toggleMetricas" class="px-2 py-1 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white text-xs font-semibold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        <span id="metricasText">Esconder Métricas</span>
+                    </button>
+                    <button id="btnCriarMesa" class="px-2 py-1 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white text-xs font-semibold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Criar Nova Mesa
+                    </button>
+                </div>
+            </div>
         </header>
 
         <div class="cards-container">
-            <!-- Botão Criar Mesa -->
-            <div class="flex justify-end mb-6">
-                <button id="btnCriarMesa" class="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
-                    Criar Nova Mesa
-                </button>
+            <!-- Filtro de Datas -->
+            <div id="filtroContainer" class="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-red-500/10 mb-6">
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800 mb-2 flex items-center gap-2">
+                            Filtro de Período
+                            {% if filtro_ativo %}
+                                <span class="px-2 py-1 bg-green-100 text-green-800 text-xs font-bold rounded-full">
+                                    ATIVO
+                                </span>
+                            {% endif %}
+                        </h3>
+                        <p class="text-sm text-gray-600">
+                            {% if filtro_ativo %}
+                                Mostrando receita do período selecionado
+                            {% else %}
+                                Selecione o período para calcular a receita total
+                            {% endif %}
+                        </p>
+                    </div>
+                    <form id="filtroDatas" class="flex flex-col sm:flex-row gap-4 items-end">
+                        <div class="space-y-2">
+                            <label class="block text-sm font-semibold text-gray-700">Data Início</label>
+                            <input type="date" id="dataInicio" name="data_inicio" 
+                                   value="{{ data_inicio|date:'Y-m-d' }}"
+                                   class="px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-sm font-semibold text-gray-700">Data Fim</label>
+                            <input type="date" id="dataFim" name="data_fim" 
+                                   value="{{ data_fim|date:'Y-m-d' }}"
+                                   class="px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md">
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="submit" class="px-6 py-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                                Filtrar
+                            </button>
+                            <button type="button" id="limparFiltro" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg transition-all duration-300 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                                Limpar
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
             
+
+            
             <!-- Cards de métricas -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div id="metricasContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <div class="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-red-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group">
                     <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div class="text-2xl font-black text-red-600 mb-2" data-count="25000">R$ 0</div>
-                    <div class="text-sm text-gray-600 font-semibold mb-2">Receita Total</div>
-                    <div class="text-xs font-medium text-green-600">+12% desde ontem</div>
+                    {% if filtro_ativo %}
+                        <div class="absolute top-2 right-2">
+                            <div class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-full">
+                                FILTRO ATIVO
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="text-2xl font-black text-red-600 mb-2" data-count="{{ receita_total|floatformat:0 }}">R$ 0</div>
+                    <div class="text-sm text-gray-600 font-semibold mb-2">
+                        {% if filtro_ativo %}
+                            Receita do Período
+                        {% else %}
+                            Receita Total
+                        {% endif %}
+                    </div>
+                    <div class="text-xs font-medium text-gray-600 mb-1">{{ periodo_texto }}</div>
+                    {% if filtro_ativo %}
+                        <div class="text-xs font-medium text-blue-600 mb-1">
+                            {{ mesas_periodo_count }} mesa{{ mesas_periodo_count|pluralize:"s" }} no período
+                        </div>
+                    {% endif %}
+                    <div class="text-xs font-medium {% if variacao_percentual >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                        {% if variacao_percentual >= 0 %}+{% endif %}{{ variacao_percentual|floatformat:1 }}% vs período anterior
+                    </div>
+                    {% if filtro_ativo and mesas_periodo_count == 0 %}
+                        <div class="text-xs font-medium text-orange-600 mt-2">
+                            ⚠️ Nenhuma mesa encontrada neste período
+                        </div>
+                    {% endif %}
                 </div>
                 <div class="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-red-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group">
                     <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -97,15 +194,15 @@
                 </div>
                 <div class="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-red-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group">
                     <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div class="text-2xl font-black text-red-600 mb-2" data-count="2">0</div>
+                    <div class="text-2xl font-black text-red-600 mb-2" data-count="{{ mesas_ativas }}">0</div>
                     <div class="text-sm text-gray-600 font-semibold mb-2">Mesas Ativas</div>
-                    <div class="text-xs font-medium text-red-600">de 4 mesas no total</div>
+                    <div class="text-xs font-medium text-red-600">de {{ total_mesas }} mesas no total</div>
                 </div>
                 <div class="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-red-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group">
                     <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div class="text-2xl font-black text-red-600 mb-2" data-count="87000">R$ 0</div>
+                    <div class="text-2xl font-black text-red-600 mb-2" data-count="{{ fichas_vendidas|floatformat:0 }}">R$ 0</div>
                     <div class="text-sm text-gray-600 font-semibold mb-2">Fichas Vendidas</div>
-                    <div class="text-xs font-medium text-gray-600">Estoque restante: R$ 93.000</div>
+                    <div class="text-xs font-medium text-gray-600">Estoque restante: R$ {{ estoque_restante|floatformat:0 }}</div>
                 </div>
             </div>
 
@@ -1070,6 +1167,148 @@
     if (!isMobile()) {
         sidebar.classList.add('closed');
     }
+
+    // Toggle Filtro e Métricas
+    const toggleFiltro = document.getElementById('toggleFiltro');
+    const toggleMetricas = document.getElementById('toggleMetricas');
+    const filtroContainer = document.getElementById('filtroContainer');
+    const metricasContainer = document.getElementById('metricasContainer');
+    const filtroText = document.getElementById('filtroText');
+    const metricasText = document.getElementById('metricasText');
+
+    // Função para salvar estado no localStorage
+    function salvarEstadoFiltros(filtroVisivel, metricasVisiveis) {
+        localStorage.setItem('filtroVisivel', filtroVisivel);
+        localStorage.setItem('metricasVisiveis', metricasVisiveis);
+    }
+
+    // Função para carregar estado do localStorage
+    function carregarEstadoFiltros() {
+        const filtroVisivel = localStorage.getItem('filtroVisivel');
+        const metricasVisiveis = localStorage.getItem('metricasVisiveis');
+        
+        // Se não há dados salvos, usar true como padrão
+        return {
+            filtroVisivel: filtroVisivel === null ? true : filtroVisivel === 'true',
+            metricasVisiveis: metricasVisiveis === null ? true : metricasVisiveis === 'true'
+        };
+    }
+
+    // Carregar estado inicial do localStorage
+    let { filtroVisivel, metricasVisiveis } = carregarEstadoFiltros();
+
+    // Aplicar estado inicial
+    function aplicarEstadoInicial() {
+        if (!filtroVisivel) {
+            filtroContainer.style.display = 'none';
+            filtroContainer.style.opacity = '0';
+            filtroText.textContent = 'Mostrar Filtro';
+        }
+        
+        if (!metricasVisiveis) {
+            metricasContainer.style.display = 'none';
+            metricasContainer.style.opacity = '0';
+            metricasText.textContent = 'Mostrar Métricas';
+        }
+    }
+
+    // Aplicar estado inicial quando a página carrega
+    aplicarEstadoInicial();
+
+    // Toggle Filtro
+    toggleFiltro.addEventListener('click', () => {
+        filtroVisivel = !filtroVisivel;
+        
+        if (filtroVisivel) {
+            filtroContainer.style.display = 'block';
+            filtroContainer.style.opacity = '0';
+            setTimeout(() => {
+                filtroContainer.style.opacity = '1';
+            }, 10);
+            filtroText.textContent = 'Esconder Filtro';
+        } else {
+            filtroContainer.style.opacity = '0';
+            setTimeout(() => {
+                filtroContainer.style.display = 'none';
+            }, 300);
+            filtroText.textContent = 'Mostrar Filtro';
+        }
+        
+        // Salvar estado no localStorage
+        salvarEstadoFiltros(filtroVisivel, metricasVisiveis);
+    });
+
+    // Toggle Métricas
+    toggleMetricas.addEventListener('click', () => {
+        metricasVisiveis = !metricasVisiveis;
+        
+        if (metricasVisiveis) {
+            metricasContainer.style.display = 'grid';
+            metricasContainer.style.opacity = '0';
+            setTimeout(() => {
+                metricasContainer.style.opacity = '1';
+            }, 10);
+            metricasText.textContent = 'Esconder Métricas';
+        } else {
+            metricasContainer.style.opacity = '0';
+            setTimeout(() => {
+                metricasContainer.style.display = 'none';
+            }, 300);
+            metricasText.textContent = 'Mostrar Métricas';
+        }
+        
+        // Salvar estado no localStorage
+        salvarEstadoFiltros(filtroVisivel, metricasVisiveis);
+    });
+
+    // Filtro de Datas
+    const filtroDatas = document.getElementById('filtroDatas');
+    const limparFiltro = document.getElementById('limparFiltro');
+    const dataInicio = document.getElementById('dataInicio');
+    const dataFim = document.getElementById('dataFim');
+
+    // Validar datas
+    function validarDatas() {
+        const inicio = new Date(dataInicio.value);
+        const fim = new Date(dataFim.value);
+        
+        if (inicio > fim) {
+            showErrorModal('A data de início não pode ser maior que a data de fim.');
+            return false;
+        }
+        
+        return true;
+    }
+
+    // Submeter filtro
+    filtroDatas.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        if (!validarDatas()) {
+            return;
+        }
+        
+        // Construir URL com parâmetros
+        const url = new URL(window.location);
+        url.searchParams.set('data_inicio', dataInicio.value);
+        url.searchParams.set('data_fim', dataFim.value);
+        
+        // Redirecionar com os filtros
+        window.location.href = url.toString();
+    });
+
+    // Limpar filtro
+    limparFiltro.addEventListener('click', () => {
+        // Redirecionar para a página sem parâmetros
+        window.location.href = window.location.pathname;
+    });
+
+    // Atualizar data fim quando data início mudar
+    dataInicio.addEventListener('change', () => {
+        if (dataInicio.value && !dataFim.value) {
+            dataFim.value = dataInicio.value;
+        }
+    });
 
     // Funções para modais de notificação
     function showConfirmModal(title, message, confirmText, confirmClass, onConfirm) {

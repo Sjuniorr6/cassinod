@@ -5,9 +5,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 def home(request):
-    from mesas.models import Mesa
-    mesas = Mesa.objects.all().order_by('numero_mesa')
-    return render(request, 'home.html', {'mesas': mesas})
+    from mesas.views import mesas_home
+    return mesas_home(request)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
