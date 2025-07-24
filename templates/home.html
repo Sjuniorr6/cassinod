@@ -1,0 +1,327 @@
+{% extends 'base.html' %}
+{% block title %}Cassino Diamante | Painel{% endblock %}
+{% block extra_head %}
+    <style>
+        .bg-cassino {
+            background: url('/static/images/estilo-de-vida-fotorrealista-cassino.jpg') center center/cover no-repeat;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 0;
+        }
+        .bg-overlay {
+            background: rgba(179,0,0,0.75);
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 1;
+        }
+        .main-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            min-height: 100vh;
+            width: 100vw;
+        }
+        .card-hover {
+            transition: transform 0.2s cubic-bezier(.4,0,.2,1), box-shadow 0.2s cubic-bezier(.4,0,.2,1);
+        }
+        .card-hover:hover {
+            transform: scale(1.035);
+            box-shadow: 0 8px 32px rgba(220,38,38,0.10);
+            z-index: 2;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 1rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: #000;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+<div class="bg-cassino"></div>
+<div class="bg-overlay"></div>
+<div class="main-content">
+    {% include 'components/_sidbar.html' %}
+    <main class="flex-1 flex flex-col items-center justify-start pt-12 px-4 gap-3">
+        <header class="w-full max-w-7xl mb-6">
+            <h1 class="text-4xl font-extrabold text-white drop-shadow mb-2">Cassino Diamante</h1>
+            <p class="text-lg text-white/90">Sistema de Controle e Gestão</p>
+        </header>
+        <!-- Cards de métricas -->
+        <div class="w-full max-w-7xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 mb-8">
+            <div class="bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center card-hover">
+                <div class="text-green-600 font-bold text-3xl">R$ 25.000</div>
+                <div class="text-gray-500">Receita Total</div>
+                <div class="text-green-500 text-xs mt-1">+12% desde ontem</div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center card-hover">
+                <div class="text-blue-600 font-bold text-3xl">10</div>
+                <div class="text-gray-500">Jogadores Ativos</div>
+                <div class="text-blue-500 text-xs mt-1">+3 na última hora</div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center card-hover">
+                <div class="text-red-600 font-bold text-3xl">2</div>
+                <div class="text-gray-500">Mesas Ativas</div>
+                <div class="text-red-500 text-xs mt-1">de 4 mesas no total</div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center card-hover">
+                <div class="text-yellow-600 font-bold text-3xl">R$ 87.000</div>
+                <div class="text-gray-500">Fichas Vendidas</div>
+                <div class="text-yellow-500 text-xs mt-1">Estoque restante: R$ 93.000</div>
+            </div>
+        </div>
+        <div class="w-full max-w-7xl flex justify-between mb-6">
+            <button id="btnCriarMesa" class="bg-green-600 hover:bg-green-700 text-white font-bold px-8 py-3 rounded-lg shadow transition flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                + Nova Mesa
+            </button>
+            <button class="bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-3 rounded-lg shadow transition flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                Configurações Gerais
+            </button>
+        </div>
+    </main>
+</div>
+
+<!-- Modal para criar mesa -->
+<div id="modalCriarMesa" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+            <svg class="w-6 h-6 mr-3 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                <rect x="2" y="4" width="20" height="16" rx="2" ry="2" stroke="currentColor" stroke-width="1" fill="none"/>
+                <rect x="4" y="6" width="16" height="12" fill="currentColor"/>
+                <text x="12" y="14" text-anchor="middle" fill="white" font-size="8" font-weight="bold">+</text>
+            </svg>
+            Criar Nova Mesa
+        </h2>
+        
+        <form id="formCriarMesa" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                            <rect x="2" y="4" width="20" height="16" rx="2" ry="2" stroke="currentColor" stroke-width="1" fill="none"/>
+                            <rect x="4" y="6" width="16" height="12" fill="currentColor"/>
+                            <text x="12" y="14" text-anchor="middle" fill="white" font-size="6" font-weight="bold">A</text>
+                        </svg>
+                        Tipo de Jogo
+                    </label>
+                    <select name="tipo_jogo" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <option value="">Selecione o jogo</option>
+                        <option value="poker">Poker</option>
+                        <option value="caribenho">Poker Caribenho</option>
+                        <option value="ultimate">Poker Ultimate</option>
+                        <option value="baccarat">Baccarat</option>
+                        <option value="roleta">Roleta</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                            <rect x="2" y="4" width="20" height="16" rx="2" ry="2" stroke="currentColor" stroke-width="1" fill="none"/>
+                            <rect x="4" y="6" width="16" height="12" fill="currentColor"/>
+                            <text x="12" y="14" text-anchor="middle" fill="white" font-size="8" font-weight="bold">#</text>
+                        </svg>
+                        Número da Mesa
+                    </label>
+                    <input type="number" name="numero_mesa" required min="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                </div>
+            </div>
+            
+            <div class="border-t pt-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="none"/>
+                        <circle cx="12" cy="12" r="6" fill="currentColor"/>
+                    </svg>
+                    Fichas
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="none"/>
+                                <circle cx="12" cy="12" r="6" fill="currentColor"/>
+                            </svg>
+                            R$ 5
+                        </label>
+                        <input type="number" name="fichas_5" value="0" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="none"/>
+                                <circle cx="12" cy="12" r="6" fill="currentColor"/>
+                            </svg>
+                            R$ 25
+                        </label>
+                        <input type="number" name="fichas_25" value="0" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-black" fill="currentColor" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="none"/>
+                                <circle cx="12" cy="12" r="6" fill="currentColor"/>
+                            </svg>
+                            R$ 100
+                        </label>
+                        <input type="number" name="fichas_100" value="0" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-pink-600" fill="currentColor" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="none"/>
+                                <circle cx="12" cy="12" r="6" fill="currentColor"/>
+                            </svg>
+                            R$ 500
+                        </label>
+                        <input type="number" name="fichas_500" value="0" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-yellow-600" fill="currentColor" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="none"/>
+                                <circle cx="12" cy="12" r="6" fill="currentColor"/>
+                            </svg>
+                            R$ 1.000
+                        </label>
+                        <input type="number" name="fichas_1000" value="0" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="none"/>
+                                <circle cx="12" cy="12" r="6" fill="currentColor"/>
+                            </svg>
+                            R$ 5.000
+                        </label>
+                        <input type="number" name="fichas_5000" value="0" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-pink-600" fill="currentColor" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="none"/>
+                                <circle cx="12" cy="12" r="6" fill="currentColor"/>
+                            </svg>
+                            R$ 10.000
+                        </label>
+                        <input type="number" name="fichas_10000" value="0" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-4 pt-6 border-t">
+                <button type="button" id="btnCancelar" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    Cancelar
+                </button>
+                <button type="submit" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex items-center">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Criar Mesa
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Modal functionality
+const modal = document.getElementById('modalCriarMesa');
+const btnCriarMesa = document.getElementById('btnCriarMesa');
+const btnCancelar = document.getElementById('btnCancelar');
+const closeBtn = document.querySelector('.close');
+const form = document.getElementById('formCriarMesa');
+
+// Abrir modal
+btnCriarMesa.onclick = function() {
+    modal.style.display = "block";
+}
+
+// Fechar modal
+function closeModal() {
+    modal.style.display = "none";
+    form.reset();
+}
+
+closeBtn.onclick = closeModal;
+btnCancelar.onclick = closeModal;
+
+// Fechar modal ao clicar fora
+window.onclick = function(event) {
+    if (event.target == modal) {
+        closeModal();
+    }
+}
+
+// Enviar formulário
+form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(form);
+    const data = {};
+    
+    for (let [key, value] of formData.entries()) {
+        data[key] = parseInt(value) || value;
+    }
+    
+    fetch('/mesas/criar/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            closeModal();
+            // Recarregar a página para mostrar a nova mesa
+            location.reload();
+        } else {
+            alert('Erro: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Erro ao criar mesa. Tente novamente.');
+    });
+});
+</script>
+{% endblock %} 
