@@ -12,6 +12,9 @@ class MesaAdmin(admin.ModelAdmin):
         ('Informações Básicas', {
             'fields': ('numero_mesa', 'tipo_jogo', 'status')
         }),
+        ('Fichas', {
+            'fields': ('fichas_5', 'fichas_25', 'fichas_100', 'fichas_500', 'fichas_1000', 'fichas_5000', 'fichas_10000')
+        }),
         ('Valores', {
             'fields': ('valor_total',)
         }),
@@ -21,4 +24,4 @@ class MesaAdmin(admin.ModelAdmin):
         }),
     )
     
-    readonly_fields = ['data_criacao', 'data_atualizacao'] 
+    readonly_fields = ['data_criacao', 'data_atualizacao', 'valor_total'] 

@@ -11,4 +11,5 @@ urlpatterns = [
     path('api/modelo/', views.modelo_info_api, name='modelo_info_api'),
     path('api/fechar/<int:mesa_id>/', views.fechar_mesa_api, name='fechar_mesa_api'),
     path('api/abrir/<int:mesa_id>/', views.abrir_mesa_api, name='abrir_mesa_api'),
+    path('editar/<int:mesa_id>/', views.editar_mesa_api, name='editar_mesa_api'),
 ] 
