@@ -36,9 +36,7 @@
                         Novo Cliente
                     </button>
                     <!-- Botão de teste temporário -->
-                    <button onclick="testarDarBaixaFichas()" class="btn-secondary ml-2">
-                        🧪 Testar Dar Baixa
-                    </button>
+                  
                 </div>
             </div>
 
@@ -258,11 +256,11 @@
 </div>
 
 <!-- Modal Adicionar Fichas -->
-<div id="modalAdicionarFichas" class="modal hidden">
+<div id="modalAdicionarFichas" class="modal hidden modal-adicionar">
     <div class="modal-overlay" onclick="fecharModalAdicionarFichas()"></div>
     <div class="modal-content">
         <div class="modal-header">
-            <h2 class="modal-title">Adicionar Fichas</h2>
+            <h2 class="modal-title">💰 Adicionar Fichas</h2>
             <button onclick="fecharModalAdicionarFichas()" class="modal-close">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -273,11 +271,11 @@
             <form id="formAdicionarFichas" class="space-y-6">
                 <div class="form-group">
                     <label for="quantidadeAdicionarFichas" class="form-label">Quantidade de Fichas</label>
-                    <input type="number" id="quantidadeAdicionarFichas" name="quantidade" class="form-input" step="1" min="1" required>
+                    <input type="number" id="quantidadeAdicionarFichas" name="quantidade" class="form-input" step="1" min="1" placeholder="Digite a quantidade" required>
                 </div>
                 <div class="form-actions">
-                    <button type="button" onclick="fecharModalAdicionarFichas()" class="btn-secondary">Cancelar</button>
-                    <button type="submit" class="btn-primary">Adicionar</button>
+                    <button type="button" onclick="fecharModalAdicionarFichas()" class="btn-secondary">❌ Cancelar</button>
+                    <button type="submit" class="btn-primary">✅ Adicionar</button>
                 </div>
             </form>
         </div>
@@ -285,11 +283,11 @@
 </div>
 
 <!-- Modal Dar Baixa Fichas -->
-<div id="modalDarBaixaFichas" class="modal hidden">
+<div id="modalDarBaixaFichas" class="modal hidden modal-dar-baixa">
     <div class="modal-overlay" onclick="fecharModalDarBaixaFichas()"></div>
     <div class="modal-content">
         <div class="modal-header">
-            <h2 class="modal-title">Dar Baixa de Fichas</h2>
+            <h2 class="modal-title">🎰 Dar Baixa de Fichas</h2>
             <button onclick="fecharModalDarBaixaFichas()" class="modal-close">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -300,13 +298,62 @@
             <form id="formDarBaixaFichas" class="space-y-6">
                 <div class="form-group">
                     <label for="quantidadeDarBaixaFichas" class="form-label">Quantidade de Fichas</label>
-                    <input type="number" id="quantidadeDarBaixaFichas" name="quantidade" class="form-input" step="1" min="1" required>
+                    <input type="number" id="quantidadeDarBaixaFichas" name="quantidade" class="form-input" step="1" min="1" placeholder="Digite a quantidade" required>
                 </div>
                 <div class="form-actions">
-                    <button type="button" onclick="fecharModalDarBaixaFichas()" class="btn-secondary">Cancelar</button>
-                    <button type="submit" class="btn-primary">Dar Baixa</button>
+                    <button type="button" onclick="fecharModalDarBaixaFichas()" class="btn-secondary">❌ Cancelar</button>
+                    <button type="submit" class="btn-primary">💸 Dar Baixa</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Popup de Alerta -->
+<div id="alertPopup" class="alert-popup hidden">
+    <div class="alert-overlay" onclick="fecharAlertPopup()"></div>
+    <div class="alert-content">
+        <div class="alert-header">
+            <div class="alert-icon">
+                <span id="alertIcon">ℹ️</span>
+            </div>
+            <button onclick="fecharAlertPopup()" class="alert-close">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="alert-body">
+            <h3 id="alertTitle" class="alert-title">Título do Alerta</h3>
+            <p id="alertMessage" class="alert-message">Mensagem do alerta</p>
+        </div>
+        <div class="alert-footer">
+            <button onclick="fecharAlertPopup()" class="alert-btn alert-btn-primary">OK</button>
+        </div>
+    </div>
+</div>
+
+<!-- Popup de Confirmação -->
+<div id="confirmPopup" class="confirm-popup hidden">
+    <div class="confirm-overlay" onclick="fecharConfirmPopup()"></div>
+    <div class="confirm-content">
+        <div class="confirm-header">
+            <div class="confirm-icon">
+                <span id="confirmIcon">❓</span>
+            </div>
+            <button onclick="fecharConfirmPopup()" class="confirm-close">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="confirm-body">
+            <h3 id="confirmTitle" class="confirm-title">Confirmar Ação</h3>
+            <p id="confirmMessage" class="confirm-message">Tem certeza que deseja realizar esta ação?</p>
+        </div>
+        <div class="confirm-footer">
+            <button onclick="fecharConfirmPopup()" class="confirm-btn confirm-btn-secondary">Cancelar</button>
+            <button id="confirmActionBtn" class="confirm-btn confirm-btn-primary">Confirmar</button>
         </div>
     </div>
 </div>
@@ -332,6 +379,108 @@
                 if (sidebar) sidebar.classList.toggle('mobile-open');
             });
         }
+    }
+
+    // ===== FUNÇÕES DOS POPUPS =====
+    
+    // Função para mostrar popup de alerta
+    function mostrarAlertPopup(titulo, mensagem, tipo = 'info', autoClose = false, tempo = 3000) {
+        const popup = document.getElementById('alertPopup');
+        const icon = document.getElementById('alertIcon');
+        const title = document.getElementById('alertTitle');
+        const message = document.getElementById('alertMessage');
+        const iconContainer = icon.parentElement;
+        
+        // Configurar conteúdo
+        title.textContent = titulo;
+        message.textContent = mensagem;
+        
+        // Configurar ícone baseado no tipo
+        iconContainer.className = 'alert-icon ' + tipo;
+        
+        switch(tipo) {
+            case 'success':
+                icon.textContent = '✅';
+                break;
+            case 'error':
+                icon.textContent = '❌';
+                break;
+            case 'warning':
+                icon.textContent = '⚠️';
+                break;
+            case 'info':
+            default:
+                icon.textContent = 'ℹ️';
+                break;
+        }
+        
+        // Mostrar popup
+        popup.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        
+        // Auto-close se configurado
+        if (autoClose) {
+            setTimeout(() => {
+                fecharAlertPopup();
+            }, tempo);
+        }
+        
+        // Focar no botão OK para acessibilidade
+        setTimeout(() => {
+            const okBtn = popup.querySelector('.alert-btn-primary');
+            if (okBtn) okBtn.focus();
+        }, 100);
+    }
+    
+    // Função para fechar popup de alerta
+    function fecharAlertPopup() {
+        const popup = document.getElementById('alertPopup');
+        popup.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+    
+    // Função para mostrar popup de confirmação
+    function mostrarConfirmPopup(titulo, mensagem, callback) {
+        const popup = document.getElementById('confirmPopup');
+        const title = document.getElementById('confirmTitle');
+        const message = document.getElementById('confirmMessage');
+        const actionBtn = document.getElementById('confirmActionBtn');
+        
+        // Configurar conteúdo
+        title.textContent = titulo;
+        message.textContent = mensagem;
+        
+        // Configurar callback
+        actionBtn.onclick = () => {
+            fecharConfirmPopup();
+            if (callback) callback();
+        };
+        
+        // Mostrar popup
+        popup.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        
+        // Focar no botão de ação para acessibilidade
+        setTimeout(() => {
+            actionBtn.focus();
+        }, 100);
+    }
+    
+    // Função para fechar popup de confirmação
+    function fecharConfirmPopup() {
+        const popup = document.getElementById('confirmPopup');
+        popup.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+    
+    // Função para substituir alert() nativo
+    function showAlert(mensagem, tipo = 'info') {
+        mostrarAlertPopup('Aviso', mensagem, tipo);
+    }
+    
+    // Função para substituir confirm() nativo
+    function showConfirm(mensagem, callback) {
+        mostrarConfirmPopup('Confirmar Ação', mensagem, callback);
     }
 
     // Configurar eventos
@@ -522,7 +671,7 @@
         // Validação
         const erros = FinanceiroAPI.validarDadosCliente(dados);
         if (erros.length > 0) {
-            alert('Erros de validação:\n' + erros.join('\n'));
+            mostrarAlertPopup('Validação', 'Erros de validação:\n' + erros.join('\n'), 'warning');
             return;
         }
 
@@ -541,13 +690,13 @@
             if (novoCliente) {
                 fecharModalCriarCliente();
                 carregarClientes(); // Recarregar lista
-                alert('Cliente criado com sucesso!');
+                mostrarAlertPopup('Sucesso!', 'Cliente criado com sucesso!', 'success', true, 3000);
             } else {
-                alert('Erro ao criar cliente. Tente novamente.');
+                mostrarAlertPopup('Erro', 'Erro ao criar cliente. Tente novamente.', 'error');
             }
         } catch (error) {
             console.error('Erro ao criar cliente:', error);
-            alert('Erro ao criar cliente. Tente novamente.');
+            mostrarAlertPopup('Erro', 'Erro ao criar cliente. Tente novamente.', 'error');
         } finally {
             btnText.style.display = 'block';
             btnLoading.classList.add('hidden');
@@ -606,8 +755,13 @@
                         <h3 class="text-lg font-bold text-gray-800 mb-3">Informações Financeiras</h3>
                         <div class="space-y-3">
                             <div>
-                                <p class="text-sm text-gray-600 font-semibold">Saldo Atual</p>
+                                <p class="text-sm text-gray-600 font-semibold">Saldo em Dinheiro</p>
                                 <p class="text-2xl font-bold text-green-600">${cliente.saldo_formatado}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600 font-semibold">Saldo de Fichas</p>
+                                <p class="text-2xl font-bold text-blue-600">${cliente.saldo_fichas || 0} fichas</p>
+                                <p class="text-xs text-gray-500">(1 ficha = R$ 1,00)</p>
                             </div>
                         </div>
                     </div>
@@ -642,7 +796,7 @@
         if (cliente.vendas_fichas && cliente.vendas_fichas.length > 0) {
             historico.innerHTML = cliente.vendas_fichas.map(venda => `
                 <li class="text-sm text-gray-600 py-2 border-b border-gray-200">
-                    ${venda.data_venda} - ${venda.quantidade} fichas vendidas
+                    ${venda.data_venda} - ${venda.quantidade} fichas vendidas (R$ ${venda.quantidade.toFixed(2)})
                 </li>
             `).join('');
         } else {
@@ -704,7 +858,7 @@
         const quantidade = parseInt(form.quantidade.value);
         
         if (!quantidade || quantidade <= 0) {
-            alert('Por favor, insira uma quantidade válida');
+            mostrarAlertPopup('Validação', 'Por favor, insira uma quantidade válida', 'warning');
             return;
         }
 
@@ -712,32 +866,101 @@
             const resultado = await FinanceiroAPI.adicionarFichas(window.clienteAtualId, quantidade);
             
             if (resultado.success) {
-                alert(`${quantidade} fichas adicionadas com sucesso!`);
+                mostrarAlertPopup(
+                    'Sucesso!', 
+                    `${quantidade} fichas adicionadas com sucesso!\n\nValor adicionado: R$ ${resultado.valor_adicao.toFixed(2)}`, 
+                    'success',
+                    true,
+                    4000
+                );
                 fecharModalAdicionarFichas();
                 
                 // Atualizar saldo de fichas em tempo real
                 const saldoElement = document.getElementById('saldoFichasCliente');
                 if (saldoElement) {
-                    const saldoAtualStr = saldoElement.textContent;
-                    const saldoAtual = parseInt(saldoAtualStr.replace(/\D/g, '')) || 0;
-                    const novoSaldo = saldoAtual + quantidade;
-                    saldoElement.textContent = `${novoSaldo} fichas`;
+                    saldoElement.textContent = `${resultado.saldo_fichas} fichas`;
                 }
                 
                 // Recarregar detalhes do cliente para atualizar histórico
                 if (window.clienteAtualId) {
                     verDetalhesCliente(window.clienteAtualId);
                 }
+                
+                // Recarregar lista de clientes para atualizar as métricas
+                carregarClientes();
             } else {
-                alert('Erro ao adicionar fichas. Tente novamente.');
+                mostrarAlertPopup('Erro', 'Erro ao adicionar fichas. Tente novamente.', 'error');
             }
         } catch (error) {
             console.error('Erro ao adicionar fichas:', error);
-            alert('Erro ao adicionar fichas. Tente novamente.');
+            mostrarAlertPopup('Erro', 'Erro ao adicionar fichas. Tente novamente.', 'error');
         }
     }
 
     // Dar baixa fichas - função movida para financeiro.js
+    async function darBaixaFichasCliente() {
+        console.log('=== INICIANDO DAR BAIXA FICHAS ===');
+        
+        const form = document.getElementById('formDarBaixaFichas');
+        console.log('Form encontrado:', form);
+        
+        if (!form) {
+            console.error('Form não encontrado!');
+            mostrarAlertPopup('Erro', 'Formulário não encontrado', 'error');
+            return;
+        }
+        
+        const quantidade = parseInt(form.quantidade.value);
+        console.log('Quantidade:', quantidade);
+        console.log('Cliente atual ID:', window.clienteAtualId);
+        
+        if (!quantidade || quantidade <= 0) {
+            mostrarAlertPopup('Validação', 'Por favor, insira uma quantidade válida', 'warning');
+            return;
+        }
+
+        if (!window.clienteAtualId) {
+            console.error('Cliente atual não definido!');
+            mostrarAlertPopup('Erro', 'Cliente não selecionado', 'error');
+            return;
+        }
+
+        try {
+            console.log('Chamando API darBaixaFichas...');
+            const resultado = await FinanceiroAPI.darBaixaFichas(window.clienteAtualId, quantidade);
+            console.log('Resultado da API:', resultado);
+            
+            if (resultado.success) {
+                mostrarAlertPopup(
+                    'Sucesso!', 
+                    `Baixa de ${quantidade} fichas realizada com sucesso!\n\nValor da baixa: R$ ${resultado.valor_baixa.toFixed(2)}`, 
+                    'success',
+                    true,
+                    4000
+                );
+                
+                console.log('Fechando modal...');
+                fecharModalDarBaixaFichas();
+                
+                // Recarregar detalhes do cliente para atualizar histórico
+                if (window.clienteAtualId) {
+                    console.log('Recarregando detalhes do cliente...');
+                    verDetalhesCliente(window.clienteAtualId);
+                }
+                
+                // Recarregar lista de clientes para atualizar as métricas
+                carregarClientes();
+            } else {
+                console.error('API retornou erro:', resultado);
+                mostrarAlertPopup('Erro', 'Erro ao dar baixa nas fichas. Tente novamente.', 'error');
+            }
+        } catch (error) {
+            console.error('Erro ao dar baixa nas fichas:', error);
+            mostrarAlertPopup('Erro', `Erro ao dar baixa nas fichas: ${error.message}`, 'error');
+        }
+        
+        console.log('=== FIM DAR BAIXA FICHAS ===');
+    }
 
     // Estados da interface
     function mostrarLoading() {

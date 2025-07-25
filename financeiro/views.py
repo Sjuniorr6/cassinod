@@ -11,21 +11,28 @@ def financeiro_home(request):
     """View principal do módulo financeiro"""
     return render(request, 'financeiro/home.html')
 
-@csrf_exempt
 @require_http_methods(["GET"])
 def listar_clientes(request):
     """API para listar todos os clientes"""
+    print("=== LISTAR CLIENTES ===")
     try:
         clientes = Cliente.objects.all()
+        print(f"Clientes encontrados: {clientes.count()}")
         clientes_data = []
         
         for cliente in clientes:
+            print(f"Processando cliente: {cliente.nome_completo}")
             # Buscar carteira e fichas
             try:
                 carteira = cliente.carteira
                 saldo_fichas = carteira.saldo_fichas
-            except:
+                print(f"  - Carteira encontrada com {saldo_fichas} fichas")
+            except Exception as e:
+                # Se não tem carteira, criar uma
+                print(f"  - Criando carteira para cliente {cliente.nome_completo}")
+                carteira = Carteira.objects.create(cliente=cliente, saldo_fichas=0)
                 saldo_fichas = 0
+                print(f"  - Carteira criada com {saldo_fichas} fichas")
             
             clientes_data.append({
                 'id': cliente.id,
@@ -41,6 +48,7 @@ def listar_clientes(request):
                 'saldo_fichas': saldo_fichas
             })
         
+        print(f"Total de clientes processados: {len(clientes_data)}")
         return JsonResponse({
             'success': True,
             'clientes': clientes_data,
@@ -48,12 +56,12 @@ def listar_clientes(request):
         })
     
     except Exception as e:
+        print(f"Erro ao listar clientes: {e}")
         return JsonResponse({
             'success': False,
             'error': str(e)
         }, status=500)
 
-@csrf_exempt
 @require_http_methods(["GET"])
 def obter_cliente(request, cliente_id):
     """API para obter um cliente específico por ID"""
@@ -63,6 +71,9 @@ def obter_cliente(request, cliente_id):
             carteira = cliente.carteira
             saldo_fichas = carteira.saldo_fichas
         except:
+            # Se não tem carteira, criar uma
+            print(f"Criando carteira para cliente {cliente.nome_completo}")
+            carteira = Carteira.objects.create(cliente=cliente, saldo_fichas=0)
             saldo_fichas = 0
         vendas = VendaFicha.objects.filter(cliente=cliente).order_by('-data_venda')
         vendas_data = [
@@ -123,12 +134,16 @@ def criar_cliente(request):
             saldo=saldo,
             telefone=telefone
         )
-        # Sempre criar a carteira, mesmo que fichas_iniciais seja zero
-        carteira = Carteira.objects.create(cliente=cliente, saldo_fichas=fichas_iniciais)
+        
+        # Criar carteira com saldo de fichas igual ao saldo em dinheiro
+        saldo_fichas = int(saldo)  # Cada R$ 1,00 = 1 ficha
+        carteira = Carteira.objects.create(cliente=cliente, saldo_fichas=saldo_fichas)
+        
         # Registrar venda inicial de fichas, se houver
         venda = None
-        if fichas_iniciais > 0:
-            venda = VendaFicha.objects.create(cliente=cliente, quantidade=fichas_iniciais)
+        if saldo_fichas > 0:
+            venda = VendaFicha.objects.create(cliente=cliente, quantidade=saldo_fichas)
+        
         cliente_data = {
             'id': cliente.id,
             'nome': cliente.nome,
@@ -166,21 +181,37 @@ def criar_cliente(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def adicionar_fichas(request, cliente_id):
-    """API para adicionar fichas a um cliente (nova venda)"""
+    """API para adicionar fichas a um cliente (nova venda) e ao saldo em dinheiro"""
+    from decimal import Decimal
+    
     try:
         data = json.loads(request.body)
         quantidade = int(data.get('quantidade', 0))
         if quantidade <= 0:
             return JsonResponse({'success': False, 'error': 'Quantidade deve ser maior que zero.'}, status=400)
         cliente = Cliente.objects.get(id=cliente_id)
+        
+        # Verificar se tem carteira, se não tiver, criar uma
         carteira = getattr(cliente, 'carteira', None)
         if not carteira:
-            return JsonResponse({'success': False, 'error': 'Carteira não encontrada.'}, status=404)
+            print("Carteira não encontrada. Criando uma nova...")
+            carteira = Carteira.objects.create(cliente=cliente, saldo_fichas=0)
+            print(f"Carteira criada com saldo inicial: {carteira.saldo_fichas}")
+        
+        # Calcular valor em dinheiro (cada ficha = R$ 1,00)
+        valor_adicao = Decimal(str(quantidade))
+        
         # Registrar venda
         venda = VendaFicha.objects.create(cliente=cliente, quantidade=quantidade)
+        
         # Atualizar carteira
         carteira.saldo_fichas += quantidade
         carteira.save()
+        
+        # Atualizar saldo em dinheiro
+        cliente.saldo += valor_adicao
+        cliente.save()
+        
         return JsonResponse({
             'success': True,
             'message': 'Fichas adicionadas com sucesso',
@@ -189,7 +220,9 @@ def adicionar_fichas(request, cliente_id):
                 'quantidade': venda.quantidade,
                 'data_venda': venda.data_venda.strftime('%d/%m/%Y %H:%M')
             },
-            'saldo_fichas': carteira.saldo_fichas
+            'saldo_fichas': carteira.saldo_fichas,
+            'saldo_dinheiro': float(cliente.saldo),
+            'valor_adicao': float(valor_adicao)
         })
     except Cliente.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Cliente não encontrado.'}, status=404)
@@ -199,27 +232,66 @@ def adicionar_fichas(request, cliente_id):
 @csrf_exempt
 @require_http_methods(["POST"])
 def dar_baixa_fichas(request, cliente_id):
-    """API para dar baixa (subtrair) fichas da carteira do cliente"""
+    """API para dar baixa (subtrair) fichas da carteira do cliente e do saldo em dinheiro"""
+    from decimal import Decimal
+    
+    print(f"=== DAR BAIXA FICHAS - Cliente ID: {cliente_id} ===")
+    print(f"Request body: {request.body}")
+    
     try:
         data = json.loads(request.body)
         quantidade = int(data.get('quantidade', 0))
+        print(f"Quantidade solicitada: {quantidade}")
+        
         if quantidade <= 0:
+            print("Erro: Quantidade deve ser maior que zero")
             return JsonResponse({'success': False, 'error': 'Quantidade deve ser maior que zero.'}, status=400)
+        
         cliente = Cliente.objects.get(id=cliente_id)
+        print(f"Cliente encontrado: {cliente.nome_completo}")
+        
+        # Verificar se tem carteira, se não tiver, criar uma
         carteira = getattr(cliente, 'carteira', None)
         if not carteira:
-            return JsonResponse({'success': False, 'error': 'Carteira não encontrada.'}, status=404)
+            print("Carteira não encontrada. Criando uma nova...")
+            carteira = Carteira.objects.create(cliente=cliente, saldo_fichas=0)
+            print(f"Carteira criada com saldo inicial: {carteira.saldo_fichas}")
+        
+        print(f"Saldo atual de fichas: {carteira.saldo_fichas}")
+        print(f"Saldo atual em dinheiro: {cliente.saldo}")
+        
         if carteira.saldo_fichas < quantidade:
+            print(f"Erro: Saldo insuficiente. Saldo: {carteira.saldo_fichas}, Solicitado: {quantidade}")
             return JsonResponse({'success': False, 'error': 'Saldo de fichas insuficiente.'}, status=400)
+        
+        # Calcular valor em dinheiro (cada ficha = R$ 1,00)
+        valor_baixa = Decimal(str(quantidade))
+        
+        if cliente.saldo < valor_baixa:
+            print(f"Erro: Saldo em dinheiro insuficiente. Saldo: {cliente.saldo}, Necessário: {valor_baixa}")
+            return JsonResponse({'success': False, 'error': 'Saldo em dinheiro insuficiente.'}, status=400)
+        
         # Subtrair fichas
         carteira.saldo_fichas -= quantidade
         carteira.save()
+        
+        # Subtrair do saldo em dinheiro
+        cliente.saldo -= valor_baixa
+        cliente.save()
+        
+        print(f"Novo saldo de fichas: {carteira.saldo_fichas}")
+        print(f"Novo saldo em dinheiro: {cliente.saldo}")
+        
         return JsonResponse({
             'success': True,
             'message': 'Baixa de fichas realizada com sucesso',
-            'saldo_fichas': carteira.saldo_fichas
+            'saldo_fichas': carteira.saldo_fichas,
+            'saldo_dinheiro': float(cliente.saldo),
+            'valor_baixa': float(valor_baixa)
         })
     except Cliente.DoesNotExist:
+        print(f"Erro: Cliente {cliente_id} não encontrado")
         return JsonResponse({'success': False, 'error': 'Cliente não encontrado.'}, status=404)
     except Exception as e:
+        print(f"Erro inesperado: {e}")
         return JsonResponse({'success': False, 'error': str(e)}, status=500)

@@ -530,6 +530,699 @@ html, body {
     margin-top: 2rem;
 }
 
+/* Estilos específicos para o modal Dar Baixa */
+.modal-dar-baixa .modal-content {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+    transform: scale(0.95);
+    transition: transform 0.3s ease !important;
+}
+
+.modal-dar-baixa .modal-content.show {
+    transform: scale(1);
+}
+
+.modal-dar-baixa .modal-header {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%) !important;
+    color: white !important;
+    border-radius: 1rem 1rem 0 0 !important;
+    border-bottom: none !important;
+    padding: 1.75rem 1.5rem !important;
+}
+
+.modal-dar-baixa .modal-title {
+    color: white !important;
+    font-size: 1.5rem !important;
+    font-weight: 800 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.modal-dar-baixa .modal-close {
+    color: white !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 50% !important;
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+}
+
+.modal-dar-baixa .modal-close:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    transform: scale(1.1) !important;
+}
+
+.modal-dar-baixa .modal-body {
+    padding: 2rem 1.5rem !important;
+    background: white !important;
+    border-radius: 0 0 1rem 1rem !important;
+}
+
+.modal-dar-baixa .form-group {
+    margin-bottom: 2rem !important;
+}
+
+.modal-dar-baixa .form-label {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    color: #1f2937 !important;
+    margin-bottom: 0.75rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+
+.modal-dar-baixa .form-label::before {
+    content: "🎰";
+    font-size: 1.2rem;
+}
+
+.modal-dar-baixa .form-input {
+    padding: 1rem !important;
+    font-size: 1.125rem !important;
+    font-weight: 600 !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 0.75rem !important;
+    background: #f9fafb !important;
+    transition: all 0.3s ease !important;
+    text-align: center !important;
+}
+
+.modal-dar-baixa .form-input:focus {
+    border-color: #dc2626 !important;
+    background: white !important;
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1) !important;
+    transform: translateY(-2px) !important;
+}
+
+.modal-dar-baixa .form-input::placeholder {
+    color: #9ca3af !important;
+    font-weight: 400 !important;
+}
+
+.modal-dar-baixa .form-actions {
+    margin-top: 2.5rem !important;
+    gap: 1.5rem !important;
+}
+
+.modal-dar-baixa .btn-secondary {
+    background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%) !important;
+    color: white !important;
+    padding: 1rem 2rem !important;
+    border-radius: 0.75rem !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3) !important;
+}
+
+.modal-dar-baixa .btn-secondary:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(107, 114, 128, 0.4) !important;
+}
+
+.modal-dar-baixa .btn-primary {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%) !important;
+    color: white !important;
+    padding: 1rem 2rem !important;
+    border-radius: 0.75rem !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.modal-dar-baixa .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.modal-dar-baixa .btn-primary:hover::before {
+    left: 100%;
+}
+
+.modal-dar-baixa .btn-primary:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4) !important;
+}
+
+/* Animação de entrada do modal */
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-dar-baixa .modal-content {
+    animation: modalSlideIn 0.4s ease-out;
+}
+
+/* Responsividade para o modal */
+@media (max-width: 768px) {
+    .modal-dar-baixa .modal-content,
+    .modal-adicionar .modal-content {
+        width: 95% !important;
+        margin: 1rem !important;
+    }
+    
+    .modal-dar-baixa .modal-header,
+    .modal-adicionar .modal-header {
+        padding: 1.5rem 1rem !important;
+    }
+    
+    .modal-dar-baixa .modal-body,
+    .modal-adicionar .modal-body {
+        padding: 1.5rem 1rem !important;
+    }
+    
+    .modal-dar-baixa .form-actions,
+    .modal-adicionar .form-actions {
+        flex-direction: column !important;
+        gap: 1rem !important;
+    }
+    
+    .modal-dar-baixa .btn-primary,
+    .modal-dar-baixa .btn-secondary,
+    .modal-adicionar .btn-primary,
+    .modal-adicionar .btn-secondary {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+}
+
+/* Estilos específicos para o modal Adicionar Fichas */
+.modal-adicionar .modal-content {
+    background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%) !important;
+    border: 1px solid #bbf7d0 !important;
+    box-shadow: 0 25px 50px -12px rgba(34, 197, 94, 0.25) !important;
+    transform: scale(0.95);
+    transition: transform 0.3s ease !important;
+}
+
+.modal-adicionar .modal-content.show {
+    transform: scale(1);
+}
+
+.modal-adicionar .modal-header {
+    background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%) !important;
+    color: white !important;
+    border-radius: 1rem 1rem 0 0 !important;
+    border-bottom: none !important;
+    padding: 1.75rem 1.5rem !important;
+}
+
+.modal-adicionar .modal-title {
+    color: white !important;
+    font-size: 1.5rem !important;
+    font-weight: 800 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.modal-adicionar .modal-close {
+    color: white !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 50% !important;
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease !important;
+}
+
+.modal-adicionar .modal-close:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    transform: scale(1.1) !important;
+}
+
+.modal-adicionar .modal-body {
+    padding: 2rem 1.5rem !important;
+    background: white !important;
+    border-radius: 0 0 1rem 1rem !important;
+}
+
+.modal-adicionar .form-group {
+    margin-bottom: 2rem !important;
+}
+
+.modal-adicionar .form-label {
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    color: #1f2937 !important;
+    margin-bottom: 0.75rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+}
+
+.modal-adicionar .form-label::before {
+    content: "💰";
+    font-size: 1.2rem;
+}
+
+.modal-adicionar .form-input {
+    padding: 1rem !important;
+    font-size: 1.125rem !important;
+    font-weight: 600 !important;
+    border: 2px solid #bbf7d0 !important;
+    border-radius: 0.75rem !important;
+    background: #f0fdf4 !important;
+    transition: all 0.3s ease !important;
+    text-align: center !important;
+}
+
+.modal-adicionar .form-input:focus {
+    border-color: #16a34a !important;
+    background: white !important;
+    box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1) !important;
+    transform: translateY(-2px) !important;
+}
+
+.modal-adicionar .form-input::placeholder {
+    color: #9ca3af !important;
+    font-weight: 400 !important;
+}
+
+.modal-adicionar .form-actions {
+    margin-top: 2.5rem !important;
+    gap: 1.5rem !important;
+}
+
+.modal-adicionar .btn-secondary {
+    background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%) !important;
+    color: white !important;
+    padding: 1rem 2rem !important;
+    border-radius: 0.75rem !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3) !important;
+}
+
+.modal-adicionar .btn-secondary:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(107, 114, 128, 0.4) !important;
+}
+
+.modal-adicionar .btn-primary {
+    background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%) !important;
+    color: white !important;
+    padding: 1rem 2rem !important;
+    border-radius: 0.75rem !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 15px rgba(22, 197, 94, 0.3) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.modal-adicionar .btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.modal-adicionar .btn-primary:hover::before {
+    left: 100%;
+}
+
+.modal-adicionar .btn-primary:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(22, 197, 94, 0.4) !important;
+}
+
+/* Animação de entrada do modal adicionar */
+.modal-adicionar .modal-content {
+    animation: modalSlideIn 0.4s ease-out;
+}
+
+/* ===== POPUP DE ALERTA ===== */
+.alert-popup {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 2000 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.alert-popup.hidden {
+    display: none !important;
+}
+
+.alert-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+}
+
+.alert-content {
+    background: white !important;
+    border-radius: 1.5rem !important;
+    max-width: 450px !important;
+    width: 90% !important;
+    position: relative !important;
+    z-index: 1 !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4) !important;
+    transform: scale(0.9);
+    transition: transform 0.3s ease !important;
+    animation: alertSlideIn 0.4s ease-out;
+}
+
+.alert-content.show {
+    transform: scale(1);
+}
+
+.alert-header {
+    padding: 1.5rem 1.5rem 0 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.alert-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-right: 1rem;
+}
+
+.alert-icon.success {
+    background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
+    color: white;
+}
+
+.alert-icon.error {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    color: white;
+}
+
+.alert-icon.warning {
+    background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+    color: white;
+}
+
+.alert-icon.info {
+    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+    color: white;
+}
+
+.alert-close {
+    background: none !important;
+    border: none !important;
+    cursor: pointer !important;
+    color: #6b7280 !important;
+    padding: 0.5rem !important;
+    border-radius: 50% !important;
+    transition: all 0.3s ease !important;
+    width: 2rem !important;
+    height: 2rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.alert-close:hover {
+    background: #f3f4f6 !important;
+    color: #1f2937 !important;
+    transform: scale(1.1) !important;
+}
+
+.alert-body {
+    padding: 1rem 1.5rem;
+}
+
+.alert-title {
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    color: #1f2937 !important;
+    margin: 0 0 0.75rem 0 !important;
+}
+
+.alert-message {
+    font-size: 1rem !important;
+    color: #6b7280 !important;
+    line-height: 1.6 !important;
+    margin: 0 !important;
+}
+
+.alert-footer {
+    padding: 1rem 1.5rem 1.5rem 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.alert-btn {
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 0.75rem !important;
+    font-weight: 600 !important;
+    font-size: 0.875rem !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    min-width: 80px !important;
+}
+
+.alert-btn-primary {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3) !important;
+}
+
+.alert-btn-primary:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4) !important;
+}
+
+.alert-btn-secondary {
+    background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3) !important;
+}
+
+.alert-btn-secondary:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(107, 114, 128, 0.4) !important;
+}
+
+/* ===== POPUP DE CONFIRMAÇÃO ===== */
+.confirm-popup {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 2000 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.confirm-popup.hidden {
+    display: none !important;
+}
+
+.confirm-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+}
+
+.confirm-content {
+    background: white !important;
+    border-radius: 1.5rem !important;
+    max-width: 450px !important;
+    width: 90% !important;
+    position: relative !important;
+    z-index: 1 !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4) !important;
+    transform: scale(0.9);
+    transition: transform 0.3s ease !important;
+    animation: alertSlideIn 0.4s ease-out;
+}
+
+.confirm-content.show {
+    transform: scale(1);
+}
+
+.confirm-header {
+    padding: 1.5rem 1.5rem 0 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.confirm-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+    color: white;
+}
+
+.confirm-close {
+    background: none !important;
+    border: none !important;
+    cursor: pointer !important;
+    color: #6b7280 !important;
+    padding: 0.5rem !important;
+    border-radius: 50% !important;
+    transition: all 0.3s ease !important;
+    width: 2rem !important;
+    height: 2rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.confirm-close:hover {
+    background: #f3f4f6 !important;
+    color: #1f2937 !important;
+    transform: scale(1.1) !important;
+}
+
+.confirm-body {
+    padding: 1rem 1.5rem;
+}
+
+.confirm-title {
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    color: #1f2937 !important;
+    margin: 0 0 0.75rem 0 !important;
+}
+
+.confirm-message {
+    font-size: 1rem !important;
+    color: #6b7280 !important;
+    line-height: 1.6 !important;
+    margin: 0 !important;
+}
+
+.confirm-footer {
+    padding: 1rem 1.5rem 1.5rem 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.confirm-btn {
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 0.75rem !important;
+    font-weight: 600 !important;
+    font-size: 0.875rem !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    min-width: 100px !important;
+}
+
+.confirm-btn-primary {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3) !important;
+}
+
+.confirm-btn-primary:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(220, 38, 38, 0.4) !important;
+}
+
+.confirm-btn-secondary {
+    background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3) !important;
+}
+
+.confirm-btn-secondary:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(107, 114, 128, 0.4) !important;
+}
+
+/* Animações para os popups */
+@keyframes alertSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Responsividade para os popups */
+@media (max-width: 768px) {
+    .alert-content,
+    .confirm-content {
+        width: 95% !important;
+        margin: 1rem !important;
+    }
+    
+    .alert-footer,
+    .confirm-footer {
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+    }
+    
+    .alert-btn,
+    .confirm-btn {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+}
+
 /* Utility Classes */
 .hidden {
     display: none !important;
