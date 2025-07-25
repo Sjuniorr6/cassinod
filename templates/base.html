@@ -7,11 +7,196 @@
     <title>{% block title %}Cassino Diamante{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
     <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+    <style>
+    /* Responsividade global */
+    @media (max-width: 1024px) {
+        .content-wrapper {
+            margin-left: 0 !important;
+            padding: 0 1rem !important;
+            text-align: center !important;
+        }
+        
+        .main-header {
+            text-align: center !important;
+            padding: 2rem 1rem 1rem 1rem !important;
+        }
+        
+        .main-title {
+            font-size: 2.5rem !important;
+            text-align: center !important;
+        }
+        
+        .main-subtitle {
+            font-size: 1.125rem !important;
+            text-align: center !important;
+        }
+        
+        .cards-container {
+            padding: 0 1rem 1rem 1rem !important;
+            text-align: center !important;
+        }
+        
+        /* Centralizar botões */
+        .control-buttons {
+            justify-content: center !important;
+            flex-wrap: wrap !important;
+        }
+        
+        /* Centralizar grids */
+        .grid {
+            justify-items: center !important;
+        }
+        
+        /* Centralizar cards */
+        .bg-white\/95 {
+            margin: 0 auto !important;
+            max-width: 100% !important;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .content-wrapper {
+            padding: 0 0.5rem !important;
+        }
+        
+        .main-header {
+            padding: 1.5rem 0.5rem 1rem 0.5rem !important;
+        }
+        
+        .main-title {
+            font-size: 2rem !important;
+        }
+        
+        .cards-container {
+            padding: 0 0.5rem 0.5rem 0.5rem !important;
+        }
+        
+        /* Centralizar métricas */
+        .metricas-container {
+            grid-template-columns: 1fr !important;
+            justify-items: center !important;
+        }
+        
+        /* Centralizar mesas */
+        .mesas-grid {
+            grid-template-columns: 1fr !important;
+            justify-items: center !important;
+        }
+    }
+    
+    @media (max-width: 640px) {
+        .main-title {
+            font-size: 1.75rem !important;
+        }
+        
+        .main-subtitle {
+            font-size: 1rem !important;
+        }
+        
+        /* Centralizar tudo em telas muito pequenas */
+        .content-wrapper > * {
+            text-align: center !important;
+        }
+        
+        /* Ajustar padding para telas pequenas */
+        .bg-white\/95 {
+            margin: 0.5rem auto !important;
+            width: calc(100% - 1rem) !important;
+        }
+    }
+    </style>
     {% block extra_css %}{% endblock %}
     {% block extra_head %}{% endblock %}
 </head>
 <body>
     {% block content %}{% endblock %}
+    
+    <!-- Sidebar JavaScript -->
+    <script>
+        // Toggle sidebar function
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                if (window.innerWidth <= 1024) {
+                    // Mobile: toggle mobile-open class
+                    sidebar.classList.toggle('mobile-open');
+                } else {
+                    // Desktop: toggle closed class
+                    sidebar.classList.toggle('closed');
+                }
+                console.log('Sidebar toggled');
+            }
+        }
+
+        // Mobile sidebar functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM carregado - configurando sidebar');
+            
+            const sidebar = document.getElementById('sidebar');
+            const mobileSidebarBtn = document.getElementById('mobileSidebarBtn');
+            const logoClickable = document.getElementById('logoClickable');
+            
+            console.log('Sidebar encontrado:', sidebar);
+            console.log('Botão mobile encontrado:', mobileSidebarBtn);
+            console.log('Logo clickable encontrado:', logoClickable);
+            
+            // Garantir que o sidebar esteja visível por padrão
+            if (sidebar) {
+                sidebar.style.display = 'block';
+                sidebar.style.visibility = 'visible';
+                sidebar.style.opacity = '1';
+                
+                // Em desktop, começar fechado
+                if (window.innerWidth > 1024) {
+                    sidebar.classList.add('closed');
+                }
+                
+                console.log('Sidebar configurado');
+            }
+            
+            // Botão mobile para abrir/fechar sidebar
+            if (mobileSidebarBtn && sidebar) {
+                mobileSidebarBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    sidebar.classList.toggle('mobile-open');
+                    console.log('Mobile sidebar toggled:', sidebar.classList.contains('mobile-open'));
+                });
+            }
+
+            // Logo click para toggle sidebar
+            if (logoClickable && sidebar) {
+                logoClickable.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleSidebar();
+                });
+            }
+
+            // Fechar sidebar no mobile ao clicar fora
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth <= 1024) {
+                    if (sidebar && !sidebar.contains(e.target) && !mobileSidebarBtn.contains(e.target)) {
+                        sidebar.classList.remove('mobile-open');
+                    }
+                }
+            });
+
+            // Ajustar sidebar quando a janela é redimensionada
+            window.addEventListener('resize', function() {
+                if (window.innerWidth > 1024) {
+                    // Desktop: remover mobile-open e adicionar closed se não estiver
+                    sidebar.classList.remove('mobile-open');
+                    if (!sidebar.classList.contains('closed')) {
+                        sidebar.classList.add('closed');
+                    }
+                } else {
+                    // Mobile: remover closed
+                    sidebar.classList.remove('closed');
+                }
+            });
+        });
+    </script>
+    
     {% block extra_js %}{% endblock %}
 </body>
 </html> 

@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Todas as Mesas - Saint Paul Cassino{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link rel="stylesheet" href="{% static 'css/todas_mesas.css' %}">
+<style>
+/* Garantir que o sidebar funcione corretamente */
+.sidebar {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 50 !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 300px !important;
+    height: 100vh !important;
+    background: rgba(255, 255, 255, 0.97) !important;
+    backdrop-filter: blur(25px) !important;
+    border-right: 1px solid rgba(220, 38, 38, 0.08) !important;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.sidebar.closed {
+    width: 110px !important;
+}
+
+.sidebar.mobile-open {
+    left: 0 !important;
+}
+
+@media (max-width: 1024px) {
+    .sidebar {
+        left: -300px !important;
+    }
+    
+    .sidebar.mobile-open {
+        left: 0 !important;
+    }
+    
+    .content-wrapper {
+        margin-left: 0 !important;
+    }
+    
+}
+
+@media (min-width: 1025px) {
+    .content-wrapper {
+        margin-left: 300px !important;
+    }
+    
+    .sidebar.closed ~ .content-wrapper {
+        margin-left: 110px !important;
+    }
+}
+
+/* Garantir que o logo seja clicável */
+#logoClickable {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    z-index: 10 !important;
+    position: relative !important;
+}
+
+#logoClickable:hover {
+    transform: scale(1.05) !important;
+}
+</style>
+{% endblock %}
+
+{% block extra_head %}
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="bg-cassino"></div>
+<div class="bg-overlay"></div>
+
+<div class="main-content">
+    {% include 'components/_sidebar.html' %}
+
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        <!-- Botão mobile para abrir sidebar -->
+        <button id="mobileSidebarBtn" class="lg:hidden fixed top-4 left-4 z-50 w-12 h-12 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold text-xl rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center">
+            S
+        </button>
+        
+        <header class="main-header">
+            <div class="flex flex-col items-center mb-4">
+                <div class="text-center mb-4">
+                    <h1 class="main-title">Todas as Mesas</h1>
+                    <p class="main-subtitle">Visualize e gerencie todas as mesas do cassino</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="cards-container">
+            <!-- Loading -->
+            <div id="loading" class="bg-white/95 backdrop-blur-xl rounded-2xl p-8 shadow-xl border border-red-500/10 mb-6">
+                <div class="flex flex-col items-center justify-center">
+                    <div class="w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin mb-4"></div>
+                    <p class="text-gray-600 font-semibold">Carregando mesas...</p>
+                </div>
+            </div>
+
+            <!-- Lista de Mesas -->
+            <div id="mesasContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6" style="display: none;">
+                <!-- As mesas serão carregadas aqui via JavaScript -->
+            </div>
+
+            <!-- Mensagem de erro -->
+            <div id="errorMessage" class="bg-white/95 backdrop-blur-xl rounded-2xl p-8 shadow-xl border border-red-500/10" style="display: none;">
+                <div class="flex flex-col items-center justify-center text-center">
+                    <svg class="w-16 h-16 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="15" y1="9" x2="9" y2="15"/>
+                        <line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Erro ao Carregar</h3>
+                    <p id="errorText" class="text-gray-600">Erro ao carregar mesas</p>
+                    <button onclick="carregarMesas()" class="mt-4 px-6 py-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                        Tentar Novamente
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para detalhes da mesa -->
+<div id="mesaModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
+    <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/20 max-w-2xl w-full max-h-[90vh] flex flex-col transform transition-all duration-300 scale-95 opacity-0" id="modalContentMesa">
+        <!-- Header -->
+        <div class="modal-header bg-gradient-to-r from-gray-600 to-gray-500 rounded-t-2xl p-6 text-white shadow-lg flex-shrink-0">
+            <div class="flex items-center justify-between">
+                <h2 class="text-2xl font-bold">Detalhes da Mesa</h2>
+                <button onclick="fecharModal()" class="text-white/80 hover:text-white transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- Content -->
+        <div class="modal-body flex-1 overflow-y-auto p-6">
+            <div id="mesaModalContent" class="space-y-6"></div>
+            <div class="flex justify-end mt-6 pt-4 border-t border-gray-200">
+                <button onclick="fecharModal()" class="px-6 py-2 bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-700 hover:to-gray-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let todasMesas = [];
+let paginaAtual = 1;
+const itensPorPagina = 12;
+
+document.addEventListener('DOMContentLoaded', function() {
+    carregarMesas();
+    
+    // Sidebar já está configurado no base.html
+    console.log('Página todas_mesas carregada - sidebar configurado no base.html');
+});
+
+function carregarMesas() {
+    const loading = document.getElementById('loading');
+    const mesasContainer = document.getElementById('mesasContainer');
+    const errorMessage = document.getElementById('errorMessage');
+
+    loading.style.display = 'block';
+    mesasContainer.style.display = 'none';
+    errorMessage.style.display = 'none';
+
+    fetch('{% url "listar_mesas_api" %}')
+        .then(response => response.json())
+        .then(data => {
+            todasMesas = data.mesas || [];
+            paginaAtual = 1;
+            renderizarMesas();
+        })
+        .catch(error => {
+            loading.style.display = 'none';
+            errorMessage.style.display = 'block';
+            document.getElementById('errorText').textContent = 'Erro ao carregar mesas. Tente novamente.';
+        });
+}
+
+function renderizarMesas() {
+    const mesasContainer = document.getElementById('mesasContainer');
+    const loading = document.getElementById('loading');
+    loading.style.display = 'none';
+    mesasContainer.style.display = 'grid';
+
+    if (!todasMesas.length) {
+        mesasContainer.innerHTML = `<div class="col-span-full bg-white/95 backdrop-blur-xl rounded-2xl p-8 shadow-xl border border-red-500/10"><div class="flex flex-col items-center justify-center text-center"><svg class="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2" ry="2"/><line x1="7" y1="8" x2="7" y2="12"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="17" y1="8" x2="17" y2="12"/></svg><h3 class="text-xl font-bold text-gray-800 mb-2">Nenhuma Mesa Encontrada</h3><p class="text-gray-600">Não há mesas cadastradas no sistema.</p></div></div>`;
+        return;
+    }
+
+    mesasContainer.innerHTML = todasMesas.map(mesa => `
+        <div class="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-red-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group">
+            <div class="absolute top-0 left-0 right-0 h-1 ${getStatusColor(mesa.status)} opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Mesa ${mesa.numero_mesa}</h3>
+                <span class="px-3 py-1 text-xs font-semibold rounded-full ${getStatusBadge(mesa.status)}">
+                    ${mesa.status_display}
+                </span>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <p class="text-sm text-gray-600 font-semibold">Tipo de Jogo</p>
+                    <p class="text-lg font-bold text-gray-800">${mesa.tipo_jogo_display}</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-600 font-semibold">Saldo</p>
+                    <p class="text-lg font-bold text-red-600">R$ ${parseFloat(mesa.saldo).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                </div>
+            </div>
+            <div class="flex gap-2 mt-4">
+                <button class="w-full px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white text-sm font-semibold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-1" onclick="verMesa(${mesa.id})" title="Ver detalhes">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                    Ver Detalhes
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function getStatusColor(status) {
+    switch(status) {
+        case 'aberta': return 'bg-gradient-to-r from-green-600 to-green-400';
+        case 'fechada': return 'bg-gradient-to-r from-amber-600 to-amber-400';
+        case 'encerrada': return 'bg-gradient-to-r from-gray-600 to-gray-400';
+        default: return 'bg-gradient-to-r from-red-600 to-red-400';
+    }
+}
+
+function getStatusBadge(status) {
+    switch(status) {
+        case 'aberta': return 'bg-green-100 text-green-800';
+        case 'fechada': return 'bg-amber-100 text-amber-800';
+        case 'encerrada': return 'bg-gray-100 text-gray-800';
+        default: return 'bg-red-100 text-red-800';
+    }
+}
+
+function verMesa(mesaId) {
+    const modal = document.getElementById('mesaModal');
+    const modalContent = document.getElementById('mesaModalContent');
+    modalContent.innerHTML = `<div class='flex flex-col items-center justify-center py-8'><div class='w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin mb-4'></div><p class='text-gray-600 font-semibold'>Carregando detalhes da mesa...</p></div>`;
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+        const modalContentDiv = document.getElementById('modalContentMesa');
+        modalContentDiv.classList.remove('scale-95', 'opacity-0');
+        modalContentDiv.classList.add('scale-100', 'opacity-100');
+        
+        // Garantir que o scroll do modal funcione corretamente
+        const modalBody = modalContentDiv.querySelector('.modal-body');
+        if (modalBody) {
+            modalBody.scrollTop = 0;
+        }
+    }, 10);
+    fetch(`/mesas/api/mesa/${mesaId}/obter/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const mesa = data.mesa;
+                modalContent.innerHTML = `<div class='grid grid-cols-1 md:grid-cols-2 gap-6'><div class='space-y-4'><div class='bg-gradient-to-r from-red-50 to-red-100 rounded-xl p-4'><h3 class='text-lg font-bold text-gray-800 mb-3'>Informações Básicas</h3><div class='space-y-3'><div><p class='text-sm text-gray-600 font-semibold'>Número da Mesa</p><p class='text-xl font-bold text-gray-800'>${mesa.numero_mesa}</p></div><div><p class='text-sm text-gray-600 font-semibold'>Tipo de Jogo</p><p class='text-lg font-bold text-gray-800'>${mesa.tipo_jogo_display}</p></div><div><p class='text-sm text-gray-600 font-semibold'>Status</p><span class='px-3 py-1 text-sm font-semibold rounded-full ${getStatusBadge(mesa.status)}'>${mesa.status_display}</span></div></div></div><div class='bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-4'><h3 class='text-lg font-bold text-gray-800 mb-3'>Valores</h3><div class='space-y-3'><div><p class='text-sm text-gray-600 font-semibold'>Valor Inicial</p><p class='text-lg font-bold text-green-600'>R$ ${parseFloat(mesa.valor_inicial).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p></div><div><p class='text-sm text-gray-600 font-semibold'>Valor Total</p><p class='text-lg font-bold text-blue-600'>R$ ${parseFloat(mesa.valor_total).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p></div><div><p class='text-sm text-gray-600 font-semibold'>Saldo</p><p class='text-xl font-bold text-red-600'>R$ ${parseFloat(mesa.saldo).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p></div></div></div></div><div class='space-y-4'><div class='bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-4'><h3 class='text-lg font-bold text-gray-800 mb-3'>Fichas</h3><div class='grid grid-cols-2 gap-3'><div><p class='text-sm text-gray-600 font-semibold'>R$ 5,00</p><p class='text-lg font-bold text-gray-800'>${mesa.fichas_5 || 0}</p></div><div><p class='text-sm text-gray-600 font-semibold'>R$ 25,00</p><p class='text-lg font-bold text-gray-800'>${mesa.fichas_25 || 0}</p></div><div><p class='text-sm text-gray-600 font-semibold'>R$ 100,00</p><p class='text-lg font-bold text-gray-800'>${mesa.fichas_100 || 0}</p></div><div><p class='text-sm text-gray-600 font-semibold'>R$ 500,00</p><p class='text-lg font-bold text-gray-800'>${mesa.fichas_500 || 0}</p></div><div><p class='text-sm text-gray-600 font-semibold'>R$ 1.000,00</p><p class='text-lg font-bold text-gray-800'>${mesa.fichas_1000 || 0}</p></div><div><p class='text-sm text-gray-600 font-semibold'>R$ 5.000,00</p><p class='text-lg font-bold text-gray-800'>${mesa.fichas_5000 || 0}</p></div><div class='col-span-2'><p class='text-sm text-gray-600 font-semibold'>R$ 10.000,00</p><p class='text-lg font-bold text-gray-800'>${mesa.fichas_10000 || 0}</p></div></div></div><div class='bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-4'><h3 class='text-lg font-bold text-gray-800 mb-3'>Datas</h3><div class='space-y-3'><div><p class='text-sm text-gray-600 font-semibold'>Data de Criação</p><p class='text-lg font-bold text-gray-800'>${mesa.data_criacao}</p></div><div><p class='text-sm text-gray-600 font-semibold'>Última Atualização</p><p class='text-lg font-bold text-gray-800'>${mesa.data_atualizacao}</p></div></div></div></div></div>`;
+            } else {
+                modalContent.innerHTML = `<div class='flex flex-col items-center justify-center py-8'><svg class='w-16 h-16 text-red-500 mb-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/><line x1='15' y1='9' x2='9' y2='15'/><line x1='9' y1='9' x2='15' y2='15'/></svg><h3 class='text-xl font-bold text-gray-800 mb-2'>Erro ao Carregar</h3><p class='text-gray-600'>${data.message || 'Erro ao carregar detalhes da mesa'}</p></div>`;
+            }
+        })
+        .catch(error => {
+            modalContent.innerHTML = `<div class='flex flex-col items-center justify-center py-8'><svg class='w-16 h-16 text-red-500 mb-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/><line x1='15' y1='9' x2='9' y2='15'/><line x1='9' y1='9' x2='15' y2='15'/></svg><h3 class='text-xl font-bold text-gray-800 mb-2'>Erro ao Carregar</h3><p class='text-gray-600'>Erro ao carregar detalhes da mesa. Tente novamente.</p></div>`;
+        });
+}
+
+function fecharModal() {
+    const modal = document.getElementById('mesaModal');
+    const modalContentDiv = document.getElementById('modalContentMesa');
+    
+    // Resetar o scroll antes de fechar
+    const modalBody = modalContentDiv.querySelector('.modal-body');
+    if (modalBody) {
+        modalBody.scrollTop = 0;
+    }
+    
+    modalContentDiv.classList.add('scale-95', 'opacity-0');
+    modalContentDiv.classList.remove('scale-100', 'opacity-100');
+    setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }, 300);
+}
+</script>
+{% endblock %} 

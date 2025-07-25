@@ -7,6 +7,140 @@
     box-sizing: border-box;
 }
 
+/* Estilos para modais responsivos */
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Proteção contra fechamento acidental */
+#modalCriarMesa:not(.hidden) {
+    pointer-events: auto !important;
+}
+
+#modalCriarMesa:not(.hidden) .modal-content {
+    pointer-events: auto !important;
+}
+
+/* Prevenir seleção de texto que pode causar problemas */
+#modalCriarMesa:not(.hidden) * {
+    user-select: text;
+}
+
+.modal-header {
+    flex-shrink: 0;
+}
+
+.modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+}
+
+/* Scroll personalizado para modais */
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: rgba(239, 68, 68, 0.5);
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(239, 68, 68, 0.7);
+}
+
+/* Melhorias para o scroll dos modais */
+.modal-body {
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(239, 68, 68, 0.5) rgba(0, 0, 0, 0.1);
+}
+
+/* Garantir que os campos permaneçam dentro do modal */
+.modal-body form {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-body form > div:last-child {
+    margin-top: auto;
+    padding-top: 1.5rem;
+}
+
+/* Melhorar espaçamento dos campos no modal */
+.modal-body .space-y-6 > div {
+    margin-bottom: 1.5rem;
+}
+
+.modal-body .space-y-6 > div:last-child {
+    margin-bottom: 0;
+}
+
+/* Responsividade para modais */
+@media (max-width: 768px) {
+    #modalCriarMesa .bg-white,
+    #modalEditarMesa .bg-white {
+        max-height: 95vh;
+        margin: 1rem;
+        width: calc(100vw - 2rem);
+    }
+    
+    .modal-body {
+        padding: 1rem;
+    }
+    
+    .modal-header {
+        padding: 1rem;
+    }
+    
+    .modal-header h3 {
+        font-size: 1.5rem;
+    }
+    
+    .modal-header p {
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 640px) {
+    #modalCriarMesa .bg-white,
+    #modalEditarMesa .bg-white {
+        max-height: 98vh;
+        margin: 0.5rem;
+        width: calc(100vw - 1rem);
+    }
+    
+    .modal-body {
+        padding: 0.75rem;
+    }
+    
+    .modal-header {
+        padding: 0.75rem;
+    }
+    
+    .modal-header h3 {
+        font-size: 1.25rem;
+    }
+    
+    .modal-header p {
+        font-size: 0.75rem;
+    }
+    
+    /* Ajustar grid de fichas para mobile */
+    .modal-body .grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     min-height: 100vh;
@@ -50,10 +184,11 @@ body {
     flex: 1;
     position: relative;
     z-index: 2;
+    padding: 0 2rem;
 }
 
 .sidebar.closed ~ .content-wrapper {
-    margin-left: 85px;
+    margin-left: 110px;
 }
 
 /* Header principal */

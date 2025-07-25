@@ -107,9 +107,6 @@ def mesas_home(request):
     else:
         variacao_percentual = 0 if receita_total == 0 else 100
     
-    # Determinar se há filtro ativo
-    filtro_ativo = bool(data_inicio and data_fim) or bool(status_filtro)
-    
     context = {
         'mesas': mesas,
         'mesas_ativas': mesas_ativas,
@@ -117,16 +114,18 @@ def mesas_home(request):
         'receita_total': receita_total,
         'fichas_vendidas': fichas_vendidas,
         'estoque_restante': estoque_restante,
+        'variacao_percentual': variacao_percentual,
         'data_inicio': data_inicio,
         'data_fim': data_fim,
         'status_filtro': status_filtro,
-        'variacao_percentual': variacao_percentual,
-        'periodo_texto': f"de {data_inicio.strftime('%d/%m/%Y')} a {data_fim.strftime('%d/%m/%Y')}",
-        'filtro_ativo': filtro_ativo,
-        'mesas_periodo_count': mesas_periodo.count()  # Quantidade de mesas no período
     }
     
     return render(request, 'home.html', context)
+
+@login_required(login_url='/usuarios/login/')
+def todas_mesas(request):
+    """View para mostrar todas as mesas em formato de lista"""
+    return render(request, 'mesas/todas_mesas.html')
 
 @csrf_exempt
 def criar_mesa(request):
@@ -200,9 +199,11 @@ def criar_mesa(request):
             })
         except Exception as e:
             print(f"DEBUG - Erro: {str(e)}")  # Debug log
+            import traceback
+            print(f"DEBUG - Traceback: {traceback.format_exc()}")
             return JsonResponse({
                 'success': False,
-                'message': str(e)
+                'message': f'Erro interno: {str(e)}'
             }, status=400)
     return JsonResponse({'success': False, 'message': 'Método não permitido'}, status=405)
 
@@ -215,7 +216,8 @@ def listar_mesas_api(request):
             'numero_mesa': mesa.numero_mesa,
             'tipo_jogo': mesa.tipo_jogo,
             'tipo_jogo_display': mesa.get_tipo_jogo_display(),
-            'valor_total': mesa.valor_total,
+            'valor_total': float(mesa.valor_total),
+            'saldo': float(mesa.saldo),
             'status': mesa.status,
             'status_display': mesa.get_status_display(),
         })
@@ -225,17 +227,31 @@ def obter_mesa_api(request, mesa_id):
     try:
         mesa = Mesa.objects.get(id=mesa_id)
         data = {
-            'id': mesa.id,
-            'numero_mesa': mesa.numero_mesa,
-            'tipo_jogo': mesa.tipo_jogo,
-            'tipo_jogo_display': mesa.get_tipo_jogo_display(),
-            'valor_total': mesa.valor_total,
-            'status': mesa.status,
-            'status_display': mesa.get_status_display(),
+            'success': True,
+            'mesa': {
+                'id': mesa.id,
+                'numero_mesa': mesa.numero_mesa,
+                'tipo_jogo': mesa.tipo_jogo,
+                'tipo_jogo_display': mesa.get_tipo_jogo_display(),
+                'valor_inicial': float(mesa.valor_inicial),
+                'valor_total': float(mesa.valor_total),
+                'saldo': float(mesa.saldo),
+                'status': mesa.status,
+                'status_display': mesa.get_status_display(),
+                'fichas_5': mesa.fichas_5 or 0,
+                'fichas_25': mesa.fichas_25 or 0,
+                'fichas_100': mesa.fichas_100 or 0,
+                'fichas_500': mesa.fichas_500 or 0,
+                'fichas_1000': mesa.fichas_1000 or 0,
+                'fichas_5000': mesa.fichas_5000 or 0,
+                'fichas_10000': mesa.fichas_10000 or 0,
+                'data_criacao': mesa.data_criacao.strftime('%d/%m/%Y %H:%M'),
+                'data_atualizacao': mesa.data_atualizacao.strftime('%d/%m/%Y %H:%M'),
+            }
         }
         return JsonResponse(data)
     except Mesa.DoesNotExist:
-        return JsonResponse({'error': 'Mesa não encontrada'}, status=404)
+        return JsonResponse({'success': False, 'message': 'Mesa não encontrada'}, status=404)
 
 def modelo_info_api(request):
     model_info = {
@@ -277,78 +293,116 @@ def modelo_info_api(request):
 
 @csrf_exempt
 def fechar_mesa_api(request, mesa_id):
+    print(f"DEBUG - fechar_mesa_api chamada para mesa_id: {mesa_id}")
+    print(f"DEBUG - Método da requisição: {request.method}")
+    
     if request.method == 'POST':
         try:
             mesa = Mesa.objects.get(id=mesa_id)
+            print(f"DEBUG - Mesa encontrada: {mesa.numero_mesa} (status atual: {mesa.status})")
+            
             mesa.status = 'fechada'
             mesa.save()
+            print(f"DEBUG - Mesa {mesa.numero_mesa} fechada com sucesso")
+            
+            mesa_atualizada = {
+                'id': mesa.id,
+                'numero_mesa': mesa.numero_mesa,
+                'tipo_jogo': mesa.tipo_jogo,
+                'tipo_jogo_display': mesa.get_tipo_jogo_display(),
+                'status': mesa.status,
+                'status_display': mesa.get_status_display(),
+                'valor_inicial': float(mesa.valor_inicial),
+                'valor_total': float(mesa.valor_total),
+                'saldo': float(mesa.saldo),
+                'fichas_5': mesa.fichas_5,
+                'fichas_25': mesa.fichas_25,
+                'fichas_100': mesa.fichas_100,
+                'fichas_500': mesa.fichas_500,
+                'fichas_1000': mesa.fichas_1000,
+                'fichas_5000': mesa.fichas_5000,
+                'fichas_10000': mesa.fichas_10000,
+                'data_criacao': mesa.data_criacao.strftime('%d/%m/%Y %H:%M'),
+                'data_atualizacao': mesa.data_atualizacao.strftime('%d/%m/%Y %H:%M'),
+            }
+            print(f"DEBUG - Dados da mesa atualizada: {mesa_atualizada}")
+            
             return JsonResponse({
                 'success': True,
                 'message': f'Mesa {mesa.numero_mesa} fechada com sucesso!',
-                'mesa_atualizada': {
-                    'id': mesa.id,
-                    'numero_mesa': mesa.numero_mesa,
-                    'tipo_jogo': mesa.tipo_jogo,
-                    'tipo_jogo_display': mesa.get_tipo_jogo_display(),
-                    'status': mesa.status,
-                    'status_display': mesa.get_status_display(),
-                    'valor_inicial': float(mesa.valor_inicial),
-                    'valor_total': float(mesa.valor_total),
-                    'saldo': float(mesa.saldo),
-                    'fichas_5': mesa.fichas_5,
-                    'fichas_25': mesa.fichas_25,
-                    'fichas_100': mesa.fichas_100,
-                    'fichas_500': mesa.fichas_500,
-                    'fichas_1000': mesa.fichas_1000,
-                    'fichas_5000': mesa.fichas_5000,
-                    'fichas_10000': mesa.fichas_10000,
-                    'data_criacao': mesa.data_criacao.strftime('%d/%m/%Y %H:%M'),
-                    'data_atualizacao': mesa.data_atualizacao.strftime('%d/%m/%Y %H:%M'),
-                }
+                'mesa_atualizada': mesa_atualizada
             })
         except Mesa.DoesNotExist:
+            print(f"DEBUG - Mesa {mesa_id} não encontrada")
             return JsonResponse({
                 'success': False,
                 'message': 'Mesa não encontrada'
             }, status=404)
+        except Exception as e:
+            print(f"DEBUG - Erro inesperado: {str(e)}")
+            return JsonResponse({
+                'success': False,
+                'message': f'Erro interno: {str(e)}'
+            }, status=500)
+    
+    print(f"DEBUG - Método {request.method} não permitido")
     return JsonResponse({'success': False, 'message': 'Método não permitido'}, status=405)
 
 @csrf_exempt
 def abrir_mesa_api(request, mesa_id):
+    print(f"DEBUG - abrir_mesa_api chamada para mesa_id: {mesa_id}")
+    print(f"DEBUG - Método da requisição: {request.method}")
+    
     if request.method == 'POST':
         try:
             mesa = Mesa.objects.get(id=mesa_id)
+            print(f"DEBUG - Mesa encontrada: {mesa.numero_mesa} (status atual: {mesa.status})")
+            
             mesa.status = 'aberta'
             mesa.save()
+            print(f"DEBUG - Mesa {mesa.numero_mesa} aberta com sucesso")
+            
+            mesa_atualizada = {
+                'id': mesa.id,
+                'numero_mesa': mesa.numero_mesa,
+                'tipo_jogo': mesa.tipo_jogo,
+                'tipo_jogo_display': mesa.get_tipo_jogo_display(),
+                'status': mesa.status,
+                'status_display': mesa.get_status_display(),
+                'valor_inicial': float(mesa.valor_inicial),
+                'valor_total': float(mesa.valor_total),
+                'saldo': float(mesa.saldo),
+                'fichas_5': mesa.fichas_5,
+                'fichas_25': mesa.fichas_25,
+                'fichas_100': mesa.fichas_100,
+                'fichas_500': mesa.fichas_500,
+                'fichas_1000': mesa.fichas_1000,
+                'fichas_5000': mesa.fichas_5000,
+                'fichas_10000': mesa.fichas_10000,
+                'data_criacao': mesa.data_criacao.strftime('%d/%m/%Y %H:%M'),
+                'data_atualizacao': mesa.data_atualizacao.strftime('%d/%m/%Y %H:%M'),
+            }
+            print(f"DEBUG - Dados da mesa atualizada: {mesa_atualizada}")
+            
             return JsonResponse({
                 'success': True,
                 'message': f'Mesa {mesa.numero_mesa} aberta com sucesso!',
-                'mesa_atualizada': {
-                    'id': mesa.id,
-                    'numero_mesa': mesa.numero_mesa,
-                    'tipo_jogo': mesa.tipo_jogo,
-                    'tipo_jogo_display': mesa.get_tipo_jogo_display(),
-                    'status': mesa.status,
-                    'status_display': mesa.get_status_display(),
-                    'valor_inicial': float(mesa.valor_inicial),
-                    'valor_total': float(mesa.valor_total),
-                    'saldo': float(mesa.saldo),
-                    'fichas_5': mesa.fichas_5,
-                    'fichas_25': mesa.fichas_25,
-                    'fichas_100': mesa.fichas_100,
-                    'fichas_500': mesa.fichas_500,
-                    'fichas_1000': mesa.fichas_1000,
-                    'fichas_5000': mesa.fichas_5000,
-                    'fichas_10000': mesa.fichas_10000,
-                    'data_criacao': mesa.data_criacao.strftime('%d/%m/%Y %H:%M'),
-                    'data_atualizacao': mesa.data_atualizacao.strftime('%d/%m/%Y %H:%M'),
-                }
+                'mesa_atualizada': mesa_atualizada
             })
         except Mesa.DoesNotExist:
+            print(f"DEBUG - Mesa {mesa_id} não encontrada")
             return JsonResponse({
                 'success': False,
                 'message': 'Mesa não encontrada'
             }, status=404)
+        except Exception as e:
+            print(f"DEBUG - Erro inesperado: {str(e)}")
+            return JsonResponse({
+                'success': False,
+                'message': f'Erro interno: {str(e)}'
+            }, status=500)
+    
+    print(f"DEBUG - Método {request.method} não permitido")
     return JsonResponse({'success': False, 'message': 'Método não permitido'}, status=405)
 
 @csrf_exempt
@@ -468,26 +522,36 @@ def editar_mesa_api(request, mesa_id):
 
 @csrf_exempt
 def encerrar_mesa_api(request, mesa_id):
+    print(f"DEBUG - encerrar_mesa_api chamada para mesa_id: {mesa_id}")
+    print(f"DEBUG - Método da requisição: {request.method}")
+    
     if request.method == 'POST':
         try:
             mesa = Mesa.objects.get(id=mesa_id)
+            print(f"DEBUG - Mesa encontrada: {mesa.numero_mesa} (status atual: {mesa.status})")
+            
             mesa.status = 'encerrada'
             mesa.save()
+            print(f"DEBUG - Mesa {mesa.numero_mesa} encerrada com sucesso")
             
             return JsonResponse({
                 'success': True,
                 'message': f'Mesa {mesa.numero_mesa} encerrada com sucesso!'
             })
         except Mesa.DoesNotExist:
+            print(f"DEBUG - Mesa {mesa_id} não encontrada")
             return JsonResponse({
                 'success': False,
                 'message': 'Mesa não encontrada'
             }, status=404)
         except Exception as e:
+            print(f"DEBUG - Erro inesperado: {str(e)}")
             return JsonResponse({
                 'success': False,
                 'message': str(e)
             }, status=400)
+    
+    print(f"DEBUG - Método {request.method} não permitido")
     return JsonResponse({'success': False, 'message': 'Método não permitido'}, status=405)
 
 @csrf_exempt

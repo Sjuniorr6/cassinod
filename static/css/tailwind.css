@@ -1,0 +1,321 @@
+/* Tailwind CSS básico para o projeto */
+
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Classes de display */
+.hidden {
+    display: none !important;
+}
+
+.flex {
+    display: flex;
+}
+
+.inline-flex {
+    display: inline-flex;
+}
+
+.grid {
+    display: grid;
+}
+
+/* Classes de posicionamento */
+.fixed {
+    position: fixed;
+}
+
+.relative {
+    position: relative;
+}
+
+.absolute {
+    position: absolute;
+}
+
+/* Classes de z-index */
+.z-50 {
+    z-index: 50;
+}
+
+.z-1000 {
+    z-index: 1000;
+}
+
+/* Classes de largura e altura */
+.w-12 {
+    width: 3rem;
+}
+
+.h-12 {
+    height: 3rem;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.h-full {
+    height: 100%;
+}
+
+/* Classes de padding */
+.p-4 {
+    padding: 1rem;
+}
+
+.px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.py-4 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+/* Classes de margin */
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+.mr-2 {
+    margin-right: 0.5rem;
+}
+
+/* Classes de texto */
+.text-white {
+    color: white;
+}
+
+.text-xl {
+    font-size: 1.25rem;
+}
+
+.font-bold {
+    font-weight: 700;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Classes de background */
+.bg-gradient-to-r {
+    background-image: linear-gradient(to right, var(--tw-gradient-stops));
+}
+
+.from-red-600 {
+    --tw-gradient-from: #dc2626;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(220, 38, 38, 0));
+}
+
+.to-red-500 {
+    --tw-gradient-to: #ef4444;
+}
+
+.hover\:from-red-700:hover {
+    --tw-gradient-from: #b91c1c;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(185, 28, 28, 0));
+}
+
+.hover\:to-red-600:hover {
+    --tw-gradient-to: #dc2626;
+}
+
+/* Classes de border radius */
+.rounded-xl {
+    border-radius: 0.75rem;
+}
+
+/* Classes de shadow */
+.shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.hover\:shadow-xl:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Classes de transform */
+.hover\:-translate-y-1:hover {
+    transform: translateY(-0.25rem);
+}
+
+/* Classes de transition */
+.transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+.duration-300 {
+    transition-duration: 300ms;
+}
+
+/* Classes de flexbox */
+.items-center {
+    align-items: center;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+/* Classes de grid */
+.grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.gap-6 {
+    gap: 1.5rem;
+}
+
+/* Classes de espaçamento */
+.space-y-4 > * + * {
+    margin-top: 1rem;
+}
+
+.space-y-6 > * + * {
+    margin-top: 1.5rem;
+}
+
+.space-y-3 > * + * {
+    margin-top: 0.75rem;
+}
+
+/* Classes de cores */
+.text-green-600 {
+    color: #059669;
+}
+
+.text-red-600 {
+    color: #dc2626;
+}
+
+.text-gray-600 {
+    color: #4b5563;
+}
+
+.text-gray-800 {
+    color: #1f2937;
+}
+
+.text-lg {
+    font-size: 1.125rem;
+}
+
+.text-2xl {
+    font-size: 1.5rem;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+/* Classes de background */
+.bg-blue-100 {
+    background-color: rgba(219, 234, 254, 0.8);
+}
+
+.text-blue-600 {
+    color: #2563eb;
+}
+
+.bg-green-100 {
+    background-color: rgba(220, 252, 231, 0.8);
+}
+
+.bg-purple-100 {
+    background-color: rgba(243, 232, 255, 0.8);
+}
+
+.text-purple-600 {
+    color: #9333ea;
+}
+
+.bg-orange-100 {
+    background-color: rgba(254, 215, 170, 0.8);
+}
+
+.text-orange-600 {
+    color: #ea580c;
+}
+
+/* Classes de gradiente */
+.bg-gradient-to-r {
+    background-image: linear-gradient(to right, var(--tw-gradient-stops));
+}
+
+.from-blue-50 {
+    --tw-gradient-from: rgba(239, 246, 255, 0.8);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(239, 246, 255, 0));
+}
+
+.to-blue-100 {
+    --tw-gradient-to: rgba(219, 234, 254, 0.8);
+}
+
+.from-green-50 {
+    --tw-gradient-from: rgba(240, 253, 244, 0.8);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(240, 253, 244, 0));
+}
+
+.to-green-100 {
+    --tw-gradient-to: rgba(220, 252, 231, 0.8);
+}
+
+.from-purple-50 {
+    --tw-gradient-from: rgba(250, 245, 255, 0.8);
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(250, 245, 255, 0));
+}
+
+.to-purple-100 {
+    --tw-gradient-to: rgba(243, 232, 255, 0.8);
+}
+
+/* Classes de tamanho de texto */
+.text-sm {
+    font-size: 0.875rem;
+}
+
+/* Classes de margin */
+.mb-3 {
+    margin-bottom: 0.75rem;
+}
+
+/* Classes de padding */
+.p-4 {
+    padding: 1rem;
+}
+
+/* Classes de border radius */
+.rounded-xl {
+    border-radius: 0.75rem;
+}
+
+/* Media queries */
+@media (min-width: 768px) {
+    .md\:grid-cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+/* Classes de largura responsiva */
+.lg\:hidden {
+    display: none;
+}
+
+@media (max-width: 1024px) {
+    .lg\:hidden {
+        display: block;
+    }
+} 

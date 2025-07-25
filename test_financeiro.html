@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Financeiro</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="static/css/sidebar.css">
+    <link rel="stylesheet" href="static/css/financeiro.css">
+    <style>
+        /* Teste adicional */
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        
+        .test-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 9999;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <div>Teste de Layout Financeiro</div>
+        <div id="status">Carregando...</div>
+    </div>
+
+    <div class="bg-cassino"></div>
+    <div class="bg-overlay"></div>
+
+    <div class="main-content">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="brand">
+                <div class="logo" id="logoClickable" style="cursor: pointer;">S</div>
+                <div class="brand-name">Saint Paul</div>
+                <div class="brand-subtitle">Gestão do Cassino</div>
+            </div>
+            
+            <nav>
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active">
+                            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="1" x2="12" y2="23"/>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                            </svg>
+                            <span class="nav-text">Financeiro</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content-wrapper">
+            <div class="financeiro-content" style="min-height: 100vh; padding: 0;">
+                <!-- Header -->
+                <div class="main-header">
+                    <h1 class="main-title">Financeiro</h1>
+                    <p class="main-subtitle">Gestão financeira e controle de clientes</p>
+                    <div class="mt-6">
+                        <button class="btn-primary">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            Novo Cliente
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Métricas -->
+                <div class="cards-container">
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-icon bg-blue-100 text-blue-600">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="metric-content">
+                                <h3 class="metric-title">Total de Clientes</h3>
+                                <p class="metric-value">0</p>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-icon bg-green-100 text-green-600">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                                </svg>
+                            </div>
+                            <div class="metric-content">
+                                <h3 class="metric-title">Saldo Total</h3>
+                                <p class="metric-value">R$ 0,00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const status = document.getElementById('status');
+            const sidebar = document.getElementById('sidebar');
+            const contentWrapper = document.querySelector('.content-wrapper');
+            const bgCassino = document.querySelector('.bg-cassino');
+            const bgOverlay = document.querySelector('.bg-overlay');
+            
+            let checks = [];
+            
+            // Verificar sidebar
+            if (sidebar && sidebar.style.display !== 'none') {
+                checks.push('✅ Sidebar visível');
+            } else {
+                checks.push('❌ Sidebar não visível');
+            }
+            
+            // Verificar content-wrapper
+            if (contentWrapper && contentWrapper.style.marginLeft === '300px') {
+                checks.push('✅ Content wrapper com margin correto');
+            } else {
+                checks.push('❌ Content wrapper sem margin correto');
+            }
+            
+            // Verificar background
+            if (bgCassino && bgOverlay) {
+                checks.push('✅ Background e overlay presentes');
+            } else {
+                checks.push('❌ Background ou overlay ausente');
+            }
+            
+            status.innerHTML = checks.join('<br>');
+        });
+    </script>
+</body>
+</html> 

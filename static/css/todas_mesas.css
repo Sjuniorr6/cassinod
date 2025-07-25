@@ -1,0 +1,225 @@
+/* Estilos específicos para a página de todas as mesas */
+
+/* Ajustes para os cards de mesa */
+.mesa-card-hover {
+    transition: all 0.3s ease;
+}
+
+.mesa-card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos para paginação */
+.pagination-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(239, 68, 68, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.pagination-button {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.pagination-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.pagination-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-info {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(239, 68, 68, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+    color: #374151;
+}
+
+/* Animações de loading personalizadas */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.loading-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Estilos para os badges de status */
+.status-badge {
+    transition: all 0.3s ease;
+}
+
+.status-badge:hover {
+    transform: scale(1.05);
+}
+
+/* Responsividade específica para os cards de mesa */
+@media (max-width: 640px) {
+    .mesa-card-mobile {
+        padding: 1rem;
+    }
+    
+    .mesa-card-mobile .text-xl {
+        font-size: 1.125rem;
+    }
+    
+    .mesa-card-mobile .text-lg {
+        font-size: 1rem;
+    }
+    
+    .pagination-mobile {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .pagination-mobile .page-info {
+        order: -1;
+    }
+}
+
+/* Efeitos de hover para botões de ação */
+.action-button-hover {
+    transition: all 0.3s ease;
+}
+
+.action-button-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Animação de entrada para os cards */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Estilos para o estado vazio */
+.empty-state {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+    backdrop-filter: blur(20px);
+}
+
+/* Melhorias para acessibilidade */
+.focus-visible:focus {
+    outline: 2px solid #ef4444;
+    outline-offset: 2px;
+}
+
+/* Transições suaves para mudanças de estado */
+.smooth-transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Grid responsivo para diferentes tamanhos de tela */
+@media (min-width: 640px) {
+    .mesas-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .mesas-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1280px) {
+    .mesas-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Estilos para o modal de detalhes da mesa */
+.modal-header {
+    flex-shrink: 0;
+}
+
+.modal-body {
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(107, 114, 128, 0.5) rgba(0, 0, 0, 0.1);
+}
+
+.modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: rgba(107, 114, 128, 0.5);
+    border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(107, 114, 128, 0.7);
+}
+
+/* Responsividade para o modal */
+@media (max-width: 768px) {
+    #mesaModal .bg-white {
+        max-height: 95vh;
+        margin: 1rem;
+        width: calc(100vw - 2rem);
+    }
+    
+    #mesaModal .modal-header {
+        padding: 1rem;
+    }
+    
+    #mesaModal .modal-body {
+        padding: 1rem;
+    }
+    
+    #mesaModal h2 {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 640px) {
+    #mesaModal .bg-white {
+        max-height: 98vh;
+        margin: 0.5rem;
+        width: calc(100vw - 1rem);
+    }
+    
+    #mesaModal .modal-header {
+        padding: 0.75rem;
+    }
+    
+    #mesaModal .modal-body {
+        padding: 0.75rem;
+    }
+    
+    #mesaModal h2 {
+        font-size: 1.125rem;
+    }
+    
+    #mesaModal .grid {
+        grid-template-columns: 1fr;
+    }
+} 

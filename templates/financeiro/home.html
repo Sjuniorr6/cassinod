@@ -1,0 +1,798 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Financeiro - Saint Paul{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" href="{% static 'css/financeiro.css' %}">
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="bg-cassino"></div>
+<div class="bg-overlay"></div>
+
+<div class="main-content">
+    {% include 'components/_sidebar.html' %}
+
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        <!-- Botão mobile para abrir sidebar -->
+        <button id="mobileSidebarBtn" class="lg:hidden fixed top-4 left-4 z-50 w-12 h-12 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold text-xl rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center">
+            S
+        </button>
+        
+        <div class="financeiro-content" style="min-height: 100vh; padding: 0;">
+            <!-- Header -->
+            <div class="main-header">
+                <h1 class="main-title">Financeiro</h1>
+                <p class="main-subtitle">Gestão financeira e controle de clientes</p>
+                <div class="mt-6">
+                    <button onclick="abrirModalCriarCliente()" class="btn-primary">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Novo Cliente
+                    </button>
+                    <!-- Botão de teste temporário -->
+                    <button onclick="testarDarBaixaFichas()" class="btn-secondary ml-2">
+                        🧪 Testar Dar Baixa
+                    </button>
+                </div>
+            </div>
+
+            <!-- Métricas -->
+            <div class="cards-container">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon bg-blue-100 text-blue-600">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="metric-content">
+                            <h3 class="metric-title">Total de Clientes</h3>
+                            <p class="metric-value" id="totalClientes">0</p>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon bg-green-100 text-green-600">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                            </svg>
+                        </div>
+                        <div class="metric-content">
+                            <h3 class="metric-title">Saldo Total</h3>
+                            <p class="metric-value" id="saldoTotal">R$ 0,00</p>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon bg-purple-100 text-purple-600">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                        <div class="metric-content">
+                            <h3 class="metric-title">Média por Cliente</h3>
+                            <p class="metric-value" id="mediaCliente">R$ 0,00</p>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon bg-orange-100 text-orange-600">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            </svg>
+                        </div>
+                        <div class="metric-content">
+                            <h3 class="metric-title">Maior Saldo</h3>
+                            <p class="metric-value" id="maiorSaldo">R$ 0,00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filtros e Busca -->
+                <div class="filters-section">
+                    <div class="search-box">
+                        <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="text" id="searchClientes" placeholder="Buscar clientes..." class="search-input">
+                    </div>
+                    
+                    <div class="filter-buttons">
+                        <button onclick="filtrarPorSaldo('todos')" class="filter-btn active" data-filter="todos">
+                            Todos
+                        </button>
+                        <button onclick="filtrarPorSaldo('positivo')" class="filter-btn" data-filter="positivo">
+                            Saldo Positivo
+                        </button>
+                        <button onclick="filtrarPorSaldo('negativo')" class="filter-btn" data-filter="negativo">
+                            Saldo Negativo
+                        </button>
+                        <button onclick="filtrarPorSaldo('zero')" class="filter-btn" data-filter="zero">
+                            Saldo Zero
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lista de Clientes -->
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Clientes</h2>
+                        <div class="section-actions">
+                            <button onclick="exportarClientes()" class="btn-secondary">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                Exportar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="loadingClientes" class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <p>Carregando clientes...</p>
+                    </div>
+
+                    <!-- Error State -->
+                    <div id="errorClientes" class="error-state hidden">
+                        <svg class="w-12 h-12 text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Erro ao carregar clientes</h3>
+                        <p class="text-gray-600 mb-4">Não foi possível carregar a lista de clientes.</p>
+                        <button onclick="carregarClientes()" class="btn-primary">Tentar Novamente</button>
+                    </div>
+
+                    <!-- Clientes Grid -->
+                    <div id="clientesGrid" class="clientes-grid hidden">
+                        <!-- Clientes serão carregados aqui dinamicamente -->
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyClientes" class="empty-state hidden">
+                        <svg class="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Nenhum cliente encontrado</h3>
+                        <p class="text-gray-600 mb-4">Comece cadastrando seu primeiro cliente.</p>
+                        <button onclick="abrirModalCriarCliente()" class="btn-primary">Cadastrar Cliente</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Criar Cliente -->
+<div id="modalCriarCliente" class="modal hidden">
+    <div class="modal-overlay" onclick="fecharModalCriarCliente()"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Novo Cliente</h2>
+            <button onclick="fecharModalCriarCliente()" class="modal-close">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="formCriarCliente" class="space-y-6">
+                <div class="form-group">
+                    <label for="nomeCliente" class="form-label">Nome *</label>
+                    <input type="text" id="nomeCliente" name="nome" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sobrenomeCliente" class="form-label">Sobrenome</label>
+                    <input type="text" id="sobrenomeCliente" name="sobrenome" class="form-input">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cpfCliente" class="form-label">CPF</label>
+                    <input type="text" id="cpfCliente" name="cpf" class="form-input" placeholder="000.000.000-00">
+                </div>
+                
+                <div class="form-group">
+                    <label for="telefoneCliente" class="form-label">Telefone</label>
+                    <input type="text" id="telefoneCliente" name="telefone" class="form-input" placeholder="(00) 00000-0000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="saldoCliente" class="form-label">Saldo Inicial</label>
+                    <input type="number" id="saldoCliente" name="saldo" class="form-input" step="0.01" value="0.00">
+                </div>
+                
+                <div class="form-group">
+                    <label for="fichasIniciais" class="form-label">Fichas Iniciais</label>
+                    <input type="number" id="fichasIniciais" name="fichas_iniciais" class="form-input" step="1" min="0" value="0">
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" onclick="fecharModalCriarCliente()" class="btn-secondary">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        <span id="btnCriarText">Criar Cliente</span>
+                        <div id="btnCriarLoading" class="loading-spinner-small hidden"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Detalhes do Cliente -->
+<div id="modalDetalhesCliente" class="modal hidden">
+    <div class="modal-overlay" onclick="fecharModalDetalhesCliente()"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Detalhes do Cliente</h2>
+            <button onclick="fecharModalDetalhesCliente()" class="modal-close">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div id="detalhesClienteContent">
+                <!-- Conteúdo será carregado dinamicamente -->
+            </div>
+            <div class="flex gap-2 mt-4">
+                <button class="btn-primary" onclick="abrirModalAdicionarFichas()">Adicionar Fichas</button>
+                <button class="btn-secondary" onclick="abrirModalDarBaixaFichas()">Dar Baixa</button>
+            </div>
+            <div class="mt-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Saldo de Fichas</h3>
+                <p id="saldoFichasCliente" class="text-2xl font-bold text-blue-600 mb-4"></p>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Histórico de Vendas de Fichas</h3>
+                <ul id="historicoVendasFichas" class="space-y-2"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Adicionar Fichas -->
+<div id="modalAdicionarFichas" class="modal hidden">
+    <div class="modal-overlay" onclick="fecharModalAdicionarFichas()"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Adicionar Fichas</h2>
+            <button onclick="fecharModalAdicionarFichas()" class="modal-close">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="formAdicionarFichas" class="space-y-6">
+                <div class="form-group">
+                    <label for="quantidadeAdicionarFichas" class="form-label">Quantidade de Fichas</label>
+                    <input type="number" id="quantidadeAdicionarFichas" name="quantidade" class="form-input" step="1" min="1" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" onclick="fecharModalAdicionarFichas()" class="btn-secondary">Cancelar</button>
+                    <button type="submit" class="btn-primary">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Dar Baixa Fichas -->
+<div id="modalDarBaixaFichas" class="modal hidden">
+    <div class="modal-overlay" onclick="fecharModalDarBaixaFichas()"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Dar Baixa de Fichas</h2>
+            <button onclick="fecharModalDarBaixaFichas()" class="modal-close">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="formDarBaixaFichas" class="space-y-6">
+                <div class="form-group">
+                    <label for="quantidadeDarBaixaFichas" class="form-label">Quantidade de Fichas</label>
+                    <input type="number" id="quantidadeDarBaixaFichas" name="quantidade" class="form-input" step="1" min="1" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" onclick="fecharModalDarBaixaFichas()" class="btn-secondary">Cancelar</button>
+                    <button type="submit" class="btn-primary">Dar Baixa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/financeiro.js' %}"></script>
+<script>
+    // Inicializar página
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Página financeiro carregada');
+        
+        carregarClientes();
+        configurarEventos();
+    });
+
+    // Configurar sidebar
+    function configurarSidebar() {
+        const mobileSidebarBtn = document.getElementById('mobileSidebarBtn');
+        if (mobileSidebarBtn) {
+            mobileSidebarBtn.addEventListener('click', function() {
+                const sidebar = document.getElementById('sidebar');
+                if (sidebar) sidebar.classList.toggle('mobile-open');
+            });
+        }
+    }
+
+    // Configurar eventos
+    function configurarEventos() {
+        // Busca em tempo real
+        document.getElementById('searchClientes').addEventListener('input', function(e) {
+            filtrarClientes(e.target.value);
+        });
+
+                        // Form de criação
+                document.getElementById('formCriarCliente').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    criarCliente();
+                });
+
+                // Form de adicionar fichas
+                document.getElementById('formAdicionarFichas').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    adicionarFichasCliente();
+                });
+
+                // Form de dar baixa fichas
+                document.getElementById('formDarBaixaFichas').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    darBaixaFichasCliente();
+                });
+    }
+
+    // Carregar clientes
+    async function carregarClientes() {
+        mostrarLoading();
+        
+        try {
+            console.log('Carregando clientes...');
+            const clientes = await FinanceiroAPI.listarClientes();
+            console.log('Resposta da API:', clientes);
+            
+            if (clientes && clientes.length >= 0) {
+                exibirClientes(clientes);
+                atualizarMetricas(clientes);
+                mostrarClientes();
+            } else {
+                console.log('Nenhum cliente encontrado, mostrando estado vazio');
+                mostrarVazio();
+            }
+        } catch (error) {
+            console.error('Erro ao carregar clientes:', error);
+            mostrarErro();
+        }
+    }
+
+    // Exibir clientes na grid
+    function exibirClientes(clientes) {
+        const grid = document.getElementById('clientesGrid');
+        grid.innerHTML = '';
+
+        clientes.forEach(cliente => {
+            const card = criarCardCliente(cliente);
+            grid.appendChild(card);
+        });
+    }
+
+    // Criar card do cliente
+    function criarCardCliente(cliente) {
+        const card = document.createElement('div');
+        card.className = 'cliente-card';
+        card.onclick = () => verDetalhesCliente(cliente.id);
+        
+        const saldoClass = cliente.saldo > 0 ? 'text-green-600' : cliente.saldo < 0 ? 'text-red-600' : 'text-gray-600';
+        
+        card.innerHTML = `
+            <div class="cliente-card-header">
+                <div class="cliente-avatar">
+                    <span class="avatar-text">${cliente.nome.charAt(0).toUpperCase()}</span>
+                </div>
+                <div class="cliente-info">
+                    <h3 class="cliente-nome">${cliente.nome_completo}</h3>
+                    <p class="cliente-cpf">${cliente.cpf || 'CPF não informado'}</p>
+                </div>
+            </div>
+            <div class="cliente-card-body">
+                <div class="cliente-saldo ${saldoClass}">
+                    <span class="saldo-label">Saldo:</span>
+                    <span class="saldo-valor">${cliente.saldo_formatado}</span>
+                </div>
+                <div class="cliente-telefone">
+                    <span class="telefone-label">Telefone:</span>
+                    <span class="telefone-valor">${cliente.telefone || 'Não informado'}</span>
+                </div>
+            </div>
+            <div class="cliente-card-footer">
+                <span class="cliente-data">Criado em: ${cliente.data_criacao}</span>
+            </div>
+        `;
+        
+        return card;
+    }
+
+    // Atualizar métricas
+    function atualizarMetricas(clientes) {
+        const total = clientes.length;
+        const saldoTotal = clientes.reduce((sum, cliente) => sum + cliente.saldo, 0);
+        const media = total > 0 ? saldoTotal / total : 0;
+        const maiorSaldo = Math.max(...clientes.map(c => c.saldo), 0);
+
+        document.getElementById('totalClientes').textContent = total;
+        document.getElementById('saldoTotal').textContent = formatarMoeda(saldoTotal);
+        document.getElementById('mediaCliente').textContent = formatarMoeda(media);
+        document.getElementById('maiorSaldo').textContent = formatarMoeda(maiorSaldo);
+    }
+
+    // Filtrar clientes
+    function filtrarClientes(termo) {
+        const cards = document.querySelectorAll('.cliente-card');
+        const termoLower = termo.toLowerCase();
+
+        cards.forEach(card => {
+            const nome = card.querySelector('.cliente-nome').textContent.toLowerCase();
+            const cpf = card.querySelector('.cliente-cpf').textContent.toLowerCase();
+            
+            if (nome.includes(termoLower) || cpf.includes(termoLower)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    // Filtrar por saldo
+    function filtrarPorSaldo(tipo) {
+        // Atualizar botões ativos
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+
+        const cards = document.querySelectorAll('.cliente-card');
+        
+        cards.forEach(card => {
+            const saldoElement = card.querySelector('.saldo-valor');
+            const saldoText = saldoElement.textContent.replace('R$ ', '').replace('.', '').replace(',', '.');
+            const saldo = parseFloat(saldoText);
+
+            let mostrar = true;
+            
+            switch(tipo) {
+                case 'positivo':
+                    mostrar = saldo > 0;
+                    break;
+                case 'negativo':
+                    mostrar = saldo < 0;
+                    break;
+                case 'zero':
+                    mostrar = saldo === 0;
+                    break;
+                default:
+                    mostrar = true;
+            }
+            
+            card.style.display = mostrar ? 'block' : 'none';
+        });
+    }
+
+    // Modal Criar Cliente
+    function abrirModalCriarCliente() {
+        document.getElementById('modalCriarCliente').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function fecharModalCriarCliente() {
+        document.getElementById('modalCriarCliente').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        document.getElementById('formCriarCliente').reset();
+    }
+
+    // Criar cliente
+    async function criarCliente() {
+        const form = document.getElementById('formCriarCliente');
+        const formData = new FormData(form);
+        
+        const dados = {
+            nome: formData.get('nome'),
+            sobrenome: formData.get('sobrenome'),
+            cpf: formData.get('cpf'),
+            telefone: formData.get('telefone'),
+            saldo: parseFloat(formData.get('saldo')) || 0.00,
+            fichas_iniciais: parseInt(formData.get('fichas_iniciais')) || 0
+        };
+
+        // Validação
+        const erros = FinanceiroAPI.validarDadosCliente(dados);
+        if (erros.length > 0) {
+            alert('Erros de validação:\n' + erros.join('\n'));
+            return;
+        }
+
+        // Mostrar loading
+        const btnCriar = document.querySelector('#formCriarCliente button[type="submit"]');
+        const btnText = document.getElementById('btnCriarText');
+        const btnLoading = document.getElementById('btnCriarLoading');
+        
+        btnText.style.display = 'none';
+        btnLoading.classList.remove('hidden');
+        btnCriar.disabled = true;
+
+        try {
+            const novoCliente = await FinanceiroAPI.criarCliente(dados);
+            
+            if (novoCliente) {
+                fecharModalCriarCliente();
+                carregarClientes(); // Recarregar lista
+                alert('Cliente criado com sucesso!');
+            } else {
+                alert('Erro ao criar cliente. Tente novamente.');
+            }
+        } catch (error) {
+            console.error('Erro ao criar cliente:', error);
+            alert('Erro ao criar cliente. Tente novamente.');
+        } finally {
+            btnText.style.display = 'block';
+            btnLoading.classList.add('hidden');
+            btnCriar.disabled = false;
+        }
+    }
+
+    // Ver detalhes do cliente
+    async function verDetalhesCliente(clienteId) {
+        console.log('=== VER DETALHES CLIENTE ===');
+        console.log('Cliente ID:', clienteId);
+        
+        window.clienteAtualId = clienteId;
+        try {
+            const cliente = await FinanceiroAPI.obterCliente(clienteId);
+            console.log('Cliente obtido:', cliente);
+            
+            if (cliente) {
+                exibirDetalhesCliente(cliente);
+                abrirModalDetalhesCliente();
+            } else {
+                alert('Erro ao carregar detalhes do cliente.');
+            }
+        } catch (error) {
+            console.error('Erro ao obter cliente:', error);
+            alert('Erro ao carregar detalhes do cliente.');
+        }
+    }
+
+    // Exibir detalhes do cliente
+    function exibirDetalhesCliente(cliente) {
+        const content = document.getElementById('detalhesClienteContent');
+        
+        content.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-4">
+                        <h3 class="text-lg font-bold text-gray-800 mb-3">Informações Pessoais</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="text-sm text-gray-600 font-semibold">Nome Completo</p>
+                                <p class="text-xl font-bold text-gray-800">${cliente.nome_completo}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600 font-semibold">CPF</p>
+                                <p class="text-lg font-bold text-gray-800">${cliente.cpf || 'Não informado'}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600 font-semibold">Telefone</p>
+                                <p class="text-lg font-bold text-gray-800">${cliente.telefone || 'Não informado'}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-4">
+                        <h3 class="text-lg font-bold text-gray-800 mb-3">Informações Financeiras</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="text-sm text-gray-600 font-semibold">Saldo Atual</p>
+                                <p class="text-2xl font-bold text-green-600">${cliente.saldo_formatado}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-4">
+                        <h3 class="text-lg font-bold text-gray-800 mb-3">Datas</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="text-sm text-gray-600 font-semibold">Data de Criação</p>
+                                <p class="text-lg font-bold text-gray-800">${cliente.data_criacao}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-600 font-semibold">Última Atualização</p>
+                                <p class="text-lg font-bold text-gray-800">${cliente.data_atualizacao}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Atualizar saldo de fichas
+        const saldoFichasElement = document.getElementById('saldoFichasCliente');
+        if (saldoFichasElement) {
+            saldoFichasElement.textContent = `${cliente.saldo_fichas || 0} fichas`;
+        }
+        
+        // Histórico de vendas
+        const historico = document.getElementById('historicoVendasFichas');
+        if (cliente.vendas_fichas && cliente.vendas_fichas.length > 0) {
+            historico.innerHTML = cliente.vendas_fichas.map(venda => `
+                <li class="text-sm text-gray-600 py-2 border-b border-gray-200">
+                    ${venda.data_venda} - ${venda.quantidade} fichas vendidas
+                </li>
+            `).join('');
+        } else {
+            historico.innerHTML = `
+                <li class="text-sm text-gray-600 py-2">
+                    Nenhuma venda de fichas registrada
+                </li>
+            `;
+        }
+    }
+
+    // Modal Detalhes
+    function abrirModalDetalhesCliente() {
+        document.getElementById('modalDetalhesCliente').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function fecharModalDetalhesCliente() {
+        document.getElementById('modalDetalhesCliente').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        window.clienteAtualId = null;
+    }
+
+    // Modal Adicionar Fichas
+    function abrirModalAdicionarFichas() {
+        if (!window.clienteAtualId) {
+            alert('Nenhum cliente selecionado');
+            return;
+        }
+        document.getElementById('modalAdicionarFichas').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function fecharModalAdicionarFichas() {
+        document.getElementById('modalAdicionarFichas').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        document.getElementById('formAdicionarFichas').reset();
+    }
+
+    // Modal Dar Baixa Fichas
+    function abrirModalDarBaixaFichas() {
+        if (!window.clienteAtualId) {
+            alert('Nenhum cliente selecionado');
+            return;
+        }
+        document.getElementById('modalDarBaixaFichas').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function fecharModalDarBaixaFichas() {
+        document.getElementById('modalDarBaixaFichas').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        document.getElementById('formDarBaixaFichas').reset();
+    }
+
+    // Adicionar fichas
+    async function adicionarFichasCliente() {
+        const form = document.getElementById('formAdicionarFichas');
+        const quantidade = parseInt(form.quantidade.value);
+        
+        if (!quantidade || quantidade <= 0) {
+            alert('Por favor, insira uma quantidade válida');
+            return;
+        }
+
+        try {
+            const resultado = await FinanceiroAPI.adicionarFichas(window.clienteAtualId, quantidade);
+            
+            if (resultado.success) {
+                alert(`${quantidade} fichas adicionadas com sucesso!`);
+                fecharModalAdicionarFichas();
+                
+                // Atualizar saldo de fichas em tempo real
+                const saldoElement = document.getElementById('saldoFichasCliente');
+                if (saldoElement) {
+                    const saldoAtualStr = saldoElement.textContent;
+                    const saldoAtual = parseInt(saldoAtualStr.replace(/\D/g, '')) || 0;
+                    const novoSaldo = saldoAtual + quantidade;
+                    saldoElement.textContent = `${novoSaldo} fichas`;
+                }
+                
+                // Recarregar detalhes do cliente para atualizar histórico
+                if (window.clienteAtualId) {
+                    verDetalhesCliente(window.clienteAtualId);
+                }
+            } else {
+                alert('Erro ao adicionar fichas. Tente novamente.');
+            }
+        } catch (error) {
+            console.error('Erro ao adicionar fichas:', error);
+            alert('Erro ao adicionar fichas. Tente novamente.');
+        }
+    }
+
+    // Dar baixa fichas - função movida para financeiro.js
+
+    // Estados da interface
+    function mostrarLoading() {
+        document.getElementById('loadingClientes').classList.remove('hidden');
+        document.getElementById('errorClientes').classList.add('hidden');
+        document.getElementById('clientesGrid').classList.add('hidden');
+        document.getElementById('emptyClientes').classList.add('hidden');
+    }
+
+    function mostrarClientes() {
+        document.getElementById('loadingClientes').classList.add('hidden');
+        document.getElementById('errorClientes').classList.add('hidden');
+        document.getElementById('clientesGrid').classList.remove('hidden');
+        document.getElementById('emptyClientes').classList.add('hidden');
+    }
+
+    function mostrarErro() {
+        document.getElementById('loadingClientes').classList.add('hidden');
+        document.getElementById('errorClientes').classList.remove('hidden');
+        document.getElementById('clientesGrid').classList.add('hidden');
+        document.getElementById('emptyClientes').classList.add('hidden');
+    }
+
+    function mostrarVazio() {
+        document.getElementById('loadingClientes').classList.add('hidden');
+        document.getElementById('errorClientes').classList.add('hidden');
+        document.getElementById('clientesGrid').classList.add('hidden');
+        document.getElementById('emptyClientes').classList.remove('hidden');
+    }
+
+    // Utilitários
+    function formatarMoeda(valor) {
+        return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        }).format(valor);
+    }
+
+    function exportarClientes() {
+        alert('Funcionalidade de exportação será implementada em breve!');
+    }
+
+    // Fechar modais com ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            // Fechar todos os modais abertos
+            document.querySelectorAll('.modal:not(.hidden)').forEach(modal => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            });
+            
+            // Reset forms
+            document.querySelectorAll('form').forEach(form => form.reset());
+            window.clienteAtualId = null;
+        }
+    });
+</script>
+{% endblock %}
