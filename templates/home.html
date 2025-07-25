@@ -1,57 +1,14 @@
 {% extends 'base.html' %}
+{% load static %}
 {% include 'components/_sidebar.html' %}
 {% block title %}Cassino Diamante | Painel{% endblock %}
-{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
 {% block extra_head %}
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <style>
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes slideIn {
-            from { 
-                opacity: 0; 
-                transform: scale(0.95) translateY(-20px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: scale(1) translateY(0); 
-            }
-        }
-        
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease-out;
-        }
-        
-        .animate-slide-in {
-            animation: slideIn 0.3s ease-out;
-        }
-        
-        .modal-backdrop {
-            backdrop-filter: blur(8px);
-        }
-        
-        .modal-content {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .modal-content.show {
-            transform: scale(1) translateY(0);
-            opacity: 1;
-        }
-        
-        .modal-content.hide {
-            transform: scale(0.95) translateY(-20px);
-            opacity: 0;
-        }
-        
-        #filtroContainer, #metricasContainer {
-            transition: opacity 0.3s ease-in-out;
-        }
-    </style>
 {% endblock %}
 
 {% block content %}
@@ -76,19 +33,20 @@
                     <p class="main-subtitle">Sistema de Controle e Gestão</p>
                 </div>
                 <div class="flex gap-2">
-                    <button id="toggleFiltro" class="px-2 py-1 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white text-xs font-semibold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-1">
+                    <button id="toggleFiltro" class="px-2 py-1 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white text-xs font-semibold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-1">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
                         </svg>
                         <span id="filtroText">Esconder Filtro</span>
                     </button>
-                    <button id="toggleMetricas" class="px-2 py-1 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white text-xs font-semibold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-1">
+                    <button id="toggleMetricas" class="px-2 py-1 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white text-xs font-semibold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-1">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                         </svg>
                         <span id="metricasText">Esconder Métricas</span>
                     </button>
-                    <button id="btnCriarMesa" class="px-2 py-1 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white text-xs font-semibold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-1">
+                    
+                    <button id="btnCriarMesa" class="px-2 py-1 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white text-xs font-semibold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-1">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
@@ -252,7 +210,8 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4">
                 {% if mesas %}
                     {% for mesa in mesas %}
-                    <div class="bg-white/95 backdrop-blur-xl rounded-lg p-4 shadow-xl border border-red-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group min-h-[70px]">
+                    <div class="bg-white/95 backdrop-blur-xl rounded-lg p-4 shadow-xl border border-red-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group min-h-[70px]" 
+                         data-mesa-id="{{ mesa.id }}">
                         <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         
                         <div class="flex justify-between items-start mb-2">
@@ -267,32 +226,32 @@
                         
                         <div class="text-xs text-red-600 font-semibold mb-2">{{ mesa.tipo_jogo|title }}</div>
                         
-                                                 <div class="space-y-1 mb-2">
-                             <div class="flex justify-between items-center text-xs">
-                                 <span class="text-gray-600">Valor Total:</span>
-                                 <span class="font-bold text-green-600">R$ {{ mesa.valor_total|floatformat:0 }}</span>
-                             </div>
-                             <div class="flex justify-between items-center text-xs">
-                                 <span class="text-gray-600">Valor Inicial:</span>
-                                 <span class="font-semibold text-blue-600">R$ {{ mesa.valor_inicial|floatformat:0 }}</span>
-                             </div>
-                             <div class="flex justify-between items-center text-xs">
-                                 <span class="text-gray-600">Saldo:</span>
-                                 <span class="font-bold {% if mesa.saldo >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
-                                     {% if mesa.saldo >= 0 %}+{% endif %}R$ {{ mesa.saldo|floatformat:0 }}
-                                 </span>
-                             </div>
-                             <div class="flex justify-between items-center text-xs">
-                                 <span class="text-gray-600">Fichas:</span>
-                                 <span class="text-xs">{{ mesa.fichas_5|add:mesa.fichas_25|add:mesa.fichas_100|add:mesa.fichas_500|add:mesa.fichas_1000|add:mesa.fichas_5000|add:mesa.fichas_10000 }}</span>
-                             </div>
-                             <div class="flex justify-between items-center text-xs">
-                                 <span class="text-gray-600">Status:</span>
-                                 <span class="text-xs font-semibold {% if mesa.status == 'aberta' %}text-green-600{% elif mesa.status == 'fechada' %}text-red-600{% else %}text-yellow-600{% endif %}">
-                                     {{ mesa.get_status_display|upper }}
-                                 </span>
-                             </div>
-                         </div>
+                        <div class="space-y-1 mb-2">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-gray-600">Valor Total:</span>
+                                <span class="font-bold text-green-600 valor-total">R$ {{ mesa.valor_total|floatformat:0 }}</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-gray-600">Valor Inicial:</span>
+                                <span class="font-semibold text-blue-600 valor-inicial">R$ {{ mesa.valor_inicial|floatformat:0 }}</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-gray-600">Saldo:</span>
+                                <span class="font-bold saldo {% if mesa.saldo >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                                    {% if mesa.saldo >= 0 %}+{% endif %}R$ {{ mesa.saldo|floatformat:0 }}
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-gray-600">Fichas:</span>
+                                <span class="text-xs fichas-total">{{ mesa.fichas_5|add:mesa.fichas_25|add:mesa.fichas_100|add:mesa.fichas_500|add:mesa.fichas_1000|add:mesa.fichas_5000|add:mesa.fichas_10000 }}</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-gray-600">Status:</span>
+                                <span class="text-xs font-semibold {% if mesa.status == 'aberta' %}text-green-600{% elif mesa.status == 'fechada' %}text-red-600{% else %}text-yellow-600{% endif %}">
+                                    {{ mesa.get_status_display|upper }}
+                                </span>
+                            </div>
+                        </div>
                         
                         <div class="w-full h-1 bg-gray-200 rounded-full mb-2 overflow-hidden">
                             <div class="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-300" 
@@ -306,33 +265,33 @@
                         </div>
                         
                         <div class="flex gap-2 mt-3">
-                             {% if mesa.status != 'encerrada' %}
-                             <button class="flex-1 py-2 px-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white text-xs font-bold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-1" 
-                                     onclick="editarMesa({{ mesa.id }}, '{{ mesa.numero_mesa }}', '{{ mesa.tipo_jogo }}', '{{ mesa.status }}', {{ mesa.valor_inicial }}, {{ mesa.fichas_5 }}, {{ mesa.fichas_25 }}, {{ mesa.fichas_100 }}, {{ mesa.fichas_500 }}, {{ mesa.fichas_1000 }}, {{ mesa.fichas_5000 }}, {{ mesa.fichas_10000 }})">
-                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                 </svg>
-                                 Editar
-                             </button>
-                             {% endif %}
-                             {% if mesa.status == 'aberta' %}
-                                 <button class="flex-1 py-2 px-3 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white text-xs font-bold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 uppercase" 
-                                         onclick="fecharMesa({{ mesa.id }})">
-                                     Fechar
-                                 </button>
-                             {% elif mesa.status == 'fechada' %}
-                                 <div class="flex gap-1 flex-1">
-                                     <button class="flex-1 py-2 px-2 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-600 hover:to-amber-500 text-white text-xs font-bold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 uppercase" 
-                                             onclick="abrirMesa({{ mesa.id }})">
-                                         Abrir
-                                     </button>
-                                     <button class="flex-1 py-2 px-2 bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-700 hover:to-gray-600 text-white text-xs font-bold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 uppercase" 
-                                             onclick="encerrarMesa({{ mesa.id }})">
-                                         Encerrar
-                                     </button>
-                                 </div>
-                             {% endif %}
-                         </div>
+                            {% if mesa.status != 'encerrada' %}
+                            <button class="flex-1 py-2 px-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white text-xs font-bold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-1" 
+                                    onclick="editarMesa({{ mesa.id }})">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                </svg>
+                                Editar
+                            </button>
+                            {% endif %}
+                            {% if mesa.status == 'aberta' %}
+                                <button class="flex-1 py-2 px-3 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white text-xs font-bold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 uppercase" 
+                                        onclick="fecharMesa({{ mesa.id }})">
+                                    Fechar
+                                </button>
+                            {% elif mesa.status == 'fechada' %}
+                                <div class="flex gap-1 flex-1">
+                                    <button class="flex-1 py-2 px-2 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-600 hover:to-amber-500 text-white text-xs font-bold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 uppercase" 
+                                            onclick="abrirMesa({{ mesa.id }})">
+                                        Abrir
+                                    </button>
+                                    <button class="flex-1 py-2 px-2 bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-700 hover:to-gray-600 text-white text-xs font-bold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 uppercase" 
+                                            onclick="encerrarMesa({{ mesa.id }})">
+                                        Encerrar
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
                     {% endfor %}
                 {% else %}
@@ -883,18 +842,23 @@
                 .then(data => {
                     if (data.success) {
                         showSuccessModal(data.message);
-                        // Recarregar a página após 1.5 segundos para atualizar o status
+                        
+                        // Atualizar a interface com os dados retornados
+                        if (data.mesa_atualizada) {
+                            atualizarMesaNaInterface(data.mesa_atualizada);
+                        }
+                        
+                        // Atualizar métricas e saldos dinamicamente
                         setTimeout(() => {
-                            window.location.reload();
-                        }, 1500);
+                            atualizarMetricasESaldos();
+                        }, 500);
                     } else {
                         showErrorModal('Erro: ' + data.message);
                     }
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showErrorModal('Erro ao fechar mesa. Tente novamente.');
-                });
+                        .catch(error => {
+            showErrorModal('Erro ao fechar mesa. Tente novamente.');
+        });
             }
         );
     }
@@ -920,18 +884,23 @@
                 .then(data => {
                     if (data.success) {
                         showSuccessModal(data.message);
-                        // Recarregar a página após 1.5 segundos para atualizar o status
+                        
+                        // Atualizar a interface com os dados retornados
+                        if (data.mesa_atualizada) {
+                            atualizarMesaNaInterface(data.mesa_atualizada);
+                        }
+                        
+                        // Atualizar métricas e saldos dinamicamente
                         setTimeout(() => {
-                            window.location.reload();
-                        }, 1500);
+                            atualizarMetricasESaldos();
+                        }, 500);
                     } else {
                         showErrorModal('Erro: ' + data.message);
                     }
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showErrorModal('Erro ao abrir mesa. Tente novamente.');
-                });
+                        .catch(error => {
+            showErrorModal('Erro ao abrir mesa. Tente novamente.');
+        });
             }
         );
     }
@@ -965,10 +934,9 @@
                         showErrorModal('Erro: ' + data.message);
                     }
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showErrorModal('Erro ao encerrar mesa. Tente novamente.');
-                });
+                        .catch(error => {
+            showErrorModal('Erro ao encerrar mesa. Tente novamente.');
+        });
             }
         );
     }
@@ -1035,19 +1003,23 @@
         e.preventDefault();
         
         const formData = new FormData(formCriarMesa);
+        
+
+        
         const data = {
             numero_mesa: parseInt(formData.get('numero_mesa')),
             tipo_jogo: formData.get('tipo_jogo'),
             status: 'aberta',
-            valor_inicial: parseFloat(formData.get('valor_inicial')) || 0,
-            fichas_5: parseInt(formData.get('fichas_5')) || 0,
-            fichas_25: parseInt(formData.get('fichas_25')) || 0,
-            fichas_100: parseInt(formData.get('fichas_100')) || 0,
-            fichas_500: parseInt(formData.get('fichas_500')) || 0,
-            fichas_1000: parseInt(formData.get('fichas_1000')) || 0,
-            fichas_5000: parseInt(formData.get('fichas_5000')) || 0,
-            fichas_10000: parseInt(formData.get('fichas_10000')) || 0
+            fichas_5: parseInt(formData.get('fichas_5') || '0'),
+            fichas_25: parseInt(formData.get('fichas_25') || '0'),
+            fichas_100: parseInt(formData.get('fichas_100') || '0'),
+            fichas_500: parseInt(formData.get('fichas_500') || '0'),
+            fichas_1000: parseInt(formData.get('fichas_1000') || '0'),
+            fichas_5000: parseInt(formData.get('fichas_5000') || '0'),
+            fichas_10000: parseInt(formData.get('fichas_10000') || '0')
         };
+        
+
 
         // Validação
         if (!data.numero_mesa || data.numero_mesa < 1) {
@@ -1075,15 +1047,25 @@
             if (result.success) {
                 showSuccessModal(result.message);
                 fecharModalCriarMesa();
-                // Recarregar a página após 1.5 segundos para mostrar a nova mesa
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
+                
+                // Criar novo card na interface se os dados da mesa foram retornados
+                if (result.mesa_criada) {
+                    criarNovoCardMesa(result.mesa_criada);
+                    
+                    // Atualizar métricas e saldos dinamicamente
+                    setTimeout(() => {
+                        atualizarMetricasESaldos();
+                    }, 500);
+                } else {
+                    // Recarregar a página se não temos os dados da mesa
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                }
             } else {
                 showErrorModal('Erro: ' + result.message);
             }
         } catch (error) {
-            console.error('Error:', error);
             showErrorModal('Erro ao criar mesa. Tente novamente.');
         }
     });
@@ -1095,31 +1077,70 @@
     const formEditarMesa = document.getElementById('formEditarMesa');
 
     // Função para abrir modal de edição
-    function editarMesa(mesaId, numeroMesa, tipoJogo, status, valorInicial, fichas5, fichas25, fichas100, fichas500, fichas1000, fichas5000, fichas10000) {
-        // Preencher o formulário com os dados atuais
-        document.getElementById('mesaIdEditar').value = mesaId;
-        document.getElementById('numeroMesaEditar').value = numeroMesa;
-        document.getElementById('tipoJogoEditar').value = tipoJogo;
-        document.getElementById('statusEditar').value = status;
-        document.getElementById('valorInicialEditar').value = `R$ ${parseFloat(valorInicial).toLocaleString()}`;
-        document.getElementById('fichas5Editar').value = fichas5;
-        document.getElementById('fichas25Editar').value = fichas25;
-        document.getElementById('fichas100Editar').value = fichas100;
-        document.getElementById('fichas500Editar').value = fichas500;
-        document.getElementById('fichas1000Editar').value = fichas1000;
-        document.getElementById('fichas5000Editar').value = fichas5000;
-        document.getElementById('fichas10000Editar').value = fichas10000;
-        
-        // Abrir modal
-        modalEditarMesa.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-        
-        // Animar entrada do modal
-        setTimeout(() => {
-            const modalContent = document.getElementById('modalContentEditar');
-            modalContent.classList.remove('scale-95', 'opacity-0');
-            modalContent.classList.add('show');
-        }, 10);
+    function editarMesa(mesaId) {
+        fetch(`/mesas/api/mesa/${mesaId}/`)
+            .then(response => response.json())
+            .then(result => {
+                if (!result.success) {
+                    showErrorModal('Erro ao buscar dados da mesa: ' + (result.message || ''));
+                    return;
+                }
+                const mesaData = result.mesa;
+
+                // Checar se todos os campos existem antes de preencher
+                const campos = [
+                    'mesaIdEditar',
+                    'numeroMesaEditar',
+                    'tipoJogoEditar',
+                    'statusEditar',
+                    'valorInicialEditar',
+                    'fichas5Editar',
+                    'fichas25Editar',
+                    'fichas100Editar',
+                    'fichas500Editar',
+                    'fichas1000Editar',
+                    'fichas5000Editar',
+                    'fichas10000Editar'
+                ];
+                let algumCampoFaltando = false;
+                campos.forEach(id => {
+                    if (!document.getElementById(id)) {
+                        algumCampoFaltando = true;
+                    }
+                });
+                if (algumCampoFaltando) {
+                    showErrorModal('Erro interno: Algum campo do formulário de edição não foi encontrado. Verifique o HTML do modal de edição.');
+                    return;
+                }
+
+                // Preencher o formulário com os dados atuais
+                document.getElementById('mesaIdEditar').value = mesaData.id;
+                document.getElementById('numeroMesaEditar').value = mesaData.numero_mesa;
+                document.getElementById('tipoJogoEditar').value = mesaData.tipo_jogo;
+                document.getElementById('statusEditar').value = mesaData.status;
+                document.getElementById('valorInicialEditar').value = `R$ ${parseFloat(mesaData.valor_inicial).toLocaleString()}`;
+                document.getElementById('fichas5Editar').value = mesaData.fichas_5;
+                document.getElementById('fichas25Editar').value = mesaData.fichas_25;
+                document.getElementById('fichas100Editar').value = mesaData.fichas_100;
+                document.getElementById('fichas500Editar').value = mesaData.fichas_500;
+                document.getElementById('fichas1000Editar').value = mesaData.fichas_1000;
+                document.getElementById('fichas5000Editar').value = mesaData.fichas_5000;
+                document.getElementById('fichas10000Editar').value = mesaData.fichas_10000;
+
+                // Abrir modal
+                modalEditarMesa.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+
+                // Animar entrada do modal
+                setTimeout(() => {
+                    const modalContent = document.getElementById('modalContentEditar');
+                    modalContent.classList.remove('scale-95', 'opacity-0');
+                    modalContent.classList.add('show');
+                }, 10);
+            })
+            .catch(error => {
+                showErrorModal('Erro ao buscar dados da mesa.');
+            });
     }
 
     // Fechar modal de edição
@@ -1131,7 +1152,7 @@
         setTimeout(() => {
             modalEditarMesa.classList.add('hidden');
             document.body.style.overflow = 'auto';
-            formEditarMesa.reset();
+            // Não resetar o formulário para preservar os valores
             modalContent.classList.remove('hide');
             modalContent.classList.add('scale-95', 'opacity-0');
         }, 300);
@@ -1154,19 +1175,23 @@
         
         const mesaId = document.getElementById('mesaIdEditar').value;
         const formData = new FormData(formEditarMesa);
+        
+
+        
         const data = {
             numero_mesa: parseInt(formData.get('numero_mesa')),
             tipo_jogo: formData.get('tipo_jogo'),
             status: formData.get('status'),
-            valor_inicial: parseFloat(formData.get('valor_inicial')) || 0,
-            fichas_5: parseInt(formData.get('fichas_5')) || 0,
-            fichas_25: parseInt(formData.get('fichas_25')) || 0,
-            fichas_100: parseInt(formData.get('fichas_100')) || 0,
-            fichas_500: parseInt(formData.get('fichas_500')) || 0,
-            fichas_1000: parseInt(formData.get('fichas_1000')) || 0,
-            fichas_5000: parseInt(formData.get('fichas_5000')) || 0,
-            fichas_10000: parseInt(formData.get('fichas_10000')) || 0
+            fichas_5: parseInt(formData.get('fichas_5') || '0'),
+            fichas_25: parseInt(formData.get('fichas_25') || '0'),
+            fichas_100: parseInt(formData.get('fichas_100') || '0'),
+            fichas_500: parseInt(formData.get('fichas_500') || '0'),
+            fichas_1000: parseInt(formData.get('fichas_1000') || '0'),
+            fichas_5000: parseInt(formData.get('fichas_5000') || '0'),
+            fichas_10000: parseInt(formData.get('fichas_10000') || '0')
         };
+        
+
 
         // Validação
         if (!data.numero_mesa || data.numero_mesa < 1) {
@@ -1180,7 +1205,7 @@
         }
 
         try {
-            const response = await fetch(`/mesas/editar/${mesaId}/`, {
+            const response = await fetch(`/mesas/api/mesa/${mesaId}/editar/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1194,18 +1219,398 @@
             if (result.success) {
                 showSuccessModal(result.message);
                 fecharModalEditarMesa();
-                // Recarregar a página após 1.5 segundos para atualizar os dados
+                
+                // Atualizar a interface com os dados retornados
+                if (result.mesa_atualizada) {
+                    atualizarMesaNaInterface(result.mesa_atualizada);
+                }
+                
+                // Atualizar métricas e saldos dinamicamente
                 setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
+                    atualizarMetricasESaldos();
+                }, 500);
+                
+                // Não recarregar a página - os dados já foram atualizados na interface
             } else {
                 showErrorModal('Erro: ' + result.message);
             }
         } catch (error) {
-            console.error('Error:', error);
             showErrorModal('Erro ao atualizar mesa. Tente novamente.');
         }
     });
+
+    // Função para criar um novo card de mesa
+    function criarNovoCardMesa(mesaData) {
+        // Encontrar o container de mesas
+        const mesasContainer = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-3.xl\\:grid-cols-4.2xl\\:grid-cols-6');
+        if (!mesasContainer) {
+            return;
+        }
+        
+        // Remover a mensagem "Nenhuma Mesa Criada" se existir
+        const noMesasMessage = mesasContainer.querySelector('.col-span-full');
+        if (noMesasMessage) {
+            noMesasMessage.remove();
+        }
+        
+        // Criar o JSON da mesa
+        const mesaJson = {
+            id: mesaData.id,
+            numero_mesa: mesaData.numero_mesa,
+            tipo_jogo: mesaData.tipo_jogo,
+            tipo_jogo_display: mesaData.tipo_jogo_display || mesaData.tipo_jogo,
+            status: mesaData.status,
+            status_display: mesaData.status_display || mesaData.status,
+            valor_inicial: mesaData.valor_inicial,
+            valor_total: mesaData.valor_total,
+            saldo: mesaData.saldo,
+            fichas_5: mesaData.fichas_5,
+            fichas_25: mesaData.fichas_25,
+            fichas_100: mesaData.fichas_100,
+            fichas_500: mesaData.fichas_500,
+            fichas_1000: mesaData.fichas_1000,
+            fichas_5000: mesaData.fichas_5000,
+            fichas_10000: mesaData.fichas_10000,
+            total_fichas: mesaData.fichas_5 + mesaData.fichas_25 + mesaData.fichas_100 + 
+                         mesaData.fichas_500 + mesaData.fichas_1000 + mesaData.fichas_5000 + mesaData.fichas_10000,
+            data_criacao: mesaData.data_criacao || new Date().toLocaleString('pt-BR'),
+            data_atualizacao: mesaData.data_atualizacao || new Date().toLocaleString('pt-BR')
+        };
+        
+        // Determinar classes de status
+        let statusClasses = '';
+        let statusText = '';
+        if (mesaData.status === 'aberta') {
+            statusClasses = 'bg-green-100 text-green-800';
+            statusText = 'ABERTA';
+        } else if (mesaData.status === 'fechada') {
+            statusClasses = 'bg-red-100 text-red-800';
+            statusText = 'FECHADA';
+        } else {
+            statusClasses = 'bg-yellow-100 text-yellow-800';
+            statusText = 'ENCERRADA';
+        }
+        
+        // Determinar classes de saldo
+        const saldoClasses = mesaData.saldo >= 0 ? 'text-green-600' : 'text-red-600';
+        const saldoPrefix = mesaData.saldo >= 0 ? '+' : '';
+        
+        // Determinar classes de status no texto
+        let statusTextClasses = '';
+        if (mesaData.status === 'aberta') {
+            statusTextClasses = 'text-green-600';
+        } else if (mesaData.status === 'fechada') {
+            statusTextClasses = 'text-red-600';
+        } else {
+            statusTextClasses = 'text-yellow-600';
+        }
+        
+        // Determinar largura da barra de progresso
+        let progressWidth = '0%';
+        if (mesaData.status === 'aberta') {
+            progressWidth = '75%';
+        } else if (mesaData.status === 'fechada') {
+            progressWidth = '100%';
+        }
+        
+        // Determinar texto de tempo
+        let timeText = '3 horas atrás';
+        if (mesaData.status === 'aberta') {
+            timeText = '5 minutos atrás';
+        } else if (mesaData.status === 'fechada') {
+            timeText = '1 hora atrás';
+        }
+        
+        // Criar o HTML do card
+        const cardHTML = `
+            <div class="bg-white/95 backdrop-blur-xl rounded-lg p-4 shadow-xl border border-red-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group min-h-[70px]" 
+                 data-mesa-id="${mesaData.id}">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                
+                <div class="flex justify-between items-start mb-2">
+                    <div class="text-xs font-bold text-gray-800">${mesaData.tipo_jogo_display || mesaData.tipo_jogo} ${mesaData.numero_mesa}</div>
+                    <div class="px-2 py-1 rounded text-xs font-bold uppercase ${statusClasses}">
+                        ${statusText}
+                    </div>
+                </div>
+                
+                <div class="text-xs text-red-600 font-semibold mb-2">${mesaData.tipo_jogo}</div>
+                
+                <div class="space-y-1 mb-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-gray-600">Valor Total:</span>
+                        <span class="font-bold text-green-600 valor-total">R$ ${parseFloat(mesaData.valor_total).toLocaleString()}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-gray-600">Valor Inicial:</span>
+                        <span class="font-semibold text-blue-600 valor-inicial">R$ ${parseFloat(mesaData.valor_inicial).toLocaleString()}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-gray-600">Saldo:</span>
+                        <span class="font-bold saldo ${saldoClasses}">
+                            ${saldoPrefix}R$ ${parseFloat(mesaData.saldo).toLocaleString()}
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-gray-600">Fichas:</span>
+                        <span class="text-xs fichas-total">${mesaJson.total_fichas}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-gray-600">Status:</span>
+                        <span class="text-xs font-semibold ${statusTextClasses}">
+                            ${statusText}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="w-full h-1 bg-gray-200 rounded-full mb-2 overflow-hidden">
+                    <div class="h-full bg-gradient-to-r from-amber-500 to-amber-400 rounded-full transition-all duration-300" 
+                         style="width: ${progressWidth}"></div>
+                </div>
+                
+                <div class="text-xs text-gray-400 mb-3">${timeText}</div>
+                
+                <div class="flex gap-2 mt-3">
+                    ${mesaData.status !== 'encerrada' ? `
+                    <button class="flex-1 py-2 px-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white text-xs font-bold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-1" 
+                            onclick="editarMesa(${mesaData.id})">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        Editar
+                    </button>
+                    ` : ''}
+                    ${mesaData.status === 'aberta' ? `
+                        <button class="flex-1 py-2 px-3 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white text-xs font-bold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 uppercase" 
+                                onclick="fecharMesa(${mesaData.id})">
+                            Fechar
+                        </button>
+                    ` : ''}
+                    ${mesaData.status === 'fechada' ? `
+                        <div class="flex gap-1 flex-1">
+                            <button class="flex-1 py-2 px-2 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-600 hover:to-amber-500 text-white text-xs font-bold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 uppercase" 
+                                    onclick="abrirMesa(${mesaData.id})">
+                                Abrir
+                            </button>
+                            <button class="flex-1 py-2 px-2 bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-700 hover:to-gray-600 text-white text-xs font-bold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 uppercase" 
+                                    onclick="encerrarMesa(${mesaData.id})">
+                                Encerrar
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+        
+        // Adicionar o card ao container
+        mesasContainer.insertAdjacentHTML('beforeend', cardHTML);
+    }
+
+    // Função para atualizar a mesa na interface
+    function atualizarMesaNaInterface(mesaData) {
+        // Encontrar o card da mesa pelo ID
+        const mesaCard = document.querySelector(`[data-mesa-id="${mesaData.id}"]`);
+        if (!mesaCard) {
+            return;
+        }
+        
+        // Atualizar os valores exibidos
+        const valorTotalElement = mesaCard.querySelector('.valor-total');
+        const valorInicialElement = mesaCard.querySelector('.valor-inicial');
+        const saldoElement = mesaCard.querySelector('.saldo');
+        const fichasElement = mesaCard.querySelector('.fichas-total');
+        const statusElement = mesaCard.querySelector('.px-2.py-1.rounded.text-xs.font-bold.uppercase');
+        
+        if (valorTotalElement) {
+            valorTotalElement.textContent = `R$ ${parseFloat(mesaData.valor_total).toLocaleString()}`;
+        }
+        
+        if (valorInicialElement) {
+            valorInicialElement.textContent = `R$ ${parseFloat(mesaData.valor_inicial).toLocaleString()}`;
+        }
+        
+        if (saldoElement) {
+            const saldo = parseFloat(mesaData.saldo);
+            saldoElement.textContent = `${saldo >= 0 ? '+' : ''}R$ ${saldo.toLocaleString()}`;
+            saldoElement.className = `font-bold ${saldo >= 0 ? 'text-green-600' : 'text-red-600'}`;
+        }
+        
+        if (fichasElement) {
+            const totalFichas = mesaData.fichas_5 + mesaData.fichas_25 + mesaData.fichas_100 + 
+                               mesaData.fichas_500 + mesaData.fichas_1000 + mesaData.fichas_5000 + mesaData.fichas_10000;
+            fichasElement.textContent = totalFichas;
+        }
+        
+        // Atualizar status visual se necessário
+        if (statusElement) {
+            // Remover classes de status anteriores
+            statusElement.classList.remove('bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'bg-yellow-100', 'text-yellow-800');
+            
+            // Aplicar classes do novo status
+            if (mesaData.status === 'aberta') {
+                statusElement.classList.add('bg-green-100', 'text-green-800');
+                statusElement.textContent = 'ABERTA';
+            } else if (mesaData.status === 'fechada') {
+                statusElement.classList.add('bg-red-100', 'text-red-800');
+                statusElement.textContent = 'FECHADA';
+            } else if (mesaData.status === 'encerrada') {
+                statusElement.classList.add('bg-yellow-100', 'text-yellow-800');
+                statusElement.textContent = 'ENCERRADA';
+            }
+        }
+    }
+
+    // Função para atualizar métricas e saldos dinamicamente
+    function atualizarMetricasESaldos() {
+        console.log('🔄 Iniciando atualização de métricas e saldos...');
+        
+        // Obter parâmetros de filtro atuais
+        const urlParams = new URLSearchParams(window.location.search);
+        const dataInicio = urlParams.get('data_inicio') || '';
+        const dataFim = urlParams.get('data_fim') || '';
+        const statusFiltro = urlParams.get('status') || '';
+        
+        // Construir URL da API com parâmetros
+        let apiUrl = '/mesas/api/atualizar-metricas/';
+        const params = new URLSearchParams();
+        if (dataInicio) params.append('data_inicio', dataInicio);
+        if (dataFim) params.append('data_fim', dataFim);
+        if (statusFiltro) params.append('status', statusFiltro);
+        
+        if (params.toString()) {
+            apiUrl += '?' + params.toString();
+        }
+        
+        console.log('📡 Fazendo requisição para:', apiUrl);
+        
+        fetch(apiUrl)
+            .then(response => {
+                console.log('📥 Resposta recebida:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('📊 Dados recebidos:', data);
+                if (!data.success) {
+                    console.log('❌ Dados não foram bem-sucedidos');
+                    return;
+                }
+                
+                // Atualizar métricas
+                const metricas = data.metricas;
+                
+                // Atualizar receita total
+                const receitaElements = document.querySelectorAll('[data-count]');
+                receitaElements.forEach(element => {
+                    const parentCard = element.closest('.bg-white');
+                    if (parentCard) {
+                        const titleElement = parentCard.querySelector('.text-sm.text-gray-600.font-semibold');
+                        if (titleElement && titleElement.textContent.includes('Receita')) {
+                            element.textContent = `R$ ${parseFloat(metricas.receita_total).toLocaleString()}`;
+                            element.setAttribute('data-count', parseFloat(metricas.receita_total).toFixed(0));
+                        }
+                    }
+                });
+                
+                // Atualizar mesas ativas
+                receitaElements.forEach(element => {
+                    const parentCard = element.closest('.bg-white');
+                    if (parentCard) {
+                        const titleElement = parentCard.querySelector('.text-sm.text-gray-600.font-semibold');
+                        if (titleElement && titleElement.textContent.includes('Mesas Ativas')) {
+                            element.textContent = metricas.mesas_ativas;
+                            element.setAttribute('data-count', metricas.mesas_ativas);
+                        }
+                    }
+                });
+                
+                // Atualizar fichas vendidas
+                receitaElements.forEach(element => {
+                    const parentCard = element.closest('.bg-white');
+                    if (parentCard) {
+                        const titleElement = parentCard.querySelector('.text-sm.text-gray-600.font-semibold');
+                        if (titleElement && titleElement.textContent.includes('Fichas Vendidas')) {
+                            element.textContent = `R$ ${parseFloat(metricas.fichas_vendidas).toLocaleString()}`;
+                            element.setAttribute('data-count', parseFloat(metricas.fichas_vendidas).toFixed(0));
+                        }
+                    }
+                });
+                
+                // Atualizar estoque restante
+                const estoqueElement = document.querySelector('.text-xs.font-medium.text-gray-600');
+                if (estoqueElement && estoqueElement.textContent.includes('Estoque restante')) {
+                    estoqueElement.textContent = `Estoque restante: R$ ${parseFloat(metricas.estoque_restante).toLocaleString()}`;
+                }
+                
+                // Atualizar variação percentual
+                const variacaoElement = document.querySelector('.text-xs.font-medium');
+                if (variacaoElement && variacaoElement.textContent.includes('% vs período anterior')) {
+                    const variacao = parseFloat(metricas.variacao_percentual);
+                    variacaoElement.textContent = `${variacao >= 0 ? '+' : ''}${variacao.toFixed(1)}% vs período anterior`;
+                    variacaoElement.className = `text-xs font-medium ${variacao >= 0 ? 'text-green-600' : 'text-red-600'}`;
+                }
+                
+                // Atualizar saldos das mesas
+                if (data.mesas) {
+                    data.mesas.forEach(mesa => {
+                        const mesaCard = document.querySelector(`[data-mesa-id="${mesa.id}"]`);
+                        if (mesaCard) {
+                            const saldoElement = mesaCard.querySelector('.saldo');
+                            if (saldoElement) {
+                                const saldo = parseFloat(mesa.saldo);
+                                saldoElement.textContent = `${saldo >= 0 ? '+' : ''}R$ ${saldo.toLocaleString()}`;
+                                saldoElement.className = `font-bold ${saldo >= 0 ? 'text-green-600' : 'text-red-600'}`;
+                            }
+                            
+                            // Atualizar valor total também
+                            const valorTotalElement = mesaCard.querySelector('.valor-total');
+                            if (valorTotalElement) {
+                                valorTotalElement.textContent = `R$ ${parseFloat(mesa.valor_total).toLocaleString()}`;
+                            }
+                            
+                            // Atualizar fichas total
+                            const fichasElement = mesaCard.querySelector('.fichas-total');
+                            if (fichasElement) {
+                                const totalFichas = mesa.fichas_5 + mesa.fichas_25 + mesa.fichas_100 + 
+                                                   mesa.fichas_500 + mesa.fichas_1000 + mesa.fichas_5000 + mesa.fichas_10000;
+                                fichasElement.textContent = totalFichas;
+                            }
+                        }
+                    });
+                }
+                
+                console.log('✅ Atualização concluída com sucesso!');
+                
+                // Mostrar notificação de sucesso
+                const notification = document.createElement('div');
+                notification.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-x-full';
+                notification.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>Dados atualizados com sucesso!</span>
+                    </div>
+                `;
+                document.body.appendChild(notification);
+                
+                // Animar entrada
+                setTimeout(() => {
+                    notification.classList.remove('translate-x-full');
+                }, 100);
+                
+                // Remover após 3 segundos
+                setTimeout(() => {
+                    notification.classList.add('translate-x-full');
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, 3000);
+            })
+            .catch(error => {
+                console.log('❌ Erro na atualização:', error);
+                // Silenciar erros para não interromper a experiência do usuário
+            });
+    }
 
     // Inicializar sidebar fechada no desktop
     if (!isMobile()) {
@@ -1560,5 +1965,21 @@
             modalContent.classList.add('show');
         }, 10);
     }
+
+    // Atualizar métricas e saldos quando a página carrega
+    document.addEventListener('DOMContentLoaded', function() {
+        // Aguardar um pouco para garantir que todos os elementos estão carregados
+        setTimeout(() => {
+            atualizarMetricasESaldos();
+        }, 1000);
+    });
+
+                // Botão de refresh para atualizar métricas e saldos
+            const refreshBtn = document.getElementById('refreshBtn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', () => {
+                    window.location.reload(); // Faz um refresh completo da página, igual ao F5
+                });
+            }
 </script>
 {% endblock %} 

@@ -1,13 +1,30 @@
-from django.shortcuts import render
-from django.http import JsonResponse
+from django.shortcuts import render, redirect
+from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
 from django.db import models
 from django.utils import timezone
 from datetime import datetime, timedelta
 import json
 from .models import Mesa
 
+def safe_int(value, default=0):
+    """Converter valores para inteiros de forma segura"""
+    try:
+        if value is None or value == '' or value == 'None' or value == 'null' or value == 'undefined':
+            return default
+        # Se for string, remover espaços e tentar converter
+        if isinstance(value, str):
+            value = value.strip()
+            if value == '':
+                return default
+        # Usar float primeiro para lidar com decimais, depois converter para int
+        return int(float(value))
+    except (ValueError, TypeError, AttributeError):
+        return default
+
+@login_required(login_url='/usuarios/login/')
 def mesas_home(request):
     # Obter parâmetros de data do request
     data_inicio = request.GET.get('data_inicio')
@@ -116,6 +133,8 @@ def criar_mesa(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
+            print(f"DEBUG - Dados recebidos: {data}")  # Debug log
+            
             numero_mesa = data.get('numero_mesa')
             
             # Verificar se já existe uma mesa com o mesmo número que esteja aberta ou fechada
@@ -130,24 +149,57 @@ def criar_mesa(request):
                     'message': f'Já existe uma mesa {numero_mesa} com status "{mesa_existente.get_status_display()}". Encerre a mesa existente antes de criar uma nova.'
                 }, status=400)
             
+            # Debug logs para fichas
+            print(f"DEBUG - Fichas 5: {data.get('fichas_5', 0)}")
+            print(f"DEBUG - Fichas 25: {data.get('fichas_25', 0)}")
+            print(f"DEBUG - Fichas 100: {data.get('fichas_100', 0)}")
+            print(f"DEBUG - Fichas 500: {data.get('fichas_500', 0)}")
+            print(f"DEBUG - Fichas 1000: {data.get('fichas_1000', 0)}")
+            print(f"DEBUG - Fichas 5000: {data.get('fichas_5000', 0)}")
+            print(f"DEBUG - Fichas 10000: {data.get('fichas_10000', 0)}")
+            
             mesa = Mesa.objects.create(
                 numero_mesa=numero_mesa,
                 tipo_jogo=data.get('tipo_jogo'),
                 status=data.get('status', 'aberta'),
-                fichas_5=data.get('fichas_5', 0),
-                fichas_25=data.get('fichas_25', 0),
-                fichas_100=data.get('fichas_100', 0),
-                fichas_500=data.get('fichas_500', 0),
-                fichas_1000=data.get('fichas_1000', 0),
-                fichas_5000=data.get('fichas_5000', 0),
-                fichas_10000=data.get('fichas_10000', 0)
+                fichas_5=safe_int(data.get('fichas_5'), 0),
+                fichas_25=safe_int(data.get('fichas_25'), 0),
+                fichas_100=safe_int(data.get('fichas_100'), 0),
+                fichas_500=safe_int(data.get('fichas_500'), 0),
+                fichas_1000=safe_int(data.get('fichas_1000'), 0),
+                fichas_5000=safe_int(data.get('fichas_5000'), 0),
+                fichas_10000=safe_int(data.get('fichas_10000'), 0)
             )
+            
+            print(f"DEBUG - Mesa criada com ID: {mesa.id}")
+            print(f"DEBUG - Fichas salvas - 5: {mesa.fichas_5}, 25: {mesa.fichas_25}, 100: {mesa.fichas_100}")
+            
             return JsonResponse({
                 'success': True,
                 'message': f'Mesa {mesa.numero_mesa} criada com sucesso!',
-                'mesa_id': mesa.id
+                'mesa_criada': {
+                    'id': mesa.id,
+                    'numero_mesa': mesa.numero_mesa,
+                    'tipo_jogo': mesa.tipo_jogo,
+                    'tipo_jogo_display': mesa.get_tipo_jogo_display(),
+                    'status': mesa.status,
+                    'status_display': mesa.get_status_display(),
+                    'valor_inicial': float(mesa.valor_inicial),
+                    'valor_total': float(mesa.valor_total),
+                    'saldo': float(mesa.saldo),
+                    'fichas_5': mesa.fichas_5,
+                    'fichas_25': mesa.fichas_25,
+                    'fichas_100': mesa.fichas_100,
+                    'fichas_500': mesa.fichas_500,
+                    'fichas_1000': mesa.fichas_1000,
+                    'fichas_5000': mesa.fichas_5000,
+                    'fichas_10000': mesa.fichas_10000,
+                    'data_criacao': mesa.data_criacao.strftime('%d/%m/%Y %H:%M'),
+                    'data_atualizacao': mesa.data_atualizacao.strftime('%d/%m/%Y %H:%M'),
+                }
             })
         except Exception as e:
+            print(f"DEBUG - Erro: {str(e)}")  # Debug log
             return JsonResponse({
                 'success': False,
                 'message': str(e)
@@ -232,7 +284,27 @@ def fechar_mesa_api(request, mesa_id):
             mesa.save()
             return JsonResponse({
                 'success': True,
-                'message': f'Mesa {mesa.numero_mesa} fechada com sucesso!'
+                'message': f'Mesa {mesa.numero_mesa} fechada com sucesso!',
+                'mesa_atualizada': {
+                    'id': mesa.id,
+                    'numero_mesa': mesa.numero_mesa,
+                    'tipo_jogo': mesa.tipo_jogo,
+                    'tipo_jogo_display': mesa.get_tipo_jogo_display(),
+                    'status': mesa.status,
+                    'status_display': mesa.get_status_display(),
+                    'valor_inicial': float(mesa.valor_inicial),
+                    'valor_total': float(mesa.valor_total),
+                    'saldo': float(mesa.saldo),
+                    'fichas_5': mesa.fichas_5,
+                    'fichas_25': mesa.fichas_25,
+                    'fichas_100': mesa.fichas_100,
+                    'fichas_500': mesa.fichas_500,
+                    'fichas_1000': mesa.fichas_1000,
+                    'fichas_5000': mesa.fichas_5000,
+                    'fichas_10000': mesa.fichas_10000,
+                    'data_criacao': mesa.data_criacao.strftime('%d/%m/%Y %H:%M'),
+                    'data_atualizacao': mesa.data_atualizacao.strftime('%d/%m/%Y %H:%M'),
+                }
             })
         except Mesa.DoesNotExist:
             return JsonResponse({
@@ -250,7 +322,27 @@ def abrir_mesa_api(request, mesa_id):
             mesa.save()
             return JsonResponse({
                 'success': True,
-                'message': f'Mesa {mesa.numero_mesa} aberta com sucesso!'
+                'message': f'Mesa {mesa.numero_mesa} aberta com sucesso!',
+                'mesa_atualizada': {
+                    'id': mesa.id,
+                    'numero_mesa': mesa.numero_mesa,
+                    'tipo_jogo': mesa.tipo_jogo,
+                    'tipo_jogo_display': mesa.get_tipo_jogo_display(),
+                    'status': mesa.status,
+                    'status_display': mesa.get_status_display(),
+                    'valor_inicial': float(mesa.valor_inicial),
+                    'valor_total': float(mesa.valor_total),
+                    'saldo': float(mesa.saldo),
+                    'fichas_5': mesa.fichas_5,
+                    'fichas_25': mesa.fichas_25,
+                    'fichas_100': mesa.fichas_100,
+                    'fichas_500': mesa.fichas_500,
+                    'fichas_1000': mesa.fichas_1000,
+                    'fichas_5000': mesa.fichas_5000,
+                    'fichas_10000': mesa.fichas_10000,
+                    'data_criacao': mesa.data_criacao.strftime('%d/%m/%Y %H:%M'),
+                    'data_atualizacao': mesa.data_atualizacao.strftime('%d/%m/%Y %H:%M'),
+                }
             })
         except Mesa.DoesNotExist:
             return JsonResponse({
@@ -265,6 +357,7 @@ def editar_mesa_api(request, mesa_id):
         try:
             mesa = Mesa.objects.get(id=mesa_id)
             data = json.loads(request.body)
+            print(f"DEBUG EDITAR - Dados recebidos: {data}")  # Debug log
             
             # Verificar se já existe outra mesa com o mesmo número que esteja aberta ou fechada
             numero_mesa = data.get('numero_mesa')
@@ -279,23 +372,157 @@ def editar_mesa_api(request, mesa_id):
                     'message': f'Já existe uma mesa {numero_mesa} com status "{mesa_existente.get_status_display()}". Encerre a mesa existente antes de usar este número.'
                 }, status=400)
             
+            # Debug logs para fichas
+            print(f"DEBUG EDITAR - Fichas 5: {data.get('fichas_5', 0)}")
+            print(f"DEBUG EDITAR - Fichas 25: {data.get('fichas_25', 0)}")
+            print(f"DEBUG EDITAR - Fichas 100: {data.get('fichas_100', 0)}")
+            print(f"DEBUG EDITAR - Fichas 500: {data.get('fichas_500', 0)}")
+            print(f"DEBUG EDITAR - Fichas 1000: {data.get('fichas_1000', 0)}")
+            print(f"DEBUG EDITAR - Fichas 5000: {data.get('fichas_5000', 0)}")
+            print(f"DEBUG EDITAR - Fichas 10000: {data.get('fichas_10000', 0)}")
+            
             # Atualizar os campos da mesa (exceto valor_inicial que não pode ser alterado)
             mesa.numero_mesa = numero_mesa
             mesa.tipo_jogo = data.get('tipo_jogo')
             mesa.status = data.get('status')
-            mesa.fichas_5 = data.get('fichas_5', 0)
-            mesa.fichas_25 = data.get('fichas_25', 0)
-            mesa.fichas_100 = data.get('fichas_100', 0)
-            mesa.fichas_500 = data.get('fichas_500', 0)
-            mesa.fichas_1000 = data.get('fichas_1000', 0)
-            mesa.fichas_5000 = data.get('fichas_5000', 0)
-            mesa.fichas_10000 = data.get('fichas_10000', 0)
             
+            # Debug: verificar valores antes da conversão
+            print(f"DEBUG EDITAR - Valores brutos recebidos:")
+            print(f"fichas_5 raw: '{data.get('fichas_5')}' (type: {type(data.get('fichas_5'))})")
+            print(f"fichas_25 raw: '{data.get('fichas_25')}' (type: {type(data.get('fichas_25'))})")
+            print(f"fichas_100 raw: '{data.get('fichas_100')}' (type: {type(data.get('fichas_100'))})")
+            
+            # Converter e atribuir valores das fichas
+            mesa.fichas_5 = safe_int(data.get('fichas_5'), 0)
+            mesa.fichas_25 = safe_int(data.get('fichas_25'), 0)
+            mesa.fichas_100 = safe_int(data.get('fichas_100'), 0)
+            mesa.fichas_500 = safe_int(data.get('fichas_500'), 0)
+            mesa.fichas_1000 = safe_int(data.get('fichas_1000'), 0)
+            mesa.fichas_5000 = safe_int(data.get('fichas_5000'), 0)
+            mesa.fichas_10000 = safe_int(data.get('fichas_10000'), 0)
+            
+            print(f"DEBUG EDITAR - Valores convertidos:")
+            print(f"fichas_5: {mesa.fichas_5}")
+            print(f"fichas_25: {mesa.fichas_25}")
+            print(f"fichas_100: {mesa.fichas_100}")
+            print(f"fichas_500: {mesa.fichas_500}")
+            print(f"fichas_1000: {mesa.fichas_1000}")
+            print(f"fichas_5000: {mesa.fichas_5000}")
+            print(f"fichas_10000: {mesa.fichas_10000}")
+            
+            # Salvar a mesa
             mesa.save()  # Isso vai automaticamente recalcular o valor_total
+            
+            # Recarregar a mesa do banco para verificar se os valores foram salvos
+            mesa.refresh_from_db()
+            
+            print(f"DEBUG EDITAR - Mesa atualizada - Fichas salvas - 5: {mesa.fichas_5}, 25: {mesa.fichas_25}, 100: {mesa.fichas_100}")
+            print(f"DEBUG EDITAR - Valores após save e refresh:")
+            print(f"fichas_5: {mesa.fichas_5}")
+            print(f"fichas_25: {mesa.fichas_25}")
+            print(f"fichas_100: {mesa.fichas_100}")
+            print(f"fichas_500: {mesa.fichas_500}")
+            print(f"fichas_1000: {mesa.fichas_1000}")
+            print(f"fichas_5000: {mesa.fichas_5000}")
+            print(f"fichas_10000: {mesa.fichas_10000}")
+            print(f"valor_total: {mesa.valor_total}")
+            print(f"saldo: {mesa.saldo}")
+            
+            # Retornar dados atualizados para o frontend
+            return JsonResponse({
+                'success': True,
+                'message': f'Mesa {mesa.numero_mesa} atualizada com sucesso!',
+                'mesa_atualizada': {
+                    'id': mesa.id,
+                    'numero_mesa': mesa.numero_mesa,
+                    'tipo_jogo': mesa.tipo_jogo,
+                    'tipo_jogo_display': mesa.get_tipo_jogo_display(),
+                    'status': mesa.status,
+                    'status_display': mesa.get_status_display(),
+                    'valor_inicial': float(mesa.valor_inicial),
+                    'valor_total': float(mesa.valor_total),
+                    'saldo': float(mesa.saldo),
+                    'fichas_5': mesa.fichas_5,
+                    'fichas_25': mesa.fichas_25,
+                    'fichas_100': mesa.fichas_100,
+                    'fichas_500': mesa.fichas_500,
+                    'fichas_1000': mesa.fichas_1000,
+                    'fichas_5000': mesa.fichas_5000,
+                    'fichas_10000': mesa.fichas_10000,
+                    'data_criacao': mesa.data_criacao.strftime('%d/%m/%Y %H:%M'),
+                    'data_atualizacao': mesa.data_atualizacao.strftime('%d/%m/%Y %H:%M'),
+                }
+            })
+        except Mesa.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'Mesa não encontrada'
+            }, status=404)
+        except Exception as e:
+            print(f"DEBUG EDITAR - Erro: {str(e)}")  # Debug log
+            return JsonResponse({
+                'success': False,
+                'message': str(e)
+            }, status=400)
+    return JsonResponse({'success': False, 'message': 'Método não permitido'}, status=405)
+
+@csrf_exempt
+def encerrar_mesa_api(request, mesa_id):
+    if request.method == 'POST':
+        try:
+            mesa = Mesa.objects.get(id=mesa_id)
+            mesa.status = 'encerrada'
+            mesa.save()
             
             return JsonResponse({
                 'success': True,
-                'message': f'Mesa {mesa.numero_mesa} atualizada com sucesso!'
+                'message': f'Mesa {mesa.numero_mesa} encerrada com sucesso!'
+            })
+        except Mesa.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'Mesa não encontrada'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': str(e)
+            }, status=400)
+    return JsonResponse({'success': False, 'message': 'Método não permitido'}, status=405)
+
+@csrf_exempt
+def testar_mesa_api(request, mesa_id):
+    """Endpoint de teste para verificar os dados de uma mesa"""
+    if request.method == 'GET':
+        try:
+            mesa = Mesa.objects.get(id=mesa_id)
+            
+            # Calcular valores manualmente para comparação
+            valor_total_calculado = mesa.calcular_valor_total()
+            saldo_calculado = valor_total_calculado - float(mesa.valor_inicial)
+            
+            return JsonResponse({
+                'success': True,
+                'mesa': {
+                    'id': mesa.id,
+                    'numero_mesa': mesa.numero_mesa,
+                    'tipo_jogo': mesa.tipo_jogo,
+                    'status': mesa.status,
+                    'valor_inicial': float(mesa.valor_inicial),
+                    'valor_total_salvo': float(mesa.valor_total),
+                    'valor_total_calculado': valor_total_calculado,
+                    'saldo_salvo': float(mesa.saldo),
+                    'saldo_calculado': saldo_calculado,
+                    'fichas_5': mesa.fichas_5,
+                    'fichas_25': mesa.fichas_25,
+                    'fichas_100': mesa.fichas_100,
+                    'fichas_500': mesa.fichas_500,
+                    'fichas_1000': mesa.fichas_1000,
+                    'fichas_5000': mesa.fichas_5000,
+                    'fichas_10000': mesa.fichas_10000,
+                    'data_criacao': mesa.data_criacao.isoformat(),
+                    'data_atualizacao': mesa.data_atualizacao.isoformat(),
+                }
             })
         except Mesa.DoesNotExist:
             return JsonResponse({
@@ -310,19 +537,144 @@ def editar_mesa_api(request, mesa_id):
     return JsonResponse({'success': False, 'message': 'Método não permitido'}, status=405) 
 
 @csrf_exempt
-def encerrar_mesa_api(request, mesa_id):
-    if request.method == 'POST':
-        try:
-            mesa = Mesa.objects.get(id=mesa_id)
-            mesa.status = 'encerrada'
-            mesa.save()
-            return JsonResponse({
-                'success': True,
-                'message': f'Mesa {mesa.numero_mesa} encerrada com sucesso!'
+def mesa_detail_api(request, mesa_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'success': False, 'message': 'Não autorizado'}, status=403)
+    try:
+        mesa = Mesa.objects.get(id=mesa_id)
+    except Mesa.DoesNotExist:
+        raise Http404
+
+    data = {
+        'id': mesa.id,
+        'numero_mesa': mesa.numero_mesa,
+        'tipo_jogo': mesa.tipo_jogo,
+        'tipo_jogo_display': mesa.get_tipo_jogo_display(),
+        'status': mesa.status,
+        'status_display': mesa.get_status_display(),
+        'valor_inicial': float(mesa.valor_inicial),
+        'valor_total': float(mesa.valor_total),
+        'saldo': float(mesa.saldo),
+        'fichas_5': mesa.fichas_5 or 0,
+        'fichas_25': mesa.fichas_25 or 0,
+        'fichas_100': mesa.fichas_100 or 0,
+        'fichas_500': mesa.fichas_500 or 0,
+        'fichas_1000': mesa.fichas_1000 or 0,
+        'fichas_5000': mesa.fichas_5000 or 0,
+        'fichas_10000': mesa.fichas_10000 or 0,
+        'data_criacao': mesa.data_criacao.strftime('%d/%m/%Y %H:%M'),
+        'data_atualizacao': mesa.data_atualizacao.strftime('%d/%m/%Y %H:%M'),
+    }
+    return JsonResponse({'success': True, 'mesa': data})
+
+@csrf_exempt
+def atualizar_metricas_api(request):
+    """API para atualizar métricas e saldos dinamicamente"""
+    if not request.user.is_authenticated:
+        return JsonResponse({'success': False, 'message': 'Não autorizado'}, status=403)
+    
+    try:
+        # Obter parâmetros de filtro do request
+        data_inicio = request.GET.get('data_inicio')
+        data_fim = request.GET.get('data_fim')
+        status_filtro = request.GET.get('status', '')
+        
+        # Se não foram fornecidas datas, usar o último mês como padrão
+        if not data_inicio or not data_fim:
+            data_fim = timezone.now().date()
+            data_inicio = data_fim - timedelta(days=30)
+        else:
+            try:
+                data_inicio = datetime.strptime(data_inicio, '%Y-%m-%d').date()
+                data_fim = datetime.strptime(data_fim, '%Y-%m-%d').date()
+            except ValueError:
+                data_fim = timezone.now().date()
+                data_inicio = data_fim - timedelta(days=30)
+        
+        # Calcular métricas atualizadas
+        mesas_ativas = Mesa.objects.filter(status='aberta').count()
+        total_mesas = Mesa.objects.exclude(status='encerrada').count()
+        
+        # Calcular receita total do período selecionado
+        mesas_periodo_query = Mesa.objects.filter(data_criacao__date__gte=data_inicio, data_criacao__date__lte=data_fim)
+        
+        if status_filtro and status_filtro in ['aberta', 'fechada', 'encerrada']:
+            mesas_periodo_query = mesas_periodo_query.filter(status=status_filtro)
+        
+        receita_total = mesas_periodo_query.aggregate(
+            total=models.Sum('saldo')
+        )['total'] or 0
+        
+        # Calcular total de fichas vendidas
+        fichas_vendidas = Mesa.objects.filter(status='aberta').aggregate(
+            total=models.Sum('valor_total')
+        )['total'] or 0
+        
+        # Estoque restante
+        estoque_restante = Mesa.objects.aggregate(
+            total=models.Sum('valor_total')
+        )['total'] or 0
+        estoque_restante -= fichas_vendidas
+        
+        # Calcular variação percentual
+        periodo_anterior_inicio = data_inicio - timedelta(days=(data_fim - data_inicio).days)
+        periodo_anterior_fim = data_inicio - timedelta(days=1)
+        
+        if status_filtro and status_filtro in ['aberta', 'fechada', 'encerrada']:
+            mesas_periodo_anterior_query = Mesa.objects.filter(status=status_filtro)
+        else:
+            mesas_periodo_anterior_query = Mesa.objects.exclude(status='encerrada')
+        
+        mesas_periodo_anterior = mesas_periodo_anterior_query.aggregate(
+            total=models.Sum('saldo')
+        )['total'] or 0
+        
+        # Calcular variação percentual
+        if mesas_periodo_anterior != 0:
+            variacao_percentual = ((receita_total - mesas_periodo_anterior) / abs(mesas_periodo_anterior)) * 100
+        else:
+            variacao_percentual = 0 if receita_total == 0 else 100
+        
+        # Obter todas as mesas com saldos atualizados
+        if status_filtro and status_filtro in ['aberta', 'fechada', 'encerrada']:
+            mesas = Mesa.objects.filter(status=status_filtro).order_by('numero_mesa')
+        else:
+            mesas = Mesa.objects.exclude(status='encerrada').order_by('numero_mesa')
+        
+        # Preparar dados das mesas
+        mesas_data = []
+        for mesa in mesas:
+            mesas_data.append({
+                'id': mesa.id,
+                'numero_mesa': mesa.numero_mesa,
+                'tipo_jogo': mesa.tipo_jogo,
+                'tipo_jogo_display': mesa.get_tipo_jogo_display(),
+                'status': mesa.status,
+                'status_display': mesa.get_status_display(),
+                'valor_inicial': float(mesa.valor_inicial),
+                'valor_total': float(mesa.valor_total),
+                'saldo': float(mesa.saldo),
+                'fichas_5': mesa.fichas_5 or 0,
+                'fichas_25': mesa.fichas_25 or 0,
+                'fichas_100': mesa.fichas_100 or 0,
+                'fichas_500': mesa.fichas_500 or 0,
+                'fichas_1000': mesa.fichas_1000 or 0,
+                'fichas_5000': mesa.fichas_5000 or 0,
+                'fichas_10000': mesa.fichas_10000 or 0,
             })
-        except Mesa.DoesNotExist:
-            return JsonResponse({
-                'success': False,
-                'message': 'Mesa não encontrada'
-            }, status=404)
-    return JsonResponse({'success': False, 'message': 'Método não permitido'}, status=405) 
+        
+        return JsonResponse({
+            'success': True,
+            'metricas': {
+                'receita_total': float(receita_total),
+                'mesas_ativas': mesas_ativas,
+                'total_mesas': total_mesas,
+                'fichas_vendidas': float(fichas_vendidas),
+                'estoque_restante': float(estoque_restante),
+                'variacao_percentual': float(variacao_percentual)
+            },
+            'mesas': mesas_data
+        })
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': f'Erro ao atualizar métricas: {str(e)}'}, status=500) 

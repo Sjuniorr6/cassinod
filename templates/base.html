@@ -7,9 +7,11 @@
     <title>{% block title %}Cassino Diamante{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
     <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
+    {% block extra_css %}{% endblock %}
     {% block extra_head %}{% endblock %}
 </head>
 <body>
     {% block content %}{% endblock %}
+    {% block extra_js %}{% endblock %}
 </body>
 </html> 
