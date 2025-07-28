@@ -699,6 +699,11 @@
     // Ver detalhes do cliente - Com Loading
     async function verDetalhesCliente(clienteId) {
         try {
+            console.log('Ver detalhes do cliente ID:', clienteId);
+            
+            // Armazenar ID do cliente atual
+            window.clienteAtualId = clienteId;
+            
             // Mostrar loading no modal
             const modal = document.getElementById('modalDetalhesCliente');
             const content = document.getElementById('detalhesClienteContent');
@@ -728,15 +733,19 @@
             `;
             
             // Fazer requisição
+            console.log('Fazendo requisição para:', `/financeiro/api/clientes/${clienteId}/`);
             const response = await fetch(`/financeiro/api/clientes/${clienteId}/`);
-            const data = await response.json();
+            console.log('Response status:', response.status);
             
-            if (response.ok) {
+            const data = await response.json();
+            console.log('Dados recebidos:', data);
+            
+            if (response.ok && data.success) {
                 // Remover loading
                 modal.classList.remove('modal-loading');
                 
                 // Exibir dados
-                exibirDetalhesCliente(data);
+                exibirDetalhesCliente(data.cliente);
                 
                 // Efeito de entrada suave
                 setTimeout(() => {
@@ -754,7 +763,9 @@
                 
             } else {
                 modal.classList.remove('modal-loading');
-                mostrarAlertPopup('Erro', 'Erro ao carregar detalhes do cliente.', 'error');
+                const errorMsg = data.error || 'Erro ao carregar detalhes do cliente.';
+                console.error('Erro na resposta:', errorMsg);
+                mostrarAlertPopup('Erro', errorMsg, 'error');
             }
         } catch (error) {
             console.error('Erro ao obter cliente:', error);
@@ -765,9 +776,13 @@
 
     // Exibir detalhes do cliente - Design Novo
     function exibirDetalhesCliente(cliente) {
+        console.log('Exibindo detalhes do cliente:', cliente);
+        
         const content = document.getElementById('detalhesClienteContent');
         const saldoFichas = cliente.saldo_fichas || 0;
         const temFichas = saldoFichas > 0;
+        
+        console.log('Saldo fichas:', saldoFichas, 'Tem fichas:', temFichas);
         
         // Atualizar header do modal
         const avatarInicial = document.querySelector('.avatar-inicial');

@@ -5,7 +5,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/home.css' %}">
-<link rel="stylesheet" href="{% static 'css/sange.css' %}">
+<link rel="stylesheet" href="{% static 'css/sange.css' %}?v=3.4">
 {% endblock %}
 
 {% block content %}
@@ -24,18 +24,18 @@
         </button>
         
         <header class="main-header">
-            <div class="flex flex-col items-center mb-4">
-                <div class="text-center mb-4">
-                    <h1 class="main-title text-center">Abrir Caixa</h1>
-                    <p class="main-subtitle text-center">{{ sange.nome }}</p>
+            <div class="header-content">
+                <div class="header-left">
+                    <h1 class="main-title">Abrir Caixa</h1>
+                    <p class="main-subtitle">{{ sange.nome }}</p>
                 </div>
-                <!-- Botão Voltar para Listagem -->
-                <div class="flex justify-center w-full mb-4">
+                
+                <div class="header-right">
                     <a href="{% url 'sange:listar_sanges' %}" class="btn-secondary">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
                         </svg>
-                        <span class="hidden sm:inline">Voltar para Listagem</span>
+                        <span class="hidden sm:inline">Voltar</span>
                         <span class="sm:hidden">Voltar</span>
                     </a>
                 </div>
@@ -67,7 +67,8 @@
                                     <label for="ficha_{{ valor }}" class="ficha-label">R$ {{ valor|floatformat:0 }}</label>
                                     <input type="number" id="ficha_{{ valor }}" name="ficha_{{ valor }}" 
                                            class="ficha-input" min="0" value="0" 
-                                           onchange="calcularValorTotal()">
+                                           onchange="calcularValorTotal()" 
+                                           placeholder="0">
                                 </div>
                             {% endfor %}
                         </div>
@@ -88,7 +89,7 @@
                             <span class="hidden sm:inline">Cancelar</span>
                             <span class="sm:hidden">Cancelar</span>
                         </a>
-                        <button type="submit" class="btn-primary" id="btnAbrirCaixa">
+                        <button type="submit" class="btn-primary" id="btnAbrirCaixa" disabled>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0l9 9m0 0v4.5m0-4.5h-4.5m4.5 0l-9-9"/>
                             </svg>
@@ -127,11 +128,25 @@ function calcularValorTotal() {
     // Habilita/desabilita o botão
     const btnAbrir = document.getElementById('btnAbrirCaixa');
     btnAbrir.disabled = total === 0;
+    
+    // Adiciona classe visual para botão desabilitado
+    if (total === 0) {
+        btnAbrir.classList.add('btn-disabled');
+    } else {
+        btnAbrir.classList.remove('btn-disabled');
+    }
 }
 
 // Inicializa o cálculo
 document.addEventListener('DOMContentLoaded', function() {
     calcularValorTotal();
+    
+    // Adiciona listeners para todos os inputs
+    const inputs = document.querySelectorAll('.ficha-input');
+    inputs.forEach(input => {
+        input.addEventListener('input', calcularValorTotal);
+        input.addEventListener('change', calcularValorTotal);
+    });
 });
 </script>
 {% endblock %} 

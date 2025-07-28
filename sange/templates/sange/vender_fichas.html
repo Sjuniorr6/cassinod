@@ -5,7 +5,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/home.css' %}">
-<link rel="stylesheet" href="{% static 'css/sange.css' %}">
+<link rel="stylesheet" href="{% static 'css/sange.css' %}?v=3.2">
 {% endblock %}
 
 {% block content %}
@@ -131,6 +131,7 @@ function atualizarQuantidadeDisponivel() {
     if (valorSelect.value) {
         const valor = valorSelect.value;
         const disponivel = fichasDisponiveis[valor] || 0;
+        
         quantidadeDisponivel.textContent = `Quantidade disponível: ${disponivel}`;
         quantidadeInput.max = disponivel;
         

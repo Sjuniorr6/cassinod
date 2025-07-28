@@ -5,7 +5,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/home.css' %}">
-<link rel="stylesheet" href="{% static 'css/sange.css' %}?v=3.1">
+<link rel="stylesheet" href="{% static 'css/sange.css' %}?v=3.4">
 {% endblock %}
 
 {% block content %}
@@ -93,11 +93,11 @@
                                 <p><strong>Total de Trocas:</strong> R$ {{ sange.total_trocas|floatformat:2 }}</p>
                                 {% if sange.caixa_atual %}
                                     <p><strong>Caixa Aberto em:</strong> {{ sange.caixa_atual.data_abertura|date:"d/m/Y H:i" }}</p>
-                                    <p><strong>Valor Inicial:</strong> R$ {{ sange.caixa_atual.valor_inicial|floatformat:2 }}</p>
+                                    <p><strong>Valor Inicial:</strong> R$ {{ sange.caixa_atual.valor_total_inicial|floatformat:2 }}</p>
                                 {% else %}
                                     {% if sange.ultimo_caixa %}
                                         <p><strong>Último Caixa Fechado:</strong> {{ sange.ultimo_caixa.data_fechamento|date:"d/m/Y H:i" }}</p>
-                                        <p><strong>Valor Final:</strong> R$ {{ sange.ultimo_caixa.valor_final|floatformat:2|default:"0.00" }}</p>
+                                        <p><strong>Valor Final:</strong> R$ {{ sange.ultimo_caixa.valor_total_atual|floatformat:2|default:"0.00" }}</p>
                                     {% else %}
                                         <p><strong>Status:</strong> Nunca foi aberto</p>
                                     {% endif %}
@@ -106,14 +106,6 @@
                             
                             <div class="sange-actions">
                                 {% if sange.caixa_atual %}
-                                    <a href="{% url 'sange:detalhes_caixa' sange.caixa_atual.id %}" class="btn-accent">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12c.75-4.5 6-7.5 9.75-7.5s9 3 9.75 7.5c-.75 4.5-6 7.5-9.75 7.5s-9-3-9.75-7.5z" />
-                                        </svg>
-                                        <span class="hidden sm:inline">Ver Caixa</span>
-                                        <span class="sm:hidden">Ver</span>
-                                    </a>
                                     <a href="{% url 'sange:vender_fichas' sange.caixa_atual.id %}" class="btn-primary">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
@@ -136,6 +128,15 @@
                                         <span class="sm:hidden">Fechar</span>
                                     </a>
                                 {% else %}
+                                    <!-- Botão para abrir novo caixa -->
+                                    <a href="{% url 'sange:abrir_caixa' sange.id %}" class="btn-primary">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                                        </svg>
+                                        <span class="hidden sm:inline">Abrir Caixa</span>
+                                        <span class="sm:hidden">Abrir</span>
+                                    </a>
+                                    
                                     {% if sange.ultimo_caixa %}
                                         <a href="{% url 'sange:detalhes_caixa' sange.ultimo_caixa.id %}" class="btn-accent">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">

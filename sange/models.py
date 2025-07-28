@@ -27,6 +27,34 @@ class Sange(models.Model):
         """Retorna o caixa atual aberto da sange"""
         return self.caixasange_set.filter(data_fechamento__isnull=True).first()
 
+    @property
+    def ultimo_caixa(self):
+        """Retorna o último caixa fechado da sange"""
+        return self.caixasange_set.filter(data_fechamento__isnull=False).order_by('-data_fechamento').first()
+
+    @property
+    def total_vendas(self):
+        """Calcula o total de vendas de todos os caixas da sange"""
+        from decimal import Decimal
+        total = Decimal('0.00')
+        for caixa in self.caixasange_set.all():
+            vendas = caixa.vendaficha_set.all()
+            for venda in vendas:
+                total += venda.valor_total
+        return total
+
+    @property
+    def total_trocas(self):
+        """Calcula o total de trocas de todos os caixas da sange"""
+        from decimal import Decimal
+        total = Decimal('0.00')
+        for caixa in self.caixasange_set.all():
+            trocas = caixa.trocaficha_set.all()
+            for troca in trocas:
+                # Para trocas, consideramos o valor original como "valor" da troca
+                total += Decimal(str(troca.valor_original))
+        return total
+
 class CaixaSange(models.Model):
     sange = models.ForeignKey(Sange, on_delete=models.CASCADE, verbose_name="Sange")
     data_abertura = models.DateTimeField(auto_now_add=True, verbose_name="Data de Abertura")

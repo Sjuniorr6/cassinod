@@ -65,17 +65,25 @@ def listar_clientes(request):
 @require_http_methods(["GET"])
 def obter_cliente(request, cliente_id):
     """API para obter um cliente específico por ID"""
+    print(f"=== OBTER CLIENTE ID: {cliente_id} ===")
     try:
         cliente = Cliente.objects.get(id=cliente_id)
+        print(f"Cliente encontrado: {cliente.nome_completo}")
+        
         try:
             carteira = cliente.carteira
             saldo_fichas = carteira.saldo_fichas
+            print(f"Carteira encontrada com {saldo_fichas} fichas")
         except:
             # Se não tem carteira, criar uma
             print(f"Criando carteira para cliente {cliente.nome_completo}")
             carteira = Carteira.objects.create(cliente=cliente, saldo_fichas=0)
             saldo_fichas = 0
+            print(f"Carteira criada com {saldo_fichas} fichas")
+        
         vendas = VendaFicha.objects.filter(cliente=cliente).order_by('-data_venda')
+        print(f"Vendas encontradas: {vendas.count()}")
+        
         vendas_data = [
             {
                 'id': venda.id,
@@ -83,6 +91,7 @@ def obter_cliente(request, cliente_id):
                 'data_venda': venda.data_venda.strftime('%d/%m/%Y %H:%M')
             } for venda in vendas
         ]
+        
         cliente_data = {
             'id': cliente.id,
             'nome': cliente.nome,
@@ -97,6 +106,9 @@ def obter_cliente(request, cliente_id):
             'saldo_fichas': saldo_fichas,
             'vendas_fichas': vendas_data
         }
+        
+        print(f"Dados do cliente preparados: {cliente_data}")
+        
         return JsonResponse({
             'success': True,
             'cliente': cliente_data

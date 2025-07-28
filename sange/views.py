@@ -8,25 +8,32 @@ from django.db import transaction
 from decimal import Decimal
 import json
 
-from .models import Sange, CaixaSange, VendaFicha as VendaFichaSange, TrocaFicha
+from .models import Sange, CaixaSange, VendaFicha, TrocaFicha
 from financeiro.models import Cliente, Carteira
 
 @login_required
 def listar_sanges(request):
-    """Lista todas as sanges"""
-    sanges = Sange.objects.filter(ativo=True).order_by('nome')
+    """Lista todas as sanges com caixas abertos primeiro"""
+    # Busca todas as sanges ativas
+    sanges = Sange.objects.filter(ativo=True)
+    
+    # Ordena: primeiro as que têm caixa aberto, depois por nome
+    sanges_ordenadas = sorted(sanges, key=lambda s: (not s.caixa_aberto, s.nome))
+    
     return render(request, 'sange/listar_sanges.html', {
-        'sanges': sanges
+        'sanges': sanges_ordenadas
     })
 
 @login_required
 def nova_sange(request):
-    """Cria uma nova sange"""
+    """Cria uma nova sange sem caixa aberto"""
     if request.method == 'POST':
         nome = request.POST.get('nome')
         if nome:
-            Sange.objects.create(nome=nome)
-            messages.success(request, 'Sange criada com sucesso!')
+            # Cria apenas a sange, sem caixa
+            sange = Sange.objects.create(nome=nome)
+            
+            messages.success(request, f'Sange "{nome}" criada com sucesso! Use o botão "Abrir Caixa" para iniciar as operações.')
             return redirect('sange:listar_sanges')
         else:
             messages.error(request, 'Nome é obrigatório!')
@@ -81,7 +88,7 @@ def detalhes_caixa(request, caixa_id):
     caixa = get_object_or_404(CaixaSange, id=caixa_id)
     
     # Busca vendas e trocas do caixa
-    vendas = VendaFichaSange.objects.filter(caixa_sange=caixa).order_by('-data')
+    vendas = VendaFicha.objects.filter(caixa_sange=caixa).order_by('-data')
     trocas = TrocaFicha.objects.filter(caixa_sange=caixa).order_by('-data')
     
     return render(request, 'sange/detalhes_caixa.html', {
@@ -119,7 +126,7 @@ def vender_fichas(request, caixa_id):
             if jogador_id:
                 jogador = Cliente.objects.get(id=jogador_id)
             
-            venda = VendaFichaSange.objects.create(
+            venda = VendaFicha.objects.create(
                 caixa_sange=caixa,
                 jogador=jogador,
                 valor_unitario=valor_unitario,
