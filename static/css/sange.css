@@ -1,0 +1,1514 @@
+/* ===== ESTILOS PARA O APP SANGE - DESIGN ELEGANTE ===== */
+
+/* Regra geral para cards em coluna única em telas menores */
+@media (max-width: 767px) {
+    .sanges-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem;
+        max-width: 100%;
+    }
+    
+    .sange-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .btn-primary, .btn-secondary, .btn-accent, .btn-danger {
+        width: 100%;
+        justify-content: center;
+        min-height: 28px;
+        padding: 0.375rem 0.625rem;
+        font-size: 0.7rem;
+    }
+}
+
+/* Container principal */
+.cards-container {
+    padding: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Espaçamento para botão mobile */
+@media (max-width: 1023px) {
+    .main-header {
+        padding-top: 6rem;
+    }
+}
+
+.messages-container {
+    margin-bottom: 1.5rem;
+    width: 100%;
+    max-width: 1400px;
+}
+
+/* Títulos principais */
+.main-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.025em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.main-subtitle {
+    font-size: 1.25rem;
+    color: #6b7280;
+    margin-bottom: 0;
+    font-weight: 400;
+    letter-spacing: 0.025em;
+}
+
+/* Filtros de Status */
+.filtros-container {
+    margin-bottom: 2rem;
+    width: 100%;
+    max-width: 600px;
+}
+
+.filtros-buttons {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.filtro-btn {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: none;
+    background: #f3f4f6;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.025em;
+    min-width: 60px;
+    text-align: center;
+}
+
+.filtro-btn:hover {
+    background: #e5e7eb;
+}
+
+.filtro-btn.active {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.filtro-btn.active:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.sanges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 1400px;
+    justify-items: center;
+}
+
+/* Grid para detalhes do caixa */
+.caixa-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    width: 100%;
+    max-width: 1400px;
+    margin-bottom: 2rem;
+}
+
+/* Cards de Sange - Design Elegante */
+.sange-card {
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border-radius: 20px !important;
+    padding: 2.5rem !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    width: 100%;
+    max-width: 480px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.sange-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ef4444, #dc2626, #b91c1c);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.sange-card:hover {
+    transform: translateY(-8px) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12) !important;
+    border-color: rgba(239, 68, 68, 0.2) !important;
+}
+
+.sange-card:hover::before {
+    opacity: 1;
+}
+
+.sange-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.sange-nome {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+    text-align: center;
+    letter-spacing: -0.025em;
+}
+
+.sange-status {
+    display: flex;
+    justify-content: center;
+}
+
+.status-badge {
+    padding: 0.625rem 1.5rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border: 1px solid;
+    transition: all 0.3s ease;
+}
+
+.status-badge.aberto {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.status-badge.fechado {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+.sange-info {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.sange-info p {
+    margin-bottom: 0.75rem;
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.sange-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 0.75rem;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Botões Elegantes */
+.btn-primary, .btn-secondary, .btn-accent {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    width: auto;
+    min-width: 80px;
+    text-align: center;
+    min-height: 32px;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.025em;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #4b5563 0%, #374151 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(107, 114, 128, 0.4);
+}
+
+.btn-accent {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.btn-accent:hover {
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+}
+
+/* Estado vazio */
+.empty-state {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+    padding: 4rem 3rem;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.empty-state::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ef4444, #dc2626, #b91c1c);
+}
+
+.empty-icon {
+    color: #9ca3af;
+    margin-bottom: 2rem;
+    opacity: 0.7;
+}
+
+.empty-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 1.25rem;
+    letter-spacing: -0.025em;
+}
+
+.empty-description {
+    color: #6b7280;
+    margin-bottom: 2.5rem;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+/* Formulários Elegantes */
+.form-card {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.form-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ef4444, #dc2626, #b91c1c);
+}
+
+.form-section {
+    margin-bottom: 2.5rem;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.025em;
+}
+
+.section-description {
+    color: #6b7280;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.form-group {
+    margin-bottom: 2rem;
+}
+
+.form-label {
+    display: block;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    letter-spacing: 0.025em;
+}
+
+.form-input {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    background: white;
+}
+
+.form-help {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1.25rem;
+    justify-content: flex-end;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+/* Resultado da troca */
+.troca-resultado {
+    background: rgba(248, 250, 252, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-top: 1.5rem;
+    backdrop-filter: blur(10px);
+}
+
+.troca-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.troca-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.troca-label {
+    font-weight: 500;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.troca-value {
+    font-weight: 600;
+    color: #111827;
+    font-size: 1rem;
+}
+
+.troca-mensagem {
+    margin-top: 1.5rem;
+}
+
+/* Botão de perigo */
+.btn-danger {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    letter-spacing: 0.025em;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+}
+
+/* Resumo do caixa */
+.resumo-caixa {
+    background: rgba(248, 250, 252, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
+}
+
+.resumo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.resumo-item:last-child {
+    border-bottom: none;
+}
+
+.resumo-label {
+    font-weight: 500;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.resumo-value {
+    font-weight: 600;
+    color: #111827;
+    font-size: 1rem;
+}
+
+.resumo-value.money {
+    color: #059669;
+    font-weight: 700;
+}
+
+.resumo-value.money.negative {
+    color: #dc2626;
+}
+
+.fichas-resumo {
+    margin-bottom: 2rem;
+}
+
+.fichas-resumo h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 1.25rem;
+    letter-spacing: -0.025em;
+}
+
+/* Grid de fichas */
+.fichas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.ficha-input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.ficha-label {
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.75rem;
+    text-align: center;
+    font-size: 0.9rem;
+    letter-spacing: 0.025em;
+}
+
+.ficha-input {
+    padding: 1rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    font-size: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+}
+
+.ficha-input:focus {
+    outline: none;
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    background: white;
+}
+
+/* Valor total */
+.valor-total-section {
+    background: rgba(248, 250, 252, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    padding: 1.5rem;
+    backdrop-filter: blur(10px);
+}
+
+.valor-total-display {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.valor-total-label {
+    font-weight: 500;
+    color: #374151;
+    font-size: 1rem;
+}
+
+.valor-total-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #059669;
+    letter-spacing: -0.025em;
+}
+
+/* Alertas */
+.alert {
+    padding: 1.25rem;
+    border-radius: 12px;
+    margin-bottom: 1.25rem;
+    border: 1px solid;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.alert-success {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.2);
+    color: #065f46;
+}
+
+.alert-error {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.2);
+    color: #991b1b;
+}
+
+.alert-warning {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.2);
+    color: #92400e;
+}
+
+/* Cards de informações do caixa */
+.caixa-info-card, .fichas-card, .historico-card {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.caixa-info-card::before, .fichas-card::before, .historico-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ef4444, #dc2626, #b91c1c);
+}
+
+.caixa-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.caixa-header h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+    letter-spacing: -0.025em;
+}
+
+.caixa-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-weight: 500;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.detail-value {
+    font-weight: 600;
+    color: #111827;
+    font-size: 1rem;
+}
+
+.detail-value.money {
+    color: #059669;
+    font-weight: 700;
+}
+
+/* Grid de fichas display */
+.fichas-grid-display {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1.5rem;
+}
+
+.ficha-item {
+    background: rgba(248, 250, 252, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    padding: 1.25rem;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.ficha-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.ficha-valor {
+    display: block;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.ficha-quantidade {
+    display: block;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #059669;
+    letter-spacing: -0.025em;
+}
+
+.no-fichas, .no-data {
+    text-align: center;
+    color: #6b7280;
+    font-style: italic;
+    padding: 2.5rem;
+    font-size: 1rem;
+}
+
+/* Tabelas */
+.table-container {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+}
+
+.data-table th,
+.data-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.data-table th {
+    background: rgba(248, 250, 252, 0.8);
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
+    letter-spacing: 0.025em;
+}
+
+.data-table td {
+    color: #111827;
+    font-size: 0.9rem;
+}
+
+.data-table td.money {
+    font-weight: 600;
+    color: #059669;
+}
+
+.data-table tbody tr:hover {
+    background: rgba(248, 250, 252, 0.5);
+}
+
+/* ===== RESPONSIVIDADE MELHORADA ===== */
+
+/* Desktop Grande (1400px+) */
+@media (min-width: 1400px) {
+    .main-title {
+        font-size: 3rem;
+    }
+    
+    .main-subtitle {
+        font-size: 1.5rem;
+    }
+    
+    .cards-container {
+        padding: 2rem;
+        max-width: 1600px;
+    }
+    
+    .filtros-container {
+        max-width: 700px;
+    }
+    
+    .filtros-buttons {
+        gap: 1rem;
+    }
+    
+    .filtro-btn {
+        padding: 0.875rem 2rem;
+        font-size: 0.9rem;
+        min-width: 120px;
+    }
+    
+    .sanges-grid {
+        grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+        gap: 2.5rem;
+        max-width: 1600px;
+    }
+    
+    .caixa-details-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 2.5rem;
+        max-width: 1600px;
+    }
+    
+    .form-card {
+        padding: 3.5rem;
+        max-width: 900px;
+    }
+    
+    .sange-card {
+        padding: 3rem;
+        max-width: 520px;
+    }
+    
+    .empty-state {
+        padding: 4.5rem 3.5rem;
+        max-width: 700px;
+    }
+}
+
+/* Desktop Médio (1200px - 1399px) */
+@media (min-width: 1200px) and (max-width: 1399px) {
+    .main-title {
+        font-size: 2.75rem;
+    }
+    
+    .main-subtitle {
+        font-size: 1.375rem;
+    }
+    
+    .filtros-container {
+        max-width: 600px;
+    }
+    
+    .sanges-grid {
+        grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+        gap: 2rem;
+    }
+    
+    .caixa-details-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+    
+    .form-card {
+        padding: 3rem;
+        max-width: 800px;
+    }
+    
+    .sange-card {
+        padding: 2.5rem;
+        max-width: 480px;
+    }
+}
+
+/* Desktop Pequeno (1024px - 1199px) */
+@media (max-width: 1199px) and (min-width: 1024px) {
+    .main-title {
+        font-size: 2.5rem;
+    }
+    
+    .main-subtitle {
+        font-size: 1.25rem;
+    }
+    
+    .cards-container {
+        padding: 1.5rem;
+        max-width: 1200px;
+    }
+    
+    .filtros-container {
+        max-width: 550px;
+    }
+    
+    .sanges-grid {
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 1.5rem;
+        max-width: 1200px;
+    }
+    
+    .caixa-details-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        max-width: 1200px;
+    }
+    
+    .form-card {
+        padding: 2.5rem;
+        max-width: 750px;
+    }
+    
+    .sange-card {
+        padding: 2rem;
+        max-width: 450px;
+    }
+}
+
+/* Tablet Grande (768px - 1023px) */
+@media (max-width: 1023px) and (min-width: 768px) {
+    .main-title {
+        font-size: 2.25rem;
+    }
+    
+    .main-subtitle {
+        font-size: 1.125rem;
+    }
+    
+    .cards-container {
+        padding: 1rem;
+    }
+    
+    .filtros-container {
+        max-width: 500px;
+    }
+    
+    .filtros-buttons {
+        gap: 0.5rem;
+    }
+    
+    .filtro-btn {
+        padding: 0.625rem 1.25rem;
+        font-size: 0.8rem;
+        min-width: 90px;
+    }
+    
+    .sanges-grid {
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .caixa-details-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+    
+    .sange-card {
+        padding: 1.75rem;
+        max-width: 380px;
+    }
+    
+    .form-card {
+        padding: 1.75rem;
+    }
+    
+    .form-actions {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+    
+    .btn-primary, .btn-secondary, .btn-accent {
+        min-width: 100px;
+        padding: 0.625rem 0.875rem;
+    }
+}
+
+/* Tablet Pequeno (640px - 767px) */
+@media (max-width: 767px) and (min-width: 640px) {
+    .main-title {
+        font-size: 2rem;
+    }
+    
+    .main-subtitle {
+        font-size: 1rem;
+    }
+    
+    .cards-container {
+        padding: 1rem;
+    }
+    
+    .filtros-container {
+        max-width: 100%;
+        margin-bottom: 1.5rem;
+    }
+    
+    .filtros-buttons {
+        gap: 0.5rem;
+        justify-content: center;
+    }
+    
+    .filtro-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+        min-width: 80px;
+    }
+    
+    .sanges-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        max-width: 100%;
+    }
+    
+    .caixa-details-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .sange-card {
+        padding: 1.5rem;
+        max-width: 100%;
+    }
+    
+    .sange-header {
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+    }
+    
+    .sange-nome {
+        font-size: 1.375rem;
+    }
+    
+    .sange-info {
+        margin-bottom: 1.25rem;
+    }
+    
+    .sange-actions {
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-primary, .btn-secondary, .btn-accent {
+        padding: 0.625rem 0.875rem;
+        font-size: 0.75rem;
+        min-width: 90px;
+        min-height: 36px;
+    }
+    
+    .empty-state {
+        padding: 2.5rem 1.5rem;
+        margin: 0 1rem;
+    }
+    
+    .empty-title {
+        font-size: 1.375rem;
+    }
+    
+    .empty-description {
+        font-size: 0.9rem;
+    }
+    
+    .form-card {
+        padding: 1.5rem;
+        margin: 0 1rem;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .fichas-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .form-actions .btn-primary,
+    .form-actions .btn-secondary,
+    .form-actions .btn-accent,
+    .form-actions .btn-danger {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Mobile Grande (480px - 639px) */
+@media (max-width: 639px) and (min-width: 480px) {
+    .main-title {
+        font-size: 1.75rem;
+    }
+    
+    .main-subtitle {
+        font-size: 0.9rem;
+    }
+    
+    .cards-container {
+        padding: 0.75rem;
+    }
+    
+    .filtros-container {
+        max-width: 100%;
+        margin-bottom: 1.25rem;
+    }
+    
+    .filtros-buttons {
+        gap: 0.375rem;
+        justify-content: center;
+    }
+    
+    .filtro-btn {
+        padding: 0.5rem 0.875rem;
+        font-size: 0.7rem;
+        min-width: 70px;
+    }
+    
+    .sanges-grid {
+        gap: 0.75rem;
+        max-width: 100%;
+    }
+    
+    .caixa-details-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .sange-card {
+        padding: 1.25rem;
+    }
+    
+    .sange-nome {
+        font-size: 1.25rem;
+    }
+    
+    .status-badge {
+        padding: 0.5rem 1rem;
+        font-size: 0.7rem;
+    }
+    
+    .btn-primary, .btn-secondary, .btn-accent {
+        padding: 0.625rem 0.75rem;
+        font-size: 0.75rem;
+        min-width: 70px;
+        min-height: 32px;
+    }
+    
+    .empty-state {
+        padding: 2rem 1rem;
+    }
+    
+    .empty-title {
+        font-size: 1.25rem;
+    }
+    
+    .empty-description {
+        font-size: 0.85rem;
+    }
+    
+    .form-card {
+        padding: 1.25rem;
+        margin: 0 0.5rem;
+    }
+    
+    .section-title {
+        font-size: 1.125rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .form-actions .btn-primary,
+    .form-actions .btn-secondary,
+    .form-actions .btn-accent,
+    .form-actions .btn-danger {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Mobile Pequeno (até 479px) */
+@media (max-width: 479px) {
+    .main-title {
+        font-size: 1.5rem;
+    }
+    
+    .main-subtitle {
+        font-size: 0.85rem;
+    }
+    
+    .cards-container {
+        padding: 0.5rem;
+    }
+    
+    .filtros-container {
+        max-width: 100%;
+        margin-bottom: 1rem;
+    }
+    
+    .filtros-buttons {
+        gap: 0.25rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .filtro-btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.65rem;
+        min-width: 60px;
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .sanges-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        max-width: 100%;
+    }
+    
+    .caixa-details-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .sange-card {
+    padding: 1rem;
+        border-radius: 16px;
+    }
+    
+    .sange-header {
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .sange-nome {
+        font-size: 1.125rem;
+    }
+    
+    .sange-info {
+        margin-bottom: 1rem;
+    }
+    
+    .sange-info p {
+        font-size: 0.8rem;
+    }
+    
+    .sange-actions {
+        gap: 0.5rem;
+        flex-direction: column;
+    width: 100%;
+    }
+    
+    .btn-primary, .btn-secondary, .btn-accent, .btn-danger {
+        padding: 0.375rem 0.625rem;
+        font-size: 0.7rem;
+        min-width: 100%;
+        min-height: 28px;
+        justify-content: center;
+    }
+    
+    .empty-state {
+        padding: 1.5rem 1rem;
+        border-radius: 16px;
+    }
+    
+    .empty-title {
+        font-size: 1.125rem;
+    }
+    
+    .empty-description {
+        font-size: 0.8rem;
+    }
+    
+    .form-card {
+        padding: 1rem;
+        margin: 0 0.25rem;
+        border-radius: 16px;
+    }
+    
+    .section-title {
+        font-size: 1rem;
+    }
+    
+    .section-description {
+        font-size: 0.85rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .form-label {
+        font-size: 0.8rem;
+    }
+    
+    .form-input {
+        padding: 0.625rem;
+        font-size: 0.9rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+        padding-top: 1rem;
+    }
+    
+    .form-actions .btn-primary,
+    .form-actions .btn-secondary,
+    .form-actions .btn-accent,
+    .form-actions .btn-danger {
+        width: 100%;
+        justify-content: center;
+        min-height: 24px;
+    }
+    
+    .fichas-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .fichas-grid-display {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    
+    .ficha-item {
+        padding: 0.75rem;
+    }
+    
+    .ficha-valor {
+        font-size: 0.75rem;
+    }
+    
+    .ficha-quantidade {
+        font-size: 1.25rem;
+    }
+    
+    .valor-total-display {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    
+    .valor-total-value {
+        font-size: 1.125rem;
+    }
+    
+    .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+        padding: 0.5rem 0;
+    }
+    
+    .detail-label {
+        font-size: 0.75rem;
+    }
+    
+    .detail-value {
+        font-size: 0.85rem;
+    }
+    
+    .data-table {
+        font-size: 0.7rem;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 0.5rem;
+    }
+    
+    .alert {
+        padding: 0.75rem;
+        font-size: 0.8rem;
+    }
+    
+    .troca-info {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .troca-item {
+        padding: 0.625rem;
+    }
+    
+    .troca-label {
+        font-size: 0.75rem;
+    }
+    
+    .troca-value {
+        font-size: 0.85rem;
+    }
+}
+
+/* Orientação Landscape em Mobile */
+@media (max-width: 767px) and (orientation: landscape) {
+    .cards-container {
+        padding: 1rem;
+    }
+    
+    .filtros-container {
+        margin-bottom: 1rem;
+    }
+    
+    .sange-card {
+        padding: 1.25rem;
+    }
+    
+    .form-card {
+        padding: 1.25rem;
+    }
+    
+    .form-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .form-actions .btn-primary,
+    .form-actions .btn-secondary,
+    .form-actions .btn-accent,
+    .form-actions .btn-danger {
+        width: auto;
+        min-width: 100px;
+    }
+}
+
+/* Ajustes para telas muito pequenas */
+@media (max-width: 360px) {
+    .main-title {
+        font-size: 1.25rem;
+    }
+    
+    .main-subtitle {
+        font-size: 0.8rem;
+    }
+    
+    .cards-container {
+        padding: 0.25rem;
+    }
+    
+    .filtros-buttons {
+        gap: 0.25rem;
+    }
+    
+    .filtro-btn {
+        padding: 0.375rem 0.5rem;
+        font-size: 0.6rem;
+        min-width: 50px;
+    }
+    
+    .sange-card {
+        padding: 0.75rem;
+    }
+    
+    .form-card {
+        padding: 0.75rem;
+        margin: 0;
+    }
+    
+    .btn-primary, .btn-secondary, .btn-accent {
+        font-size: 0.7rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .sange-nome {
+        font-size: 1rem;
+    }
+    
+    .empty-title {
+        font-size: 1rem;
+    }
+} 

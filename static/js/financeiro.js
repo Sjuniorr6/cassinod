@@ -369,7 +369,27 @@ async function darBaixaFichasCliente() {
         }
     } catch (error) {
         console.error('Erro ao dar baixa nas fichas:', error);
-        alert(`Erro ao dar baixa nas fichas: ${error.message}`);
+        
+        // Verificar se é erro de saldo insuficiente
+        if (error.message.includes('Saldo total insuficiente') || error.message.includes('Saldo de fichas insuficiente')) {
+            // Usar popup de alerta para saldo insuficiente
+            if (typeof mostrarAlertPopup === 'function') {
+                mostrarAlertPopup(
+                    'Saldo Insuficiente', 
+                    'Não há saldo suficiente (fichas + dinheiro) para realizar esta operação.', 
+                    'error'
+                );
+            } else {
+                alert('Saldo insuficiente: Não há saldo suficiente (fichas + dinheiro) para realizar esta operação.');
+            }
+        } else {
+            // Para outros erros, usar popup de alerta ou alert normal
+            if (typeof mostrarAlertPopup === 'function') {
+                mostrarAlertPopup('Erro', `Erro ao dar baixa nas fichas: ${error.message}`, 'error');
+            } else {
+                alert(`Erro ao dar baixa nas fichas: ${error.message}`);
+            }
+        }
     }
     
     console.log('=== FIM DAR BAIXA FICHAS ===');

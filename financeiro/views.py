@@ -260,34 +260,51 @@ def dar_baixa_fichas(request, cliente_id):
         print(f"Saldo atual de fichas: {carteira.saldo_fichas}")
         print(f"Saldo atual em dinheiro: {cliente.saldo}")
         
-        if carteira.saldo_fichas < quantidade:
-            print(f"Erro: Saldo insuficiente. Saldo: {carteira.saldo_fichas}, Solicitado: {quantidade}")
-            return JsonResponse({'success': False, 'error': 'Saldo de fichas insuficiente.'}, status=400)
-        
         # Calcular valor em dinheiro (cada ficha = R$ 1,00)
         valor_baixa = Decimal(str(quantidade))
         
-        if cliente.saldo < valor_baixa:
-            print(f"Erro: Saldo em dinheiro insuficiente. Saldo: {cliente.saldo}, Necessário: {valor_baixa}")
-            return JsonResponse({'success': False, 'error': 'Saldo em dinheiro insuficiente.'}, status=400)
+        # Verificar se há saldo suficiente (fichas + dinheiro)
+        saldo_total_disponivel = carteira.saldo_fichas + int(cliente.saldo)
         
-        # Subtrair fichas
-        carteira.saldo_fichas -= quantidade
-        carteira.save()
+        if saldo_total_disponivel < quantidade:
+            print(f"Erro: Saldo total insuficiente. Fichas: {carteira.saldo_fichas}, Dinheiro: {cliente.saldo}, Total: {saldo_total_disponivel}, Solicitado: {quantidade}")
+            return JsonResponse({'success': False, 'error': 'Saldo total insuficiente (fichas + dinheiro).'}, status=400)
         
-        # Subtrair do saldo em dinheiro
-        cliente.saldo -= valor_baixa
-        cliente.save()
+        # Estratégia de dedução: primeiro usar fichas, depois dinheiro
+        fichas_a_deduzir = min(carteira.saldo_fichas, quantidade)
+        dinheiro_a_deduzir = quantidade - fichas_a_deduzir
+        
+        print(f"Estratégia de dedução: {fichas_a_deduzir} fichas + {dinheiro_a_deduzir} em dinheiro")
+        
+        # Subtrair fichas primeiro
+        if fichas_a_deduzir > 0:
+            carteira.saldo_fichas -= fichas_a_deduzir
+            carteira.save()
+            print(f"Fichas deduzidas: {fichas_a_deduzir}. Novo saldo de fichas: {carteira.saldo_fichas}")
+        
+        # Subtrair dinheiro se necessário
+        if dinheiro_a_deduzir > 0:
+            cliente.saldo -= Decimal(str(dinheiro_a_deduzir))
+            cliente.save()
+            print(f"Dinheiro deduzido: {dinheiro_a_deduzir}. Novo saldo em dinheiro: {cliente.saldo}")
         
         print(f"Novo saldo de fichas: {carteira.saldo_fichas}")
         print(f"Novo saldo em dinheiro: {cliente.saldo}")
         
+        # Criar mensagem detalhada sobre a dedução
+        if dinheiro_a_deduzir > 0:
+            message = f'Baixa realizada: {fichas_a_deduzir} fichas + R$ {dinheiro_a_deduzir} em dinheiro'
+        else:
+            message = f'Baixa de {fichas_a_deduzir} fichas realizada com sucesso'
+        
         return JsonResponse({
             'success': True,
-            'message': 'Baixa de fichas realizada com sucesso',
+            'message': message,
             'saldo_fichas': carteira.saldo_fichas,
             'saldo_dinheiro': float(cliente.saldo),
-            'valor_baixa': float(valor_baixa)
+            'valor_baixa': float(valor_baixa),
+            'fichas_deduzidas': fichas_a_deduzir,
+            'dinheiro_deduzido': dinheiro_a_deduzir
         })
     except Cliente.DoesNotExist:
         print(f"Erro: Cliente {cliente_id} não encontrado")

@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gerenciar Sanges - Saint Paul Cassino{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link rel="stylesheet" href="{% static 'css/sange.css' %}?v=2.6">
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="bg-cassino"></div>
+<div class="bg-overlay"></div>
+
+<div class="main-content">
+    {% include 'components/_sidebar.html' %}
+
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        <!-- Botão mobile para abrir sidebar -->
+        <button id="mobileSidebarBtn" class="mobile-sidebar-btn lg:hidden">
+            S
+        </button>
+        
+        <!-- Header -->
+        <header class="main-header">
+            <div class="flex flex-col items-center mb-4">
+                <div class="text-center mb-8">
+                    <h1 class="main-title text-center">Gerenciar Sanges</h1>
+                    <p class="main-subtitle text-center">Gerencie as sanges e seus caixas</p>
+                </div>
+                
+                <!-- Filtros de Status -->
+                <div class="filtros-container">
+                    <div class="filtros-buttons">
+                        <button class="filtro-btn filtro-todos active" data-filtro="todos">
+                            <span class="hidden sm:inline">Todos</span>
+                            <span class="sm:hidden">Todos</span>
+                        </button>
+                        <button class="filtro-btn filtro-abertos" data-filtro="abertos">
+                            <span class="hidden sm:inline">Caixas Abertos</span>
+                            <span class="sm:hidden">Abertos</span>
+                        </button>
+                        <button class="filtro-btn filtro-fechados" data-filtro="fechados">
+                            <span class="hidden sm:inline">Caixas Fechados</span>
+                            <span class="sm:hidden">Fechados</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="cards-container">
+            {% if messages %}
+                <div class="messages-container">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} mb-2">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if sanges %}
+                <div class="sanges-grid" id="sangesGrid">
+                    {% for sange in sanges %}
+                        <div class="sange-card" data-status="{% if sange.caixa_atual %}aberto{% else %}fechado{% endif %}">
+                            <div class="sange-header">
+                                <h3 class="sange-nome">{{ sange.nome }}</h3>
+                                <div class="sange-status">
+                                    {% if sange.caixa_atual %}
+                                        <span class="status-badge aberto">Caixa Aberto</span>
+                                    {% else %}
+                                        <span class="status-badge fechado">Caixa Fechado</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="sange-info">
+                                <p><strong>Total de Vendas:</strong> R$ {{ sange.total_vendas|floatformat:2 }}</p>
+                                <p><strong>Total de Trocas:</strong> R$ {{ sange.total_trocas|floatformat:2 }}</p>
+                                {% if sange.caixa_atual %}
+                                    <p><strong>Caixa Aberto em:</strong> {{ sange.caixa_atual.data_abertura|date:"d/m/Y H:i" }}</p>
+                                    <p><strong>Valor Inicial:</strong> R$ {{ sange.caixa_atual.valor_inicial|floatformat:2 }}</p>
+                                {% else %}
+                                    <p><strong>Último Caixa:</strong> {{ sange.ultimo_caixa.data_fechamento|date:"d/m/Y H:i"|default:"Nunca aberto" }}</p>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="sange-actions">
+                                {% if sange.caixa_atual %}
+                                    <a href="{% url 'sange:detalhes_caixa' sange.caixa_atual.id %}" class="btn-accent">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12c.75-4.5 6-7.5 9.75-7.5s9 3 9.75 7.5c-.75 4.5-6 7.5-9.75 7.5s-9-3-9.75-7.5z" />
+                                        </svg>
+                                        <span class="hidden sm:inline">Ver Caixa</span>
+                                        <span class="sm:hidden">Ver</span>
+                                    </a>
+                                    <a href="{% url 'sange:vender_fichas' sange.caixa_atual.id %}" class="btn-primary">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                                        </svg>
+                                        <span class="hidden sm:inline">Vender Fichas</span>
+                                        <span class="sm:hidden">Vender</span>
+                                    </a>
+                                    <a href="{% url 'sange:trocar_fichas' sange.caixa_atual.id %}" class="btn-accent">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/>
+                                        </svg>
+                                        <span class="hidden sm:inline">Trocar Fichas</span>
+                                        <span class="sm:hidden">Trocar</span>
+                                    </a>
+                                    <a href="{% url 'sange:fechar_caixa' sange.caixa_atual.id %}" class="btn-danger">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                        <span class="hidden sm:inline">Fechar Caixa</span>
+                                        <span class="sm:hidden">Fechar</span>
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'sange:abrir_caixa' sange.id %}" class="btn-primary">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                                        </svg>
+                                        <span class="hidden sm:inline">Abrir Caixa</span>
+                                        <span class="sm:hidden">Abrir</span>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                    </div>
+                    <h2 class="empty-title">Nenhuma Sange Cadastrada</h2>
+                    <p class="empty-description">Comece criando sua primeira sange para gerenciar vendas de fichas</p>
+                    <a href="{% url 'sange:nova_sange' %}" class="btn-primary">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                        </svg>
+                        <span class="hidden sm:inline">Criar Primeira Sange</span>
+                        <span class="sm:hidden">Criar Sange</span>
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filtros de status
+    const filtroBtns = document.querySelectorAll('.filtro-btn');
+    const sangeCards = document.querySelectorAll('.sange-card');
+    
+    filtroBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const filtro = this.getAttribute('data-filtro');
+            
+            // Remove active de todos os botões
+            filtroBtns.forEach(b => b.classList.remove('active'));
+            // Adiciona active ao botão clicado
+            this.classList.add('active');
+            
+            // Filtra os cards
+            sangeCards.forEach(card => {
+                const status = card.getAttribute('data-status');
+                
+                if (filtro === 'todos') {
+                    card.style.display = 'block';
+                } else if (filtro === 'abertos' && status === 'aberto') {
+                    card.style.display = 'block';
+                } else if (filtro === 'fechados' && status === 'fechado') {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %} 

@@ -5,7 +5,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
-<link rel="stylesheet" href="{% static 'css/financeiro.css' %}">
+                <link rel="stylesheet" href="{% static 'css/financeiro.css' %}?v=7.2">
 {% endblock %}
 
 {% block content %}
@@ -225,69 +225,65 @@
     </div>
 </div>
 
-<!-- Modal Detalhes do Cliente -->
+<!-- Modal Detalhes do Cliente - Design Novo -->
 <div id="modalDetalhesCliente" class="modal hidden">
     <div class="modal-overlay" onclick="fecharModalDetalhesCliente()"></div>
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 class="modal-title">Detalhes do Cliente</h2>
-            <button onclick="fecharModalDetalhesCliente()" class="modal-close">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
+    <div class="modal-content modal-novo">
+        <!-- Header Elegante -->
+        <div class="modal-header-novo">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="cliente-avatar-grande">
+                        <span class="avatar-inicial">C</span>
+                    </div>
+                    <div class="cliente-info-header">
+                        <h2 class="cliente-nome-header">Nome do Cliente</h2>
+                        <p class="cliente-cpf-header">CPF: 000.000.000-00</p>
+                    </div>
+                </div>
+                <button onclick="fecharModalDetalhesCliente()" class="btn-fechar-novo">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
         </div>
-        <div class="modal-body">
+
+        <!-- Conteúdo Principal -->
+        <div class="modal-body-novo">
             <div id="detalhesClienteContent">
                 <!-- Conteúdo será carregado dinamicamente -->
             </div>
-            <div class="flex gap-2 mt-4">
-                <button class="btn-primary" onclick="abrirModalAdicionarFichas()">Adicionar Fichas</button>
-                <button class="btn-secondary" onclick="abrirModalDarBaixaFichas()">Dar Baixa</button>
-            </div>
-            <div class="mt-6">
-                <h3 class="text-lg font-bold text-gray-800 mb-2">Saldo de Fichas</h3>
-                <p id="saldoFichasCliente" class="text-2xl font-bold text-blue-600 mb-4"></p>
-                <h3 class="text-lg font-bold text-gray-800 mb-2">Histórico de Vendas de Fichas</h3>
-                <ul id="historicoVendasFichas" class="space-y-2"></ul>
+        </div>
+
+        <!-- Footer com Ações -->
+        <div class="modal-footer-novo">
+            <div class="acoes-container">
+                <button class="btn-acao btn-adicionar" onclick="abrirModalAdicionarFichas()">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    <span>Adicionar Fichas</span>
+                </button>
+                <button class="btn-acao btn-remover" onclick="abrirModalDarBaixaFichas()">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                    </svg>
+                    <span>Dar Baixa</span>
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal Adicionar Fichas -->
-<div id="modalAdicionarFichas" class="modal hidden modal-adicionar">
-    <div class="modal-overlay" onclick="fecharModalAdicionarFichas()"></div>
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 class="modal-title">💰 Adicionar Fichas</h2>
-            <button onclick="fecharModalAdicionarFichas()" class="modal-close">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-        </div>
-        <div class="modal-body">
-            <form id="formAdicionarFichas" class="space-y-6">
-                <div class="form-group">
-                    <label for="quantidadeAdicionarFichas" class="form-label">Quantidade de Fichas</label>
-                    <input type="number" id="quantidadeAdicionarFichas" name="quantidade" class="form-input" step="1" min="1" placeholder="Digite a quantidade" required>
-                </div>
-                <div class="form-actions">
-                    <button type="button" onclick="fecharModalAdicionarFichas()" class="btn-secondary">❌ Cancelar</button>
-                    <button type="submit" class="btn-primary">✅ Adicionar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+
 
 <!-- Modal Dar Baixa Fichas -->
 <div id="modalDarBaixaFichas" class="modal hidden modal-dar-baixa">
     <div class="modal-overlay" onclick="fecharModalDarBaixaFichas()"></div>
-    <div class="modal-content">
+    <div class="modal-content modal-clean">
         <div class="modal-header">
-            <h2 class="modal-title">🎰 Dar Baixa de Fichas</h2>
+            <h2 class="modal-title">Dar Baixa de Fichas</h2>
             <button onclick="fecharModalDarBaixaFichas()" class="modal-close">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -295,14 +291,14 @@
             </button>
         </div>
         <div class="modal-body">
-            <form id="formDarBaixaFichas" class="space-y-6">
+            <form id="formDarBaixaFichas" class="form-clean">
                 <div class="form-group">
                     <label for="quantidadeDarBaixaFichas" class="form-label">Quantidade de Fichas</label>
                     <input type="number" id="quantidadeDarBaixaFichas" name="quantidade" class="form-input" step="1" min="1" placeholder="Digite a quantidade" required>
                 </div>
                 <div class="form-actions">
-                    <button type="button" onclick="fecharModalDarBaixaFichas()" class="btn-secondary">❌ Cancelar</button>
-                    <button type="submit" class="btn-primary">💸 Dar Baixa</button>
+                    <button type="button" onclick="fecharModalDarBaixaFichas()" class="btn-cancel">Cancelar</button>
+                    <button type="submit" class="btn-confirm">Dar Baixa</button>
                 </div>
             </form>
         </div>
@@ -496,11 +492,7 @@
                     criarCliente();
                 });
 
-                // Form de adicionar fichas
-                document.getElementById('formAdicionarFichas').addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    adicionarFichasCliente();
-                });
+
 
                 // Form de dar baixa fichas
                 document.getElementById('formDarBaixaFichas').addEventListener('submit', function(e) {
@@ -704,155 +696,361 @@
         }
     }
 
-    // Ver detalhes do cliente
+    // Ver detalhes do cliente - Com Loading
     async function verDetalhesCliente(clienteId) {
-        console.log('=== VER DETALHES CLIENTE ===');
-        console.log('Cliente ID:', clienteId);
-        
-        window.clienteAtualId = clienteId;
         try {
-            const cliente = await FinanceiroAPI.obterCliente(clienteId);
-            console.log('Cliente obtido:', cliente);
+            // Mostrar loading no modal
+            const modal = document.getElementById('modalDetalhesCliente');
+            const content = document.getElementById('detalhesClienteContent');
             
-            if (cliente) {
-                exibirDetalhesCliente(cliente);
-                abrirModalDetalhesCliente();
+            // Abrir modal primeiro
+            abrirModalDetalhesCliente();
+            
+            // Adicionar classe de loading
+            modal.classList.add('modal-loading');
+            
+            // Mostrar skeleton loading
+            content.innerHTML = `
+                <div class="cliente-details-novo">
+                    <div class="saldos-cards">
+                        <div class="saldo-card skeleton skeleton-card"></div>
+                        <div class="saldo-card skeleton skeleton-card"></div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-card skeleton skeleton-card"></div>
+                        <div class="info-card skeleton skeleton-card"></div>
+                        <div class="info-card skeleton skeleton-card"></div>
+                        <div class="info-card skeleton skeleton-card"></div>
+                        <div class="info-card skeleton skeleton-card"></div>
+                        <div class="info-card skeleton skeleton-card"></div>
+                    </div>
+                </div>
+            `;
+            
+            // Fazer requisição
+            const response = await fetch(`/financeiro/api/clientes/${clienteId}/`);
+            const data = await response.json();
+            
+            if (response.ok) {
+                // Remover loading
+                modal.classList.remove('modal-loading');
+                
+                // Exibir dados
+                exibirDetalhesCliente(data);
+                
+                // Efeito de entrada suave
+                setTimeout(() => {
+                    const cards = content.querySelectorAll('.saldo-card, .info-card');
+                    cards.forEach((card, index) => {
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(20px)';
+                        setTimeout(() => {
+                            card.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0)';
+                        }, index * 100);
+                    });
+                }, 100);
+                
             } else {
-                alert('Erro ao carregar detalhes do cliente.');
+                modal.classList.remove('modal-loading');
+                mostrarAlertPopup('Erro', 'Erro ao carregar detalhes do cliente.', 'error');
             }
         } catch (error) {
             console.error('Erro ao obter cliente:', error);
-            alert('Erro ao carregar detalhes do cliente.');
+            modal.classList.remove('modal-loading');
+            mostrarAlertPopup('Erro', 'Erro ao carregar detalhes do cliente.', 'error');
         }
     }
 
-    // Exibir detalhes do cliente
+    // Exibir detalhes do cliente - Design Novo
     function exibirDetalhesCliente(cliente) {
         const content = document.getElementById('detalhesClienteContent');
+        const saldoFichas = cliente.saldo_fichas || 0;
+        const temFichas = saldoFichas > 0;
+        
+        // Atualizar header do modal
+        const avatarInicial = document.querySelector('.avatar-inicial');
+        const clienteNomeHeader = document.querySelector('.cliente-nome-header');
+        const clienteCpfHeader = document.querySelector('.cliente-cpf-header');
+        
+        if (avatarInicial) {
+            avatarInicial.textContent = cliente.nome.charAt(0).toUpperCase();
+        }
+        if (clienteNomeHeader) {
+            clienteNomeHeader.textContent = cliente.nome_completo;
+        }
+        if (clienteCpfHeader) {
+            clienteCpfHeader.textContent = `CPF: ${cliente.cpf || 'Não informado'}`;
+        }
         
         content.innerHTML = `
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-4">
-                    <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-4">
-                        <h3 class="text-lg font-bold text-gray-800 mb-3">Informações Pessoais</h3>
-                        <div class="space-y-3">
-                            <div>
-                                <p class="text-sm text-gray-600 font-semibold">Nome Completo</p>
-                                <p class="text-xl font-bold text-gray-800">${cliente.nome_completo}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-600 font-semibold">CPF</p>
-                                <p class="text-lg font-bold text-gray-800">${cliente.cpf || 'Não informado'}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-600 font-semibold">Telefone</p>
-                                <p class="text-lg font-bold text-gray-800">${cliente.telefone || 'Não informado'}</p>
+            <div class="cliente-details-novo">
+                <!-- Cards de Saldo -->
+                <div class="saldos-cards">
+                    <div class="saldo-card dinheiro">
+                        <div class="saldo-header">
+                            <div class="saldo-icon">💰</div>
+                            <div class="saldo-info">
+                                <div class="saldo-label">Saldo em Dinheiro</div>
+                                <div class="saldo-valor">${cliente.saldo_formatado}</div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-4">
-                        <h3 class="text-lg font-bold text-gray-800 mb-3">Informações Financeiras</h3>
-                        <div class="space-y-3">
-                            <div>
-                                <p class="text-sm text-gray-600 font-semibold">Saldo em Dinheiro</p>
-                                <p class="text-2xl font-bold text-green-600">${cliente.saldo_formatado}</p>
-                            </div>
-                            <div>
-                                <p class="text-sm text-gray-600 font-semibold">Saldo de Fichas</p>
-                                <p class="text-2xl font-bold text-blue-600">${cliente.saldo_fichas || 0} fichas</p>
-                                <p class="text-xs text-gray-500">(1 ficha = R$ 1,00)</p>
+                    ${temFichas ? `
+                    <div class="saldo-card fichas">
+                        <div class="saldo-header">
+                            <div class="saldo-icon">🎰</div>
+                            <div class="saldo-info">
+                                <div class="saldo-label">Saldo de Fichas</div>
+                                <div class="saldo-valor">${saldoFichas} fichas</div>
+                                <div class="saldo-conversao">(1 ficha = R$ 1,00)</div>
                             </div>
                         </div>
                     </div>
+                    ` : ''}
                 </div>
-                
-                <div class="space-y-4">
-                    <div class="bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-4">
-                        <h3 class="text-lg font-bold text-gray-800 mb-3">Datas</h3>
-                        <div class="space-y-3">
-                            <div>
-                                <p class="text-sm text-gray-600 font-semibold">Data de Criação</p>
-                                <p class="text-lg font-bold text-gray-800">${cliente.data_criacao}</p>
+
+                <!-- Grid de Informações -->
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-header">
+                            <div class="info-icon">📞</div>
+                            <div class="info-content">
+                                <div class="info-title">Telefone</div>
+                                <div class="info-value">${cliente.telefone || 'Não informado'}</div>
                             </div>
-                            <div>
-                                <p class="text-sm text-gray-600 font-semibold">Última Atualização</p>
-                                <p class="text-lg font-bold text-gray-800">${cliente.data_atualizacao}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <div class="info-header">
+                            <div class="info-icon">📅</div>
+                            <div class="info-content">
+                                <div class="info-title">Criado em</div>
+                                <div class="info-value">${cliente.data_criacao}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <div class="info-header">
+                            <div class="info-icon">🔄</div>
+                            <div class="info-content">
+                                <div class="info-title">Última atualização</div>
+                                <div class="info-value">${cliente.data_atualizacao}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <div class="info-header">
+                            <div class="info-icon">📊</div>
+                            <div class="info-content">
+                                <div class="info-title">Total Fichas Vendidas</div>
+                                <div class="info-value">${cliente.vendas_fichas ? cliente.vendas_fichas.reduce((total, venda) => total + venda.quantidade, 0) : 0}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <div class="info-header">
+                            <div class="info-icon">💵</div>
+                            <div class="info-content">
+                                <div class="info-title">Valor Total</div>
+                                <div class="info-value">R$ ${cliente.vendas_fichas ? cliente.vendas_fichas.reduce((total, venda) => total + venda.quantidade, 0).toFixed(2) : '0,00'}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <div class="info-header">
+                            <div class="info-icon">🎯</div>
+                            <div class="info-content">
+                                <div class="info-title">Status</div>
+                                <div class="info-value">${temFichas ? 'Ativo' : 'Inativo'}</div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         `;
-
-        // Atualizar saldo de fichas
-        const saldoFichasElement = document.getElementById('saldoFichasCliente');
-        if (saldoFichasElement) {
-            saldoFichasElement.textContent = `${cliente.saldo_fichas || 0} fichas`;
-        }
         
-        // Histórico de vendas
-        const historico = document.getElementById('historicoVendasFichas');
-        if (cliente.vendas_fichas && cliente.vendas_fichas.length > 0) {
-            historico.innerHTML = cliente.vendas_fichas.map(venda => `
-                <li class="text-sm text-gray-600 py-2 border-b border-gray-200">
-                    ${venda.data_venda} - ${venda.quantidade} fichas vendidas (R$ ${venda.quantidade.toFixed(2)})
-                </li>
-            `).join('');
-        } else {
-            historico.innerHTML = `
-                <li class="text-sm text-gray-600 py-2">
-                    Nenhuma venda de fichas registrada
-                </li>
-            `;
-        }
+        // Adicionar efeitos de entrada
+        setTimeout(() => {
+            const cards = content.querySelectorAll('.saldo-card, .info-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 50);
+            });
+        }, 100);
     }
 
     // Modal Detalhes
     function abrirModalDetalhesCliente() {
-        document.getElementById('modalDetalhesCliente').classList.remove('hidden');
+        const modal = document.getElementById('modalDetalhesCliente');
+        modal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+        
+        // Aplicar estilos com animação suave
+        modal.style.display = 'flex';
+        modal.style.alignItems = 'center';
+        modal.style.justifyContent = 'center';
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100vw';
+        modal.style.height = '100vh';
+        modal.style.zIndex = '9999';
+        modal.style.opacity = '0';
+        modal.style.transform = 'scale(0.95)';
+        
+        // Animar entrada
+        requestAnimationFrame(() => {
+            modal.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            modal.style.opacity = '1';
+            modal.style.transform = 'scale(1)';
+        });
+        
+        // Focar no modal para acessibilidade
+        setTimeout(() => {
+            const closeBtn = modal.querySelector('.modal-close');
+            if (closeBtn) closeBtn.focus();
+        }, 100);
     }
 
     function fecharModalDetalhesCliente() {
-        document.getElementById('modalDetalhesCliente').classList.add('hidden');
-        document.body.style.overflow = 'auto';
-        window.clienteAtualId = null;
+        const modal = document.getElementById('modalDetalhesCliente');
+        
+        // Animar saída
+        modal.style.transition = 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
+        modal.style.opacity = '0';
+        modal.style.transform = 'scale(0.95)';
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            window.clienteAtualId = null;
+            
+            // Resetar estilos
+            modal.style.opacity = '';
+            modal.style.transform = '';
+            modal.style.transition = '';
+        }, 200);
     }
 
     // Modal Adicionar Fichas
     function abrirModalAdicionarFichas() {
         if (!window.clienteAtualId) {
-            alert('Nenhum cliente selecionado');
+            mostrarAlertPopup('Aviso', 'Nenhum cliente selecionado', 'warning');
             return;
         }
-        document.getElementById('modalAdicionarFichas').classList.remove('hidden');
+        
+        const modal = document.getElementById('modalAdicionarFichas');
+        modal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+        
+        // Animar entrada
+        modal.style.opacity = '0';
+        modal.style.transform = 'scale(0.95)';
+        
+        requestAnimationFrame(() => {
+            modal.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            modal.style.opacity = '1';
+            modal.style.transform = 'scale(1)';
+        });
     }
 
     function fecharModalAdicionarFichas() {
-        document.getElementById('modalAdicionarFichas').classList.add('hidden');
-        document.body.style.overflow = 'auto';
-        document.getElementById('formAdicionarFichas').reset();
+        const modal = document.getElementById('modalAdicionarFichas');
+        
+        // Animar saída
+        modal.style.transition = 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
+        modal.style.opacity = '0';
+        modal.style.transform = 'scale(0.95)';
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            document.getElementById('formAdicionarFichas').reset();
+            
+            // Resetar estilos
+            modal.style.opacity = '';
+            modal.style.transform = '';
+            modal.style.transition = '';
+        }, 200);
     }
 
     // Modal Dar Baixa Fichas
     function abrirModalDarBaixaFichas() {
         if (!window.clienteAtualId) {
-            alert('Nenhum cliente selecionado');
+            mostrarAlertPopup('Aviso', 'Nenhum cliente selecionado', 'warning');
             return;
         }
-        document.getElementById('modalDarBaixaFichas').classList.remove('hidden');
+        
+        const modal = document.getElementById('modalDarBaixaFichas');
+        modal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+        
+        // Animar entrada
+        modal.style.opacity = '0';
+        modal.style.transform = 'scale(0.95)';
+        
+        requestAnimationFrame(() => {
+            modal.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            modal.style.opacity = '1';
+            modal.style.transform = 'scale(1)';
+        });
     }
 
     function fecharModalDarBaixaFichas() {
-        document.getElementById('modalDarBaixaFichas').classList.add('hidden');
-        document.body.style.overflow = 'auto';
-        document.getElementById('formDarBaixaFichas').reset();
+        const modal = document.getElementById('modalDarBaixaFichas');
+        
+        // Animar saída
+        modal.style.transition = 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
+        modal.style.opacity = '0';
+        modal.style.transform = 'scale(0.95)';
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            document.getElementById('formDarBaixaFichas').reset();
+            
+            // Resetar estilos
+            modal.style.opacity = '';
+            modal.style.transform = '';
+            modal.style.transition = '';
+        }, 200);
     }
 
-    // Adicionar fichas
+    // Atualizar saldo com efeito visual
+    function atualizarSaldoComEfeito(novoSaldo, tipo = 'fichas') {
+        const saldoElement = document.querySelector(`.saldo-card.${tipo} .saldo-valor`);
+        if (saldoElement) {
+            // Adicionar classe de animação
+            saldoElement.classList.add('updated');
+            
+            // Atualizar valor
+            if (tipo === 'fichas') {
+                saldoElement.textContent = `${novoSaldo} fichas`;
+            } else {
+                saldoElement.textContent = novoSaldo;
+            }
+            
+            // Remover classe após animação
+            setTimeout(() => {
+                saldoElement.classList.remove('updated');
+            }, 600);
+        }
+    }
+
+    // Adicionar fichas com efeito visual
     async function adicionarFichasCliente() {
         const form = document.getElementById('formAdicionarFichas');
         const quantidade = parseInt(form.quantidade.value);
@@ -875,11 +1073,8 @@
                 );
                 fecharModalAdicionarFichas();
                 
-                // Atualizar saldo de fichas em tempo real
-                const saldoElement = document.getElementById('saldoFichasCliente');
-                if (saldoElement) {
-                    saldoElement.textContent = `${resultado.saldo_fichas} fichas`;
-                }
+                // Atualizar saldo com efeito visual
+                atualizarSaldoComEfeito(resultado.saldo_fichas, 'fichas');
                 
                 // Recarregar detalhes do cliente para atualizar histórico
                 if (window.clienteAtualId) {
@@ -897,70 +1092,7 @@
         }
     }
 
-    // Dar baixa fichas - função movida para financeiro.js
-    async function darBaixaFichasCliente() {
-        console.log('=== INICIANDO DAR BAIXA FICHAS ===');
-        
-        const form = document.getElementById('formDarBaixaFichas');
-        console.log('Form encontrado:', form);
-        
-        if (!form) {
-            console.error('Form não encontrado!');
-            mostrarAlertPopup('Erro', 'Formulário não encontrado', 'error');
-            return;
-        }
-        
-        const quantidade = parseInt(form.quantidade.value);
-        console.log('Quantidade:', quantidade);
-        console.log('Cliente atual ID:', window.clienteAtualId);
-        
-        if (!quantidade || quantidade <= 0) {
-            mostrarAlertPopup('Validação', 'Por favor, insira uma quantidade válida', 'warning');
-            return;
-        }
 
-        if (!window.clienteAtualId) {
-            console.error('Cliente atual não definido!');
-            mostrarAlertPopup('Erro', 'Cliente não selecionado', 'error');
-            return;
-        }
-
-        try {
-            console.log('Chamando API darBaixaFichas...');
-            const resultado = await FinanceiroAPI.darBaixaFichas(window.clienteAtualId, quantidade);
-            console.log('Resultado da API:', resultado);
-            
-            if (resultado.success) {
-                mostrarAlertPopup(
-                    'Sucesso!', 
-                    `Baixa de ${quantidade} fichas realizada com sucesso!\n\nValor da baixa: R$ ${resultado.valor_baixa.toFixed(2)}`, 
-                    'success',
-                    true,
-                    4000
-                );
-                
-                console.log('Fechando modal...');
-                fecharModalDarBaixaFichas();
-                
-                // Recarregar detalhes do cliente para atualizar histórico
-                if (window.clienteAtualId) {
-                    console.log('Recarregando detalhes do cliente...');
-                    verDetalhesCliente(window.clienteAtualId);
-                }
-                
-                // Recarregar lista de clientes para atualizar as métricas
-                carregarClientes();
-            } else {
-                console.error('API retornou erro:', resultado);
-                mostrarAlertPopup('Erro', 'Erro ao dar baixa nas fichas. Tente novamente.', 'error');
-            }
-        } catch (error) {
-            console.error('Erro ao dar baixa nas fichas:', error);
-            mostrarAlertPopup('Erro', `Erro ao dar baixa nas fichas: ${error.message}`, 'error');
-        }
-        
-        console.log('=== FIM DAR BAIXA FICHAS ===');
-    }
 
     // Estados da interface
     function mostrarLoading() {
@@ -1000,22 +1132,84 @@
     }
 
     function exportarClientes() {
-        alert('Funcionalidade de exportação será implementada em breve!');
+        mostrarAlertPopup('Info', 'Funcionalidade de exportação será implementada em breve!', 'info');
     }
 
-    // Fechar modais com ESC
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            // Fechar todos os modais abertos
-            document.querySelectorAll('.modal:not(.hidden)').forEach(modal => {
-                modal.classList.add('hidden');
-                document.body.style.overflow = 'auto';
+    // Event listeners para modais
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fechar modal com ESC
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modaisAbertos = document.querySelectorAll('.modal:not(.hidden)');
+                if (modaisAbertos.length > 0) {
+                    const modalAtivo = modaisAbertos[0];
+                    const modalId = modalAtivo.id;
+                    
+                    switch(modalId) {
+                        case 'modalDetalhesCliente':
+                            fecharModalDetalhesCliente();
+                            break;
+                        case 'modalAdicionarFichas':
+                            fecharModalAdicionarFichas();
+                            break;
+                        case 'modalDarBaixaFichas':
+                            fecharModalDarBaixaFichas();
+                            break;
+                        case 'modalCriarCliente':
+                            fecharModalCriarCliente();
+                            break;
+                    }
+                }
+            }
+        });
+
+        // Fechar modal clicando no overlay
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(event) {
+                if (event.target === overlay) {
+                    const modal = overlay.closest('.modal');
+                    const modalId = modal.id;
+                    
+                    switch(modalId) {
+                        case 'modalDetalhesCliente':
+                            fecharModalDetalhesCliente();
+                            break;
+                        case 'modalAdicionarFichas':
+                            fecharModalAdicionarFichas();
+                            break;
+                        case 'modalDarBaixaFichas':
+                            fecharModalDarBaixaFichas();
+                            break;
+                        case 'modalCriarCliente':
+                            fecharModalCriarCliente();
+                            break;
+                    }
+                }
             });
-            
-            // Reset forms
-            document.querySelectorAll('form').forEach(form => form.reset());
-            window.clienteAtualId = null;
-        }
+        });
+
+        // Fechar modal com botão X
+        document.querySelectorAll('.modal-close').forEach(closeBtn => {
+            closeBtn.addEventListener('click', function() {
+                const modal = closeBtn.closest('.modal');
+                const modalId = modal.id;
+                
+                switch(modalId) {
+                    case 'modalDetalhesCliente':
+                        fecharModalDetalhesCliente();
+                        break;
+                    case 'modalAdicionarFichas':
+                        fecharModalAdicionarFichas();
+                        break;
+                    case 'modalDarBaixaFichas':
+                        fecharModalDarBaixaFichas();
+                        break;
+                    case 'modalCriarCliente':
+                        fecharModalCriarCliente();
+                        break;
+                }
+            });
+        });
     });
 </script>
 {% endblock %}

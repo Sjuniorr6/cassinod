@@ -13,6 +13,7 @@ urlpatterns = [
     path('usuarios/', include('usuarios.urls')),
     path('mesas/', include('mesas.urls')),
     path('financeiro/', include('financeiro.urls')),
+    path('sange/', include('sange.urls')),
     path('', home, name='home'),
 ]
 

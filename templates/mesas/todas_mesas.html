@@ -5,7 +5,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/home.css' %}">
-<link rel="stylesheet" href="{% static 'css/todas_mesas.css' %}">
+<link rel="stylesheet" href="{% static 'css/todas_mesas.css' %}?v=2.1">
 <style>
 /* Garantir que o sidebar funcione corretamente */
 .sidebar {
@@ -134,24 +134,24 @@
 </div>
 
 <!-- Modal para detalhes da mesa -->
-<div id="mesaModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" style="display: none;">
-    <div class="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/20 max-w-2xl w-full max-h-[90vh] flex flex-col transform transition-all duration-300 scale-95 opacity-0" id="modalContentMesa">
+<div id="mesaModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display: none;">
+    <div class="transform transition-all duration-300 scale-95 opacity-0" id="modalContentMesa">
         <!-- Header -->
-        <div class="modal-header bg-gradient-to-r from-gray-600 to-gray-500 rounded-t-2xl p-6 text-white shadow-lg flex-shrink-0">
+        <div class="modal-header">
             <div class="flex items-center justify-between">
-                <h2 class="text-2xl font-bold">Detalhes da Mesa</h2>
-                <button onclick="fecharModal()" class="text-white/80 hover:text-white transition-colors duration-200">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <h2>Detalhes da Mesa</h2>
+                <button onclick="fecharModal()" title="Fechar">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
         </div>
         <!-- Content -->
-        <div class="modal-body flex-1 overflow-y-auto p-6">
-            <div id="mesaModalContent" class="space-y-6"></div>
-            <div class="flex justify-end mt-6 pt-4 border-t border-gray-200">
-                <button onclick="fecharModal()" class="px-6 py-2 bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-700 hover:to-gray-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+        <div class="modal-body">
+            <div id="mesaModalContent"></div>
+            <div class="modal-footer">
+                <button onclick="fecharModal()" class="btn-close-clean">
                     Fechar
                 </button>
             </div>
@@ -279,7 +279,85 @@ function verMesa(mesaId) {
         .then(data => {
             if (data.success) {
                 const mesa = data.mesa;
-                modalContent.innerHTML = `<div class='grid grid-cols-1 md:grid-cols-2 gap-6'><div class='space-y-4'><div class='bg-gradient-to-r from-red-50 to-red-100 rounded-xl p-4'><h3 class='text-lg font-bold text-gray-800 mb-3'>Informações Básicas</h3><div class='space-y-3'><div><p class='text-sm text-gray-600 font-semibold'>Número da Mesa</p><p class='text-xl font-bold text-gray-800'>${mesa.numero_mesa}</p></div><div><p class='text-sm text-gray-600 font-semibold'>Tipo de Jogo</p><p class='text-lg font-bold text-gray-800'>${mesa.tipo_jogo_display}</p></div><div><p class='text-sm text-gray-600 font-semibold'>Status</p><span class='px-3 py-1 text-sm font-semibold rounded-full ${getStatusBadge(mesa.status)}'>${mesa.status_display}</span></div></div></div><div class='bg-gradient-to-r from-green-50 to-green-100 rounded-xl p-4'><h3 class='text-lg font-bold text-gray-800 mb-3'>Valores</h3><div class='space-y-3'><div><p class='text-sm text-gray-600 font-semibold'>Valor Inicial</p><p class='text-lg font-bold text-green-600'>R$ ${parseFloat(mesa.valor_inicial).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p></div><div><p class='text-sm text-gray-600 font-semibold'>Valor Total</p><p class='text-lg font-bold text-blue-600'>R$ ${parseFloat(mesa.valor_total).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p></div><div><p class='text-sm text-gray-600 font-semibold'>Saldo</p><p class='text-xl font-bold text-red-600'>R$ ${parseFloat(mesa.saldo).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p></div></div></div></div><div class='space-y-4'><div class='bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-4'><h3 class='text-lg font-bold text-gray-800 mb-3'>Fichas</h3><div class='grid grid-cols-2 gap-3'><div><p class='text-sm text-gray-600 font-semibold'>R$ 5,00</p><p class='text-lg font-bold text-gray-800'>${mesa.fichas_5 || 0}</p></div><div><p class='text-sm text-gray-600 font-semibold'>R$ 25,00</p><p class='text-lg font-bold text-gray-800'>${mesa.fichas_25 || 0}</p></div><div><p class='text-sm text-gray-600 font-semibold'>R$ 100,00</p><p class='text-lg font-bold text-gray-800'>${mesa.fichas_100 || 0}</p></div><div><p class='text-sm text-gray-600 font-semibold'>R$ 500,00</p><p class='text-lg font-bold text-gray-800'>${mesa.fichas_500 || 0}</p></div><div><p class='text-sm text-gray-600 font-semibold'>R$ 1.000,00</p><p class='text-lg font-bold text-gray-800'>${mesa.fichas_1000 || 0}</p></div><div><p class='text-sm text-gray-600 font-semibold'>R$ 5.000,00</p><p class='text-lg font-bold text-gray-800'>${mesa.fichas_5000 || 0}</p></div><div class='col-span-2'><p class='text-sm text-gray-600 font-semibold'>R$ 10.000,00</p><p class='text-lg font-bold text-gray-800'>${mesa.fichas_10000 || 0}</p></div></div></div><div class='bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl p-4'><h3 class='text-lg font-bold text-gray-800 mb-3'>Datas</h3><div class='space-y-3'><div><p class='text-sm text-gray-600 font-semibold'>Data de Criação</p><p class='text-lg font-bold text-gray-800'>${mesa.data_criacao}</p></div><div><p class='text-sm text-gray-600 font-semibold'>Última Atualização</p><p class='text-lg font-bold text-gray-800'>${mesa.data_atualizacao}</p></div></div></div></div></div>`;
+                modalContent.innerHTML = `
+                    <div class="info-section">
+                        <h3>Informações Básicas</h3>
+                        <div class="info-item">
+                            <span class="info-label">Número da Mesa</span>
+                            <span class="info-value">${mesa.numero_mesa}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Tipo de Jogo</span>
+                            <span class="info-value">${mesa.tipo_jogo_display}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Status</span>
+                            <span class="status-badge-clean ${mesa.status}">${mesa.status_display}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3>Valores</h3>
+                        <div class="info-item">
+                            <span class="info-label">Valor Inicial</span>
+                            <span class="info-value money-value">R$ ${parseFloat(mesa.valor_inicial).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Valor Total</span>
+                            <span class="info-value money-value">R$ ${parseFloat(mesa.valor_total).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Saldo</span>
+                            <span class="info-value money-value ${parseFloat(mesa.saldo) < 0 ? 'negative' : ''}">R$ ${parseFloat(mesa.saldo).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3>Fichas</h3>
+                        <div class="fichas-grid">
+                            <div class="ficha-item">
+                                <span class="ficha-label">R$ 5,00</span>
+                                <span class="ficha-value">${mesa.fichas_5 || 0}</span>
+                            </div>
+                            <div class="ficha-item">
+                                <span class="ficha-label">R$ 25,00</span>
+                                <span class="ficha-value">${mesa.fichas_25 || 0}</span>
+                            </div>
+                            <div class="ficha-item">
+                                <span class="ficha-label">R$ 100,00</span>
+                                <span class="ficha-value">${mesa.fichas_100 || 0}</span>
+                            </div>
+                            <div class="ficha-item">
+                                <span class="ficha-label">R$ 500,00</span>
+                                <span class="ficha-value">${mesa.fichas_500 || 0}</span>
+                            </div>
+                            <div class="ficha-item">
+                                <span class="ficha-label">R$ 1.000,00</span>
+                                <span class="ficha-value">${mesa.fichas_1000 || 0}</span>
+                            </div>
+                            <div class="ficha-item">
+                                <span class="ficha-label">R$ 5.000,00</span>
+                                <span class="ficha-value">${mesa.fichas_5000 || 0}</span>
+                            </div>
+                            <div class="ficha-item" style="grid-column: span 2;">
+                                <span class="ficha-label">R$ 10.000,00</span>
+                                <span class="ficha-value">${mesa.fichas_10000 || 0}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3>Datas</h3>
+                        <div class="info-item">
+                            <span class="info-label">Data de Criação</span>
+                            <span class="info-value">${mesa.data_criacao}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Última Atualização</span>
+                            <span class="info-value">${mesa.data_atualizacao}</span>
+                        </div>
+                    </div>
+                `;
             } else {
                 modalContent.innerHTML = `<div class='flex flex-col items-center justify-center py-8'><svg class='w-16 h-16 text-red-500 mb-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/><line x1='15' y1='9' x2='9' y2='15'/><line x1='9' y1='9' x2='15' y2='15'/></svg><h3 class='text-xl font-bold text-gray-800 mb-2'>Erro ao Carregar</h3><p class='text-gray-600'>${data.message || 'Erro ao carregar detalhes da mesa'}</p></div>`;
             }

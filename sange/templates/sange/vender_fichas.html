@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Vender Fichas - {{ caixa.sange.nome }} - Saint Paul Cassino{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link rel="stylesheet" href="{% static 'css/sange.css' %}">
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="bg-cassino"></div>
+<div class="bg-overlay"></div>
+
+<div class="main-content">
+    {% include 'components/_sidebar.html' %}
+
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        <!-- Botão mobile para abrir sidebar -->
+        <button id="mobileSidebarBtn" class="lg:hidden fixed top-4 left-4 z-50 w-12 h-12 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold text-xl rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center">
+            S
+        </button>
+        
+        <!-- Título e subtítulo acima -->
+        <div class="text-center mb-4">
+            <h1 class="main-title text-center">Vender Fichas</h1>
+            <p class="main-subtitle text-center">{{ caixa.sange.nome }}</p>
+        </div>
+
+        <div class="cards-container">
+            {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} mb-2">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="form-card">
+                <!-- Botão Voltar para Listagem dentro do card -->
+                <div class="flex justify-center w-full mb-4">
+                    <a href="{% url 'sange:listar_sanges' %}" class="btn-secondary">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+                        </svg>
+                        <span class="hidden sm:inline">Voltar para Listagem</span>
+                        <span class="sm:hidden">Voltar</span>
+                    </a>
+                </div>
+
+                <form method="post" class="venda-form" id="formVenda">
+                    {% csrf_token %}
+                    
+                    <div class="form-section">
+                        <h3 class="section-title">Informações da Venda</h3>
+                        <p class="section-description">Registre a venda de fichas para um jogador</p>
+                        
+                        <div class="form-group">
+                            <label for="jogador" class="form-label">Jogador (Opcional)</label>
+                            <select id="jogador" name="jogador" class="form-input">
+                                <option value="">Selecione um jogador (opcional)</option>
+                                {% for jogador in jogadores %}
+                                    <option value="{{ jogador.id }}">{{ jogador.nome }}</option>
+                                {% endfor %}
+                            </select>
+                            <p class="form-help">Selecione o jogador que está comprando as fichas (opcional)</p>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="valor_unitario" class="form-label">Valor da Ficha *</label>
+                                <select id="valor_unitario" name="valor_unitario" class="form-input" required onchange="atualizarQuantidadeDisponivel()">
+                                    <option value="">Selecione o valor</option>
+                                    {% for valor in valores_fichas %}
+                                        <option value="{{ valor }}">R$ {{ valor }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="quantidade" class="form-label">Quantidade *</label>
+                                <input type="number" id="quantidade" name="quantidade" class="form-input" 
+                                       min="1" required onchange="calcularValorTotal()">
+                                <p class="form-help" id="quantidadeDisponivel">Quantidade disponível: -</p>
+                            </div>
+                        </div>
+                        
+                        <div class="valor-total-section">
+                            <div class="valor-total-display">
+                                <span class="valor-total-label">Valor Total da Venda:</span>
+                                <span class="valor-total-value" id="valorTotalVenda">R$ 0,00</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <a href="{% url 'sange:listar_sanges' %}" class="btn-secondary">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+                            </svg>
+                            <span class="hidden sm:inline">Cancelar</span>
+                            <span class="sm:hidden">Cancelar</span>
+                        </a>
+                        <button type="submit" class="btn-primary" id="btnVender">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                            </svg>
+                            <span class="hidden sm:inline">Registrar Venda</span>
+                            <span class="sm:hidden">Vender</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Dados das fichas disponíveis
+const fichasDisponiveis = {{ caixa.fichas_atuais|safe }};
+
+function atualizarQuantidadeDisponivel() {
+    const valorSelect = document.getElementById('valor_unitario');
+    const quantidadeDisponivel = document.getElementById('quantidadeDisponivel');
+    const quantidadeInput = document.getElementById('quantidade');
+    
+    if (valorSelect.value) {
+        const valor = valorSelect.value;
+        const disponivel = fichasDisponiveis[valor] || 0;
+        quantidadeDisponivel.textContent = `Quantidade disponível: ${disponivel}`;
+        quantidadeInput.max = disponivel;
+        
+        if (disponivel === 0) {
+            quantidadeDisponivel.style.color = '#ef4444';
+            quantidadeInput.disabled = true;
+        } else {
+            quantidadeDisponivel.style.color = '#6b7280';
+            quantidadeInput.disabled = false;
+        }
+    } else {
+        quantidadeDisponivel.textContent = 'Quantidade disponível: -';
+        quantidadeInput.disabled = true;
+    }
+    
+    calcularValorTotal();
+}
+
+function calcularValorTotal() {
+    const valorSelect = document.getElementById('valor_unitario');
+    const quantidadeInput = document.getElementById('quantidade');
+    const valorTotalSpan = document.getElementById('valorTotalVenda');
+    const btnVender = document.getElementById('btnVender');
+    
+    if (valorSelect.value && quantidadeInput.value) {
+        const valor = parseInt(valorSelect.value);
+        const quantidade = parseInt(quantidadeInput.value);
+        const total = valor * quantidade;
+        
+        valorTotalSpan.textContent = `R$ ${total.toLocaleString('pt-BR')}`;
+        btnVender.disabled = false;
+    } else {
+        valorTotalSpan.textContent = 'R$ 0,00';
+        btnVender.disabled = true;
+    }
+}
+
+// Inicializa quando a página carrega
+document.addEventListener('DOMContentLoaded', function() {
+    atualizarQuantidadeDisponivel();
+});
+</script>
+{% endblock %} 
