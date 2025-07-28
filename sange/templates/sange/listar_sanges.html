@@ -5,7 +5,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/home.css' %}">
-<link rel="stylesheet" href="{% static 'css/sange.css' %}?v=2.6">
+<link rel="stylesheet" href="{% static 'css/sange.css' %}?v=3.1">
 {% endblock %}
 
 {% block content %}
@@ -25,28 +25,39 @@
         
         <!-- Header -->
         <header class="main-header">
-            <div class="flex flex-col items-center mb-4">
-                <div class="text-center mb-8">
-                    <h1 class="main-title text-center">Gerenciar Sanges</h1>
-                    <p class="main-subtitle text-center">Gerencie as sanges e seus caixas</p>
+            <div class="header-content">
+                <div class="header-left">
+                    <h1 class="main-title">Gerenciar Sanges</h1>
+                    <p class="main-subtitle">Gerencie as sanges e seus caixas</p>
                 </div>
                 
-                <!-- Filtros de Status -->
-                <div class="filtros-container">
-                    <div class="filtros-buttons">
-                        <button class="filtro-btn filtro-todos active" data-filtro="todos">
-                            <span class="hidden sm:inline">Todos</span>
-                            <span class="sm:hidden">Todos</span>
-                        </button>
-                        <button class="filtro-btn filtro-abertos" data-filtro="abertos">
-                            <span class="hidden sm:inline">Caixas Abertos</span>
-                            <span class="sm:hidden">Abertos</span>
-                        </button>
-                        <button class="filtro-btn filtro-fechados" data-filtro="fechados">
-                            <span class="hidden sm:inline">Caixas Fechados</span>
-                            <span class="sm:hidden">Fechados</span>
-                        </button>
-                    </div>
+                <div class="header-right">
+                    <!-- Botão para abrir novo caixa -->
+                    <a href="{% url 'sange:nova_sange' %}" class="btn-primary">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                        </svg>
+                        <span class="hidden sm:inline">Abrir Novo Caixa</span>
+                        <span class="sm:hidden">Novo Caixa</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Filtros de Status -->
+            <div class="filtros-container">
+                <div class="filtros-buttons">
+                    <button class="filtro-btn filtro-todos active" data-filtro="todos">
+                        <span class="hidden sm:inline">Todos</span>
+                        <span class="sm:hidden">Todos</span>
+                    </button>
+                    <button class="filtro-btn filtro-abertos" data-filtro="abertos">
+                        <span class="hidden sm:inline">Caixas Abertos</span>
+                        <span class="sm:hidden">Abertos</span>
+                    </button>
+                    <button class="filtro-btn filtro-fechados" data-filtro="fechados">
+                        <span class="hidden sm:inline">Caixas Fechados</span>
+                        <span class="sm:hidden">Fechados</span>
+                    </button>
                 </div>
             </div>
         </header>
@@ -84,7 +95,12 @@
                                     <p><strong>Caixa Aberto em:</strong> {{ sange.caixa_atual.data_abertura|date:"d/m/Y H:i" }}</p>
                                     <p><strong>Valor Inicial:</strong> R$ {{ sange.caixa_atual.valor_inicial|floatformat:2 }}</p>
                                 {% else %}
-                                    <p><strong>Último Caixa:</strong> {{ sange.ultimo_caixa.data_fechamento|date:"d/m/Y H:i"|default:"Nunca aberto" }}</p>
+                                    {% if sange.ultimo_caixa %}
+                                        <p><strong>Último Caixa Fechado:</strong> {{ sange.ultimo_caixa.data_fechamento|date:"d/m/Y H:i" }}</p>
+                                        <p><strong>Valor Final:</strong> R$ {{ sange.ultimo_caixa.valor_final|floatformat:2|default:"0.00" }}</p>
+                                    {% else %}
+                                        <p><strong>Status:</strong> Nunca foi aberto</p>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                             
@@ -120,13 +136,16 @@
                                         <span class="sm:hidden">Fechar</span>
                                     </a>
                                 {% else %}
-                                    <a href="{% url 'sange:abrir_caixa' sange.id %}" class="btn-primary">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                                        </svg>
-                                        <span class="hidden sm:inline">Abrir Caixa</span>
-                                        <span class="sm:hidden">Abrir</span>
-                                    </a>
+                                    {% if sange.ultimo_caixa %}
+                                        <a href="{% url 'sange:detalhes_caixa' sange.ultimo_caixa.id %}" class="btn-accent">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12c.75-4.5 6-7.5 9.75-7.5s9 3 9.75 7.5c-.75 4.5-6 7.5-9.75 7.5s-9-3-9.75-7.5z" />
+                                            </svg>
+                                            <span class="hidden sm:inline">Ver Detalhes</span>
+                                            <span class="sm:hidden">Detalhes</span>
+                                        </a>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                         </div>
