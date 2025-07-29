@@ -1,8 +1,8 @@
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
     <div class="brand">
-        <div class="logo" id="logoClickable" style="cursor: pointer;">S</div>
-        <div class="brand-name">Saint Paul</div>
+        <div class="logo" id="logoClickable" style="cursor: pointer;">Cass</div>
+        <div class="brand-name">Cass</div>
         <div class="brand-subtitle">Gestão do Cassino</div>
     </div>
     
@@ -15,6 +15,18 @@
                         <polyline points="9,22 9,12 15,12 15,22"/>
                     </svg>
                     <span class="nav-text">Painel</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'dashboard:home' %}" class="nav-link {% if 'dashboard' in request.resolver_match.namespace %}active{% endif %}">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 3v18h18"/>
+                        <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                        <path d="M9 12h2v6"/>
+                        <path d="M13 9h2v9"/>
+                        <path d="M17 6h2v12"/>
+                    </svg>
+                    <span class="nav-text">Dashboard</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -45,15 +57,6 @@
                         <path d="M6 12h.01M18 12h.01"/>
                     </svg>
                     <span class="nav-text">Sanges</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="8" r="5"/>
-                        <path d="M20 21a8 8 0 1 0-16 0"/>
-                    </svg>
-                    <span class="nav-text">Usuários</span>
                 </a>
             </li>
         </ul>

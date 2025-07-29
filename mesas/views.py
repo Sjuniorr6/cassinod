@@ -8,6 +8,7 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 import json
 from .models import Mesa
+from sange.models import VendaFicha
 
 def safe_int(value, default=0):
     """Converter valores para inteiros de forma segura"""
@@ -76,16 +77,16 @@ def mesas_home(request):
     if not mesas_periodo.exists():
         receita_total = 0
     
-    # Calcular total de fichas vendidas (soma dos valores totais de mesas abertas)
-    fichas_vendidas = Mesa.objects.filter(status='aberta').aggregate(
+    # Calcular total de fichas vendidas do SANGE (soma de todas as vendas de fichas)
+    fichas_vendidas = VendaFicha.objects.aggregate(
         total=models.Sum('valor_total')
     )['total'] or 0
     
-    # Estoque restante (valor total de todas as mesas menos fichas vendidas)
-    estoque_restante = Mesa.objects.aggregate(
-        total=models.Sum('valor_total')
+    # Estoque restante (valor total atual de todos os caixas abertos do sange)
+    from sange.models import CaixaSange
+    estoque_restante = CaixaSange.objects.filter(data_fechamento__isnull=True).aggregate(
+        total=models.Sum('valor_total_atual')
     )['total'] or 0
-    estoque_restante -= fichas_vendidas
     
     # Calcular variação percentual (comparar com período anterior)
     periodo_anterior_inicio = data_inicio - timedelta(days=(data_fim - data_inicio).days)
@@ -669,16 +670,15 @@ def atualizar_metricas_api(request):
             total=models.Sum('saldo')
         )['total'] or 0
         
-        # Calcular total de fichas vendidas
-        fichas_vendidas = Mesa.objects.filter(status='aberta').aggregate(
+        # Calcular total de fichas vendidas do SANGE
+        fichas_vendidas = VendaFicha.objects.aggregate(
             total=models.Sum('valor_total')
         )['total'] or 0
         
-        # Estoque restante
-        estoque_restante = Mesa.objects.aggregate(
-            total=models.Sum('valor_total')
+        # Estoque restante (valor total atual de todos os caixas abertos do sange)
+        estoque_restante = CaixaSange.objects.filter(data_fechamento__isnull=True).aggregate(
+            total=models.Sum('valor_total_atual')
         )['total'] or 0
-        estoque_restante -= fichas_vendidas
         
         # Calcular variação percentual
         periodo_anterior_inicio = data_inicio - timedelta(days=(data_fim - data_inicio).days)

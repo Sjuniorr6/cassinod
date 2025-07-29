@@ -14,6 +14,7 @@ urlpatterns = [
     path('mesas/', include('mesas.urls')),
     path('financeiro/', include('financeiro.urls')),
     path('sange/', include('sange.urls')),
+    path('dashboard/', include('dashboard.urls')),
     path('', home, name='home'),
 ]
 
