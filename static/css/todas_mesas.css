@@ -150,7 +150,7 @@
     }
 }
 
-/* ===== ESTILOS LIMPOS E MINIMALISTAS PARA O MODAL ===== */
+/* ===== ESTILOS LIMPOS E MINIMALISTAS PARA TODOS OS MODAIS ===== */
 
 /* Modal principal - design limpo e profissional */
 #mesaModal {
@@ -169,6 +169,23 @@
     min-height: 400px;
 }
 
+/* Modal de abrir/fechar/encerrar mesa - design limpo e profissional */
+#abrirMesaModal {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+#modalContentAbrirMesa {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    max-width: 700px;
+    width: 95%;
+    max-height: 90vh;
+    overflow: hidden;
+}
+
 /* Modal de nova mesa - design limpo e profissional */
 #novaMesaModal {
     background: rgba(0, 0, 0, 0.5);
@@ -181,6 +198,23 @@
     border-radius: 12px;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     max-width: 800px;
+    width: 95%;
+    max-height: 90vh;
+    overflow: hidden;
+}
+
+/* Modal de confirmação/erro genérico - design limpo e profissional */
+#confirmModal {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+#modalContentConfirm {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    max-width: 500px;
     width: 95%;
     max-height: 90vh;
     overflow: hidden;
@@ -241,7 +275,7 @@
 }
 
 /* Conteúdo do modal - seções organizadas */
-#mesaModalContent {
+#mesaModalContent, #abrirMesaModalContent {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
@@ -352,12 +386,13 @@
     font-weight: 600;
 }
 
-/* Botão de fechar - design clean */
+/* Botões do modal - design clean */
 .modal-footer {
     padding-top: 1rem;
     border-top: 1px solid #e5e7eb;
     display: flex;
     justify-content: flex-end;
+    gap: 0.75rem;
     margin-top: auto;
 }
 
@@ -377,17 +412,38 @@
     background: #4b5563;
 }
 
-/* ===== RESPONSIVIDADE MELHORADA ===== */
+.btn-primary {
+    background: #ef4444;
+    color: #ffffff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: #dc2626;
+}
+
+/* ===== RESPONSIVIDADE MELHORADA PARA TODOS OS MODAIS ===== */
 
 /* Desktop grande (1200px+) */
 @media (min-width: 1200px) {
-    #modalContentMesa {
+    #modalContentMesa, #modalContentAbrirMesa {
         max-width: 800px;
         width: 90%;
     }
     
     #modalContentNovaMesa {
         max-width: 900px;
+        width: 90%;
+    }
+    
+    #modalContentConfirm {
+        max-width: 600px;
         width: 90%;
     }
     
@@ -406,7 +462,7 @@
 
 /* Desktop médio (1024px - 1199px) */
 @media (min-width: 1024px) and (max-width: 1199px) {
-    #modalContentMesa {
+    #modalContentMesa, #modalContentAbrirMesa {
         max-width: 700px;
         width: 90%;
     }
@@ -415,11 +471,16 @@
         max-width: 800px;
         width: 90%;
     }
+    
+    #modalContentConfirm {
+        max-width: 550px;
+        width: 90%;
+    }
 }
 
 /* Tablet (768px - 1023px) */
 @media (min-width: 768px) and (max-width: 1023px) {
-    #modalContentMesa {
+    #modalContentMesa, #modalContentAbrirMesa {
         max-width: 600px;
         width: 95%;
         max-height: 85vh;
@@ -427,6 +488,12 @@
     
     #modalContentNovaMesa {
         max-width: 700px;
+        width: 95%;
+        max-height: 85vh;
+    }
+    
+    #modalContentConfirm {
+        max-width: 500px;
         width: 95%;
         max-height: 85vh;
     }
@@ -451,13 +518,7 @@
 
 /* Mobile grande (640px - 767px) */
 @media (min-width: 640px) and (max-width: 767px) {
-    #modalContentMesa {
-        width: 98%;
-        max-height: 90vh;
-        margin: 0.5rem;
-    }
-    
-    #modalContentNovaMesa {
+    #modalContentMesa, #modalContentAbrirMesa, #modalContentNovaMesa, #modalContentConfirm {
         width: 98%;
         max-height: 90vh;
         margin: 0.5rem;
@@ -496,22 +557,11 @@
 
 /* Mobile pequeno (até 639px) */
 @media (max-width: 639px) {
-    #mesaModal {
+    #mesaModal, #abrirMesaModal, #novaMesaModal, #confirmModal {
         padding: 0.5rem;
     }
     
-    #novaMesaModal {
-        padding: 0.5rem;
-    }
-    
-    #modalContentMesa {
-        width: 100%;
-        max-height: 95vh;
-        margin: 0;
-        border-radius: 8px;
-    }
-    
-    #modalContentNovaMesa {
+    #modalContentMesa, #modalContentAbrirMesa, #modalContentNovaMesa, #modalContentConfirm {
         width: 100%;
         max-height: 95vh;
         margin: 0;
@@ -576,19 +626,20 @@
         padding: 0.2rem 0.5rem;
     }
     
-    .btn-close-clean {
+    .btn-close-clean, .btn-primary {
         padding: 0.5rem 0.75rem;
         font-size: 0.8rem;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+        gap: 0.5rem;
     }
 }
 
 /* Orientação landscape em mobile */
 @media (max-width: 767px) and (orientation: landscape) {
-    #modalContentMesa {
-        max-height: 85vh;
-    }
-    
-    #modalContentNovaMesa {
+    #modalContentMesa, #modalContentAbrirMesa, #modalContentNovaMesa, #modalContentConfirm {
         max-height: 85vh;
     }
     

@@ -238,11 +238,12 @@
                     </div>
                 </div>
                 
-                <div>
-                    <label for="valor_inicial" class="block text-sm font-medium text-gray-700 mb-2">Valor Inicial (R$) *</label>
-                    <input type="number" id="valor_inicial" name="valor_inicial" required min="0" step="0.01" 
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
-                </div>
+                                            <div>
+                                <label for="valor_inicial" class="block text-sm font-medium text-gray-700 mb-2">Valor Inicial (R$) *</label>
+                                <input type="number" id="valor_inicial" name="valor_inicial" required min="0" step="0.01" readonly
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed">
+                                <p class="text-xs text-gray-500 mt-1">Calculado automaticamente baseado nas fichas</p>
+                            </div>
                 
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div>
@@ -288,6 +289,37 @@
                 </button>
                 <button onclick="criarNovaMesa()" class="btn-primary">
                     Criar Mesa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmação/erro genérico -->
+<div id="confirmModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display: none;">
+    <div class="transform transition-all duration-300 scale-95 opacity-0" id="modalContentConfirm">
+        <!-- Header -->
+        <div class="modal-header">
+            <div class="flex items-center justify-between">
+                <h2 id="confirmTitle">Confirmação</h2>
+                <button onclick="fecharModalConfirm()" title="Fechar">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- Content -->
+        <div class="modal-body">
+            <div id="confirmContent" class="text-center">
+                <div id="confirmIcon" class="mb-4">
+                    <!-- Ícone será definido via JavaScript -->
+                </div>
+                <p id="confirmMessage" class="text-gray-700 mb-4"></p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="fecharModalConfirm()" class="btn-close-clean">
+                    OK
                 </button>
             </div>
         </div>
@@ -348,7 +380,38 @@ function abrirModalNovaMesa() {
         if (modalBody) {
             modalBody.scrollTop = 0;
         }
+        
+        // Adicionar event listeners para calcular o valor inicial
+        adicionarEventListenersFichas();
+        calcularValorInicial();
     }, 10);
+}
+
+function adicionarEventListenersFichas() {
+    const fichasInputs = ['fichas_5', 'fichas_25', 'fichas_100', 'fichas_500', 'fichas_1000', 'fichas_5000', 'fichas_10000'];
+    
+    fichasInputs.forEach(inputId => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.addEventListener('input', calcularValorInicial);
+        }
+    });
+}
+
+function calcularValorInicial() {
+    const fichas5 = parseInt(document.getElementById('fichas_5').value) || 0;
+    const fichas25 = parseInt(document.getElementById('fichas_25').value) || 0;
+    const fichas100 = parseInt(document.getElementById('fichas_100').value) || 0;
+    const fichas500 = parseInt(document.getElementById('fichas_500').value) || 0;
+    const fichas1000 = parseInt(document.getElementById('fichas_1000').value) || 0;
+    const fichas5000 = parseInt(document.getElementById('fichas_5000').value) || 0;
+    const fichas10000 = parseInt(document.getElementById('fichas_10000').value) || 0;
+    
+    const valorTotal = (fichas5 * 5) + (fichas25 * 25) + (fichas100 * 100) + 
+                      (fichas500 * 500) + (fichas1000 * 1000) + (fichas5000 * 5000) + 
+                      (fichas10000 * 10000);
+    
+    document.getElementById('valor_inicial').value = valorTotal.toFixed(2);
 }
 
 function renderizarMesas() {
@@ -662,7 +725,7 @@ function fecharModalAbrirMesa() {
 
 function confirmarAbrirMesa() {
     if (!mesaParaAbrir) {
-        alert('Erro: Mesa não identificada');
+        mostrarModalConfirm('Erro', 'Mesa não identificada', 'error');
         return;
     }
     
@@ -881,8 +944,13 @@ function criarNovaMesa() {
     const fichas5000 = document.getElementById('fichas_5000').value;
     const fichas10000 = document.getElementById('fichas_10000').value;
 
-    if (!numeroMesa || !tipoJogo || !valorInicial) {
-        alert('Por favor, preencha todos os campos obrigatórios.');
+    if (!numeroMesa || !tipoJogo) {
+        mostrarModalConfirm('Atenção', 'Por favor, preencha o número da mesa e o tipo de jogo.', 'warning');
+        return;
+    }
+    
+    if (parseFloat(valorInicial) <= 0) {
+        mostrarModalConfirm('Atenção', 'Por favor, adicione pelo menos uma ficha para criar a mesa.', 'warning');
         return;
     }
 
@@ -969,6 +1037,96 @@ function fecharModalNovaMesa() {
     
     modalContentDiv.classList.add('scale-95', 'opacity-0');
     modalContentDiv.classList.remove('scale-100', 'opacity-100');
+    setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        limparFormularioNovaMesa();
+    }, 300);
+}
+
+function limparFormularioNovaMesa() {
+    // Limpar todos os campos do formulário
+    document.getElementById('numero_mesa').value = '';
+    document.getElementById('tipo_jogo').value = '';
+    document.getElementById('valor_inicial').value = '0.00';
+    document.getElementById('fichas_5').value = '0';
+    document.getElementById('fichas_25').value = '0';
+    document.getElementById('fichas_100').value = '0';
+    document.getElementById('fichas_500').value = '0';
+    document.getElementById('fichas_1000').value = '0';
+    document.getElementById('fichas_5000').value = '0';
+    document.getElementById('fichas_10000').value = '0';
+    
+    // Remover event listeners para evitar duplicação
+    const fichasInputs = ['fichas_5', 'fichas_25', 'fichas_100', 'fichas_500', 'fichas_1000', 'fichas_5000', 'fichas_10000'];
+    fichasInputs.forEach(inputId => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.removeEventListener('input', calcularValorInicial);
+        }
+    });
+}
+
+// Funções para o modal de confirmação/erro
+function mostrarModalConfirm(titulo, mensagem, tipo = 'info') {
+    const modal = document.getElementById('confirmModal');
+    const modalContent = document.getElementById('modalContentConfirm');
+    const title = document.getElementById('confirmTitle');
+    const message = document.getElementById('confirmMessage');
+    const icon = document.getElementById('confirmIcon');
+    
+    title.textContent = titulo;
+    message.textContent = mensagem;
+    
+    // Definir ícone baseado no tipo
+    let iconHtml = '';
+    let iconColor = '';
+    
+    switch(tipo) {
+        case 'error':
+            iconColor = 'text-red-500';
+            iconHtml = `<svg class="w-16 h-16 ${iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+            </svg>`;
+            break;
+        case 'warning':
+            iconColor = 'text-yellow-500';
+            iconHtml = `<svg class="w-16 h-16 ${iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+            </svg>`;
+            break;
+        case 'success':
+            iconColor = 'text-green-500';
+            iconHtml = `<svg class="w-16 h-16 ${iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>`;
+            break;
+        default:
+            iconColor = 'text-blue-500';
+            iconHtml = `<svg class="w-16 h-16 ${iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4M12 8h.01"/>
+            </svg>`;
+    }
+    
+    icon.innerHTML = iconHtml;
+    
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+        modalContent.classList.remove('scale-95', 'opacity-0');
+        modalContent.classList.add('scale-100', 'opacity-100');
+    }, 10);
+}
+
+function fecharModalConfirm() {
+    const modal = document.getElementById('confirmModal');
+    const modalContent = document.getElementById('modalContentConfirm');
+    
+    modalContent.classList.add('scale-95', 'opacity-0');
+    modalContent.classList.remove('scale-100', 'opacity-100');
     setTimeout(() => {
         modal.style.display = 'none';
         document.body.style.overflow = 'auto';
