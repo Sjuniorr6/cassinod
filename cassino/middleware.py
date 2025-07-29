@@ -13,6 +13,7 @@ class AuthenticationMiddleware:
     def __call__(self, request):
         # List of URLs that don't require authentication
         public_urls = [
+            '/',
             '/landing/',
             '/usuarios/login/',
             '/usuarios/register/',
@@ -40,6 +41,11 @@ class AuthenticationMiddleware:
         if not is_public and not request.user.is_authenticated:
             logger.info(f"Redirecting {current_path} to login")
             return redirect('usuarios:login')
+        
+        # If user is authenticated and trying to access login page, redirect to home
+        if request.user.is_authenticated and current_path == '/usuarios/login/':
+            logger.info(f"Authenticated user accessing login, redirecting to home")
+            return redirect('/')
         
         response = self.get_response(request)
         return response 
