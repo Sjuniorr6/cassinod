@@ -97,6 +97,14 @@
                     <h1 class="main-title">Todas as Mesas</h1>
                     <p class="main-subtitle">Visualize e gerencie todas as mesas do cassino</p>
                 </div>
+                <div class="flex gap-4">
+                    <button onclick="abrirModalNovaMesa()" class="px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        Nova Mesa
+                    </button>
+                </div>
             </div>
         </header>
 
@@ -158,6 +166,133 @@
         </div>
     </div>
 </div>
+
+<!-- Modal para abrir mesa -->
+<div id="abrirMesaModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display: none;">
+    <div class="transform transition-all duration-300 scale-95 opacity-0" id="modalContentAbrirMesa">
+        <!-- Header -->
+        <div class="modal-header">
+            <div class="flex items-center justify-between">
+                <h2>Abrir Mesa</h2>
+                <button onclick="fecharModalAbrirMesa()" title="Fechar">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- Content -->
+        <div class="modal-body">
+            <div id="abrirMesaModalContent">
+                <div class="flex flex-col items-center justify-center py-8">
+                    <div class="w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin mb-4"></div>
+                    <p class="text-gray-600 font-semibold">Carregando mesa...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="fecharModalAbrirMesa()" class="btn-close-clean">
+                    Cancelar
+                </button>
+                <button onclick="confirmarAbrirMesa()" class="btn-primary">
+                    Abrir Mesa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para nova mesa -->
+<div id="novaMesaModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display: none;">
+    <div class="transform transition-all duration-300 scale-95 opacity-0" id="modalContentNovaMesa">
+        <!-- Header -->
+        <div class="modal-header">
+            <div class="flex items-center justify-between">
+                <h2>Nova Mesa</h2>
+                <button onclick="fecharModalNovaMesa()" title="Fechar">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- Content -->
+        <div class="modal-body">
+            <form id="novaMesaForm" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="numero_mesa" class="block text-sm font-medium text-gray-700 mb-2">Número da Mesa *</label>
+                        <input type="number" id="numero_mesa" name="numero_mesa" required min="1" 
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label for="tipo_jogo" class="block text-sm font-medium text-gray-700 mb-2">Tipo de Jogo *</label>
+                        <select id="tipo_jogo" name="tipo_jogo" required 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                            <option value="">Selecione...</option>
+                            <option value="poker">Poker</option>
+                            <option value="caribenho">Poker Caribenho</option>
+                            <option value="ultimate">Poker Ultimate</option>
+                            <option value="baccarat">Baccarat</option>
+                            <option value="roleta">Roleta</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="valor_inicial" class="block text-sm font-medium text-gray-700 mb-2">Valor Inicial (R$) *</label>
+                    <input type="number" id="valor_inicial" name="valor_inicial" required min="0" step="0.01" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div>
+                        <label for="fichas_5" class="block text-sm font-medium text-gray-700 mb-2">Fichas R$ 5</label>
+                        <input type="number" id="fichas_5" name="fichas_5" min="0" value="0"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label for="fichas_25" class="block text-sm font-medium text-gray-700 mb-2">Fichas R$ 25</label>
+                        <input type="number" id="fichas_25" name="fichas_25" min="0" value="0"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label for="fichas_100" class="block text-sm font-medium text-gray-700 mb-2">Fichas R$ 100</label>
+                        <input type="number" id="fichas_100" name="fichas_100" min="0" value="0"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label for="fichas_500" class="block text-sm font-medium text-gray-700 mb-2">Fichas R$ 500</label>
+                        <input type="number" id="fichas_500" name="fichas_500" min="0" value="0"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label for="fichas_1000" class="block text-sm font-medium text-gray-700 mb-2">Fichas R$ 1.000</label>
+                        <input type="number" id="fichas_1000" name="fichas_1000" min="0" value="0"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label for="fichas_5000" class="block text-sm font-medium text-gray-700 mb-2">Fichas R$ 5.000</label>
+                        <input type="number" id="fichas_5000" name="fichas_5000" min="0" value="0"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="fichas_10000" class="block text-sm font-medium text-gray-700 mb-2">Fichas R$ 10.000</label>
+                        <input type="number" id="fichas_10000" name="fichas_10000" min="0" value="0"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button onclick="fecharModalNovaMesa()" class="btn-close-clean">
+                    Cancelar
+                </button>
+                <button onclick="criarNovaMesa()" class="btn-primary">
+                    Criar Mesa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -165,6 +300,9 @@
 let todasMesas = [];
 let paginaAtual = 1;
 const itensPorPagina = 12;
+let mesaParaAbrir = null;
+let mesaParaFechar = null;
+let mesaParaEncerrar = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     carregarMesas();
@@ -194,6 +332,23 @@ function carregarMesas() {
             errorMessage.style.display = 'block';
             document.getElementById('errorText').textContent = 'Erro ao carregar mesas. Tente novamente.';
         });
+}
+
+function abrirModalNovaMesa() {
+    const modal = document.getElementById('novaMesaModal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+        const modalContentDiv = document.getElementById('modalContentNovaMesa');
+        modalContentDiv.classList.remove('scale-95', 'opacity-0');
+        modalContentDiv.classList.add('scale-100', 'opacity-100');
+        
+        // Garantir que o scroll do modal funcione corretamente
+        const modalBody = modalContentDiv.querySelector('.modal-body');
+        if (modalBody) {
+            modalBody.scrollTop = 0;
+        }
+    }, 10);
 }
 
 function renderizarMesas() {
@@ -234,6 +389,29 @@ function renderizarMesas() {
                     </svg>
                     Ver Detalhes
                 </button>
+                ${mesa.status === 'aberta' ? `
+                    <button class="w-full px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white text-sm font-semibold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-1" onclick="fecharMesa(${mesa.id})" title="Fechar mesa">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        Fechar Mesa
+                    </button>
+                ` : mesa.status === 'fechada' ? `
+                    <button class="w-full px-3 py-2 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white text-sm font-semibold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-1" onclick="abrirMesa(${mesa.id})" title="Abrir mesa">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2v20M2 12h20"/>
+                        </svg>
+                        Abrir Mesa
+                    </button>
+                ` : ''}
+                ${mesa.status !== 'encerrada' ? `
+                    <button class="w-full px-3 py-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white text-sm font-semibold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-1" onclick="encerrarMesa(${mesa.id})" title="Encerrar mesa">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        Encerrar Mesa
+                    </button>
+                ` : ''}
             </div>
         </div>
     `).join('');
@@ -370,6 +548,418 @@ function verMesa(mesaId) {
 function fecharModal() {
     const modal = document.getElementById('mesaModal');
     const modalContentDiv = document.getElementById('modalContentMesa');
+    
+    // Resetar o scroll antes de fechar
+    const modalBody = modalContentDiv.querySelector('.modal-body');
+    if (modalBody) {
+        modalBody.scrollTop = 0;
+    }
+    
+    modalContentDiv.classList.add('scale-95', 'opacity-0');
+    modalContentDiv.classList.remove('scale-100', 'opacity-100');
+    setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }, 300);
+}
+
+function abrirMesa(mesaId) {
+    mesaParaAbrir = mesaId;
+    const modal = document.getElementById('abrirMesaModal');
+    const modalContent = document.getElementById('abrirMesaModalContent');
+    modalContent.innerHTML = `<div class='flex flex-col items-center justify-center py-8'><div class='w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin mb-4'></div><p class='text-gray-600 font-semibold'>Carregando mesa...</p></div>`;
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+        const modalContentDiv = document.getElementById('modalContentAbrirMesa');
+        modalContentDiv.classList.remove('scale-95', 'opacity-0');
+        modalContentDiv.classList.add('scale-100', 'opacity-100');
+        
+        // Garantir que o scroll do modal funcione corretamente
+        const modalBody = modalContentDiv.querySelector('.modal-body');
+        if (modalBody) {
+            modalBody.scrollTop = 0;
+        }
+    }, 10);
+    
+    fetch(`/mesas/api/mesa/${mesaId}/obter/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const mesa = data.mesa;
+                modalContent.innerHTML = `
+                    <div class="info-section">
+                        <h3>Confirmar Abertura da Mesa</h3>
+                        <div class="info-item">
+                            <span class="info-label">Número da Mesa</span>
+                            <span class="info-value">${mesa.numero_mesa}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Tipo de Jogo</span>
+                            <span class="info-value">${mesa.tipo_jogo_display}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Status Atual</span>
+                            <span class="status-badge-clean ${mesa.status}">${mesa.status_display}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <h3>Valores</h3>
+                        <div class="info-item">
+                            <span class="info-label">Valor Inicial</span>
+                            <span class="info-value money-value">R$ ${parseFloat(mesa.valor_inicial).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Valor Total</span>
+                            <span class="info-value money-value">R$ ${parseFloat(mesa.valor_total).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Saldo</span>
+                            <span class="info-value money-value ${parseFloat(mesa.saldo) < 0 ? 'negative' : ''}">R$ ${parseFloat(mesa.saldo).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                            </svg>
+                            <p class="text-yellow-800 font-medium">Atenção</p>
+                        </div>
+                        <p class="text-yellow-700 text-sm mt-1">
+                            Ao abrir a mesa, ela ficará disponível para jogos. Confirme se todos os valores estão corretos.
+                        </p>
+                    </div>
+                `;
+            } else {
+                modalContent.innerHTML = `<div class='flex flex-col items-center justify-center py-8'><svg class='w-16 h-16 text-red-500 mb-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/><line x1='15' y1='9' x2='9' y2='15'/><line x1='9' y1='9' x2='15' y2='15'/></svg><h3 class='text-xl font-bold text-gray-800 mb-2'>Erro ao Carregar</h3><p class='text-gray-600'>${data.message || 'Erro ao carregar detalhes da mesa'}</p></div>`;
+            }
+        })
+        .catch(error => {
+            modalContent.innerHTML = `<div class='flex flex-col items-center justify-center py-8'><svg class='w-16 h-16 text-red-500 mb-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'><circle cx='12' cy='12' r='10'/><line x1='15' y1='9' x2='9' y2='15'/><line x1='9' y1='9' x2='15' y2='15'/></svg><h3 class='text-xl font-bold text-gray-800 mb-2'>Erro ao Carregar</h3><p class='text-gray-600'>Erro ao carregar detalhes da mesa. Tente novamente.</p></div>`;
+        });
+}
+
+function fecharModalAbrirMesa() {
+    const modal = document.getElementById('abrirMesaModal');
+    const modalContentDiv = document.getElementById('modalContentAbrirMesa');
+    
+    // Resetar o scroll antes de fechar
+    const modalBody = modalContentDiv.querySelector('.modal-body');
+    if (modalBody) {
+        modalBody.scrollTop = 0;
+    }
+    
+    modalContentDiv.classList.add('scale-95', 'opacity-0');
+    modalContentDiv.classList.remove('scale-100', 'opacity-100');
+    setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        mesaParaAbrir = null;
+    }, 300);
+}
+
+function confirmarAbrirMesa() {
+    if (!mesaParaAbrir) {
+        alert('Erro: Mesa não identificada');
+        return;
+    }
+    
+    const modalContent = document.getElementById('abrirMesaModalContent');
+    modalContent.innerHTML = `<div class='flex flex-col items-center justify-center py-8'><div class='w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin mb-4'></div><p class='text-gray-600 font-semibold'>Abrindo mesa...</p></div>`;
+    
+    fetch(`/mesas/api/mesa/${mesaParaAbrir}/abrir/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            modalContent.innerHTML = `
+                <div class='flex flex-col items-center justify-center py-8'>
+                    <svg class='w-16 h-16 text-green-500 mb-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 13l4 4L19 7'/>
+                    </svg>
+                    <h3 class='text-xl font-bold text-gray-800 mb-2'>Mesa Aberta!</h3>
+                    <p class='text-gray-600 text-center'>A mesa foi aberta com sucesso.</p>
+                </div>
+            `;
+            
+            // Atualizar a lista de mesas após 2 segundos
+            setTimeout(() => {
+                fecharModalAbrirMesa();
+                carregarMesas();
+            }, 2000);
+        } else {
+            modalContent.innerHTML = `
+                <div class='flex flex-col items-center justify-center py-8'>
+                    <svg class='w-16 h-16 text-red-500 mb-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <circle cx='12' cy='12' r='10'/>
+                        <line x1='15' y1='9' x2='9' y2='15'/>
+                        <line x1='9' y1='9' x2='15' y2='15'/>
+                    </svg>
+                    <h3 class='text-xl font-bold text-gray-800 mb-2'>Erro ao Abrir Mesa</h3>
+                    <p class='text-gray-600 text-center'>${data.message || 'Erro ao abrir a mesa'}</p>
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        modalContent.innerHTML = `
+            <div class='flex flex-col items-center justify-center py-8'>
+                <svg class='w-16 h-16 text-red-500 mb-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <circle cx='12' cy='12' r='10'/>
+                    <line x1='15' y1='9' x2='9' y2='15'/>
+                    <line x1='9' y1='9' x2='15' y2='15'/>
+                </svg>
+                <h3 class='text-xl font-bold text-gray-800 mb-2'>Erro ao Abrir Mesa</h3>
+                <p class='text-gray-600 text-center'>Erro ao abrir a mesa. Tente novamente.</p>
+            </div>
+        `;
+    });
+}
+
+function fecharMesa(mesaId) {
+    mesaParaFechar = mesaId;
+    const modal = document.getElementById('abrirMesaModal');
+    const modalContent = document.getElementById('abrirMesaModalContent');
+    modalContent.innerHTML = `<div class='flex flex-col items-center justify-center py-8'><div class='w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin mb-4'></div><p class='text-gray-600 font-semibold'>Fechando mesa...</p></div>`;
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+        const modalContentDiv = document.getElementById('modalContentAbrirMesa');
+        modalContentDiv.classList.remove('scale-95', 'opacity-0');
+        modalContentDiv.classList.add('scale-100', 'opacity-100');
+        
+        // Garantir que o scroll do modal funcione corretamente
+        const modalBody = modalContentDiv.querySelector('.modal-body');
+        if (modalBody) {
+            modalBody.scrollTop = 0;
+        }
+    }, 10);
+    
+    fetch(`/mesas/api/mesa/${mesaId}/fechar/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            modalContent.innerHTML = `
+                <div class='flex flex-col items-center justify-center py-8'>
+                    <svg class='w-16 h-16 text-green-500 mb-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 13l4 4L19 7'/>
+                    </svg>
+                    <h3 class='text-xl font-bold text-gray-800 mb-2'>Mesa Fechada!</h3>
+                    <p class='text-gray-600 text-center'>A mesa foi fechada com sucesso.</p>
+                </div>
+            `;
+            
+            // Atualizar a lista de mesas após 2 segundos
+            setTimeout(() => {
+                fecharModalAbrirMesa();
+                carregarMesas();
+            }, 2000);
+        } else {
+            modalContent.innerHTML = `
+                <div class='flex flex-col items-center justify-center py-8'>
+                    <svg class='w-16 h-16 text-red-500 mb-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <circle cx='12' cy='12' r='10'/>
+                        <line x1='15' y1='9' x2='9' y2='15'/>
+                        <line x1='9' y1='9' x2='15' y2='15'/>
+                    </svg>
+                    <h3 class='text-xl font-bold text-gray-800 mb-2'>Erro ao Fechar Mesa</h3>
+                    <p class='text-gray-600 text-center'>${data.message || 'Erro ao fechar a mesa'}</p>
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        modalContent.innerHTML = `
+            <div class='flex flex-col items-center justify-center py-8'>
+                <svg class='w-16 h-16 text-red-500 mb-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <circle cx='12' cy='12' r='10'/>
+                    <line x1='15' y1='9' x2='9' y2='15'/>
+                    <line x1='9' y1='9' x2='15' y2='15'/>
+                </svg>
+                <h3 class='text-xl font-bold text-gray-800 mb-2'>Erro ao Fechar Mesa</h3>
+                <p class='text-gray-600 text-center'>Erro ao fechar a mesa. Tente novamente.</p>
+            </div>
+        `;
+    });
+}
+
+function encerrarMesa(mesaId) {
+    mesaParaEncerrar = mesaId;
+    const modal = document.getElementById('abrirMesaModal');
+    const modalContent = document.getElementById('abrirMesaModalContent');
+    modalContent.innerHTML = `<div class='flex flex-col items-center justify-center py-8'><div class='w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin mb-4'></div><p class='text-gray-600 font-semibold'>Encerrando mesa...</p></div>`;
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+        const modalContentDiv = document.getElementById('modalContentAbrirMesa');
+        modalContentDiv.classList.remove('scale-95', 'opacity-0');
+        modalContentDiv.classList.add('scale-100', 'opacity-100');
+        
+        // Garantir que o scroll do modal funcione corretamente
+        const modalBody = modalContentDiv.querySelector('.modal-body');
+        if (modalBody) {
+            modalBody.scrollTop = 0;
+        }
+    }, 10);
+    
+    fetch(`/mesas/api/mesa/${mesaId}/encerrar/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            modalContent.innerHTML = `
+                <div class='flex flex-col items-center justify-center py-8'>
+                    <svg class='w-16 h-16 text-green-500 mb-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 13l4 4L19 7'/>
+                    </svg>
+                    <h3 class='text-xl font-bold text-gray-800 mb-2'>Mesa Encerrada!</h3>
+                    <p class='text-gray-600 text-center'>A mesa foi encerrada com sucesso.</p>
+                </div>
+            `;
+            
+            // Atualizar a lista de mesas após 2 segundos
+            setTimeout(() => {
+                fecharModalAbrirMesa();
+                carregarMesas();
+            }, 2000);
+        } else {
+            modalContent.innerHTML = `
+                <div class='flex flex-col items-center justify-center py-8'>
+                    <svg class='w-16 h-16 text-red-500 mb-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <circle cx='12' cy='12' r='10'/>
+                        <line x1='15' y1='9' x2='9' y2='15'/>
+                        <line x1='9' y1='9' x2='15' y2='15'/>
+                    </svg>
+                    <h3 class='text-xl font-bold text-gray-800 mb-2'>Erro ao Encerrar Mesa</h3>
+                    <p class='text-gray-600 text-center'>${data.message || 'Erro ao encerrar a mesa'}</p>
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        modalContent.innerHTML = `
+            <div class='flex flex-col items-center justify-center py-8'>
+                <svg class='w-16 h-16 text-red-500 mb-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <circle cx='12' cy='12' r='10'/>
+                    <line x1='15' y1='9' x2='9' y2='15'/>
+                    <line x1='9' y1='9' x2='15' y2='15'/>
+                </svg>
+                <h3 class='text-xl font-bold text-gray-800 mb-2'>Erro ao Encerrar Mesa</h3>
+                <p class='text-gray-600 text-center'>Erro ao encerrar a mesa. Tente novamente.</p>
+            </div>
+        `;
+    });
+}
+
+function criarNovaMesa() {
+    const numeroMesa = document.getElementById('numero_mesa').value;
+    const tipoJogo = document.getElementById('tipo_jogo').value;
+    const valorInicial = document.getElementById('valor_inicial').value;
+    const fichas5 = document.getElementById('fichas_5').value;
+    const fichas25 = document.getElementById('fichas_25').value;
+    const fichas100 = document.getElementById('fichas_100').value;
+    const fichas500 = document.getElementById('fichas_500').value;
+    const fichas1000 = document.getElementById('fichas_1000').value;
+    const fichas5000 = document.getElementById('fichas_5000').value;
+    const fichas10000 = document.getElementById('fichas_10000').value;
+
+    if (!numeroMesa || !tipoJogo || !valorInicial) {
+        alert('Por favor, preencha todos os campos obrigatórios.');
+        return;
+    }
+
+    const novaMesaData = {
+        numero_mesa: numeroMesa,
+        tipo_jogo: tipoJogo,
+        valor_inicial: valorInicial,
+        fichas_5: fichas5,
+        fichas_25: fichas25,
+        fichas_100: fichas100,
+        fichas_500: fichas500,
+        fichas_1000: fichas1000,
+        fichas_5000: fichas5000,
+        fichas_10000: fichas10000,
+    };
+
+    const modalContent = document.getElementById('modalContentNovaMesa');
+    modalContent.innerHTML = `<div class='flex flex-col items-center justify-center py-8'><div class='w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin mb-4'></div><p class='text-gray-600 font-semibold'>Criando nova mesa...</p></div>`;
+    
+         fetch('/mesas/api/mesa/criar/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify(novaMesaData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            modalContent.innerHTML = `
+                <div class='flex flex-col items-center justify-center py-8'>
+                    <svg class='w-16 h-16 text-green-500 mb-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 13l4 4L19 7'/>
+                    </svg>
+                    <h3 class='text-xl font-bold text-gray-800 mb-2'>Mesa Criada!</h3>
+                    <p class='text-gray-600 text-center'>A nova mesa foi criada com sucesso.</p>
+                </div>
+            `;
+            
+            // Atualizar a lista de mesas após 2 segundos
+            setTimeout(() => {
+                fecharModalNovaMesa();
+                carregarMesas();
+            }, 2000);
+        } else {
+            modalContent.innerHTML = `
+                <div class='flex flex-col items-center justify-center py-8'>
+                    <svg class='w-16 h-16 text-red-500 mb-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                        <circle cx='12' cy='12' r='10'/>
+                        <line x1='15' y1='9' x2='9' y2='15'/>
+                        <line x1='9' y1='9' x2='15' y2='15'/>
+                    </svg>
+                    <h3 class='text-xl font-bold text-gray-800 mb-2'>Erro ao Criar Mesa</h3>
+                    <p class='text-gray-600 text-center'>${data.message || 'Erro ao criar a nova mesa'}</p>
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        modalContent.innerHTML = `
+            <div class='flex flex-col items-center justify-center py-8'>
+                <svg class='w-16 h-16 text-red-500 mb-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <circle cx='12' cy='12' r='10'/>
+                    <line x1='15' y1='9' x2='9' y2='15'/>
+                    <line x1='9' y1='9' x2='15' y2='15'/>
+                </svg>
+                <h3 class='text-xl font-bold text-gray-800 mb-2'>Erro ao Criar Mesa</h3>
+                <p class='text-gray-600 text-center'>Erro ao criar a nova mesa. Tente novamente.</p>
+            </div>
+        `;
+    });
+}
+
+function fecharModalNovaMesa() {
+    const modal = document.getElementById('novaMesaModal');
+    const modalContentDiv = document.getElementById('modalContentNovaMesa');
     
     // Resetar o scroll antes de fechar
     const modalBody = modalContentDiv.querySelector('.modal-body');

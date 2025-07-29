@@ -6,6 +6,7 @@ urlpatterns = [
     path('todas/', views.todas_mesas, name='todas_mesas'),
     path('criar/', views.criar_mesa, name='criar_mesa'),
     path('api/mesas/', views.listar_mesas_api, name='listar_mesas_api'),
+    path('api/mesa/criar/', views.criar_mesa_api, name='criar_mesa_api'),
     path('api/mesa/<int:mesa_id>/', views.mesa_detail_api, name='mesa_detail_api'),
     path('api/mesa/<int:mesa_id>/obter/', views.obter_mesa_api, name='obter_mesa_api'),
     path('api/mesa/<int:mesa_id>/editar/', views.editar_mesa_api, name='editar_mesa_api'),

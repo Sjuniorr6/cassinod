@@ -208,6 +208,87 @@ def criar_mesa(request):
             }, status=400)
     return JsonResponse({'success': False, 'message': 'Método não permitido'}, status=405)
 
+@csrf_exempt
+def criar_mesa_api(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            print(f"DEBUG - Dados recebidos: {data}")  # Debug log
+            
+            numero_mesa = data.get('numero_mesa')
+            
+            # Verificar se já existe uma mesa com o mesmo número que esteja aberta ou fechada
+            mesa_existente = Mesa.objects.filter(
+                numero_mesa=numero_mesa,
+                status__in=['aberta', 'fechada']
+            ).first()
+            
+            if mesa_existente:
+                return JsonResponse({
+                    'success': False,
+                    'message': f'Já existe uma mesa {numero_mesa} com status "{mesa_existente.get_status_display()}". Encerre a mesa existente antes de criar uma nova.'
+                }, status=400)
+            
+            # Debug logs para fichas
+            print(f"DEBUG - Fichas 5: {data.get('fichas_5', 0)}")
+            print(f"DEBUG - Fichas 25: {data.get('fichas_25', 0)}")
+            print(f"DEBUG - Fichas 100: {data.get('fichas_100', 0)}")
+            print(f"DEBUG - Fichas 500: {data.get('fichas_500', 0)}")
+            print(f"DEBUG - Fichas 1000: {data.get('fichas_1000', 0)}")
+            print(f"DEBUG - Fichas 5000: {data.get('fichas_5000', 0)}")
+            print(f"DEBUG - Fichas 10000: {data.get('fichas_10000', 0)}")
+            
+            mesa = Mesa.objects.create(
+                numero_mesa=numero_mesa,
+                tipo_jogo=data.get('tipo_jogo'),
+                status=data.get('status', 'aberta'),
+                valor_inicial=data.get('valor_inicial', 0),
+                fichas_5=safe_int(data.get('fichas_5'), 0),
+                fichas_25=safe_int(data.get('fichas_25'), 0),
+                fichas_100=safe_int(data.get('fichas_100'), 0),
+                fichas_500=safe_int(data.get('fichas_500'), 0),
+                fichas_1000=safe_int(data.get('fichas_1000'), 0),
+                fichas_5000=safe_int(data.get('fichas_5000'), 0),
+                fichas_10000=safe_int(data.get('fichas_10000'), 0)
+            )
+            
+            print(f"DEBUG - Mesa criada com ID: {mesa.id}")
+            print(f"DEBUG - Fichas salvas - 5: {mesa.fichas_5}, 25: {mesa.fichas_25}, 100: {mesa.fichas_100}")
+            
+            return JsonResponse({
+                'success': True,
+                'message': f'Mesa {mesa.numero_mesa} criada com sucesso!',
+                'mesa_criada': {
+                    'id': mesa.id,
+                    'numero_mesa': mesa.numero_mesa,
+                    'tipo_jogo': mesa.tipo_jogo,
+                    'tipo_jogo_display': mesa.get_tipo_jogo_display(),
+                    'status': mesa.status,
+                    'status_display': mesa.get_status_display(),
+                    'valor_inicial': float(mesa.valor_inicial),
+                    'valor_total': float(mesa.valor_total),
+                    'saldo': float(mesa.saldo),
+                    'fichas_5': mesa.fichas_5,
+                    'fichas_25': mesa.fichas_25,
+                    'fichas_100': mesa.fichas_100,
+                    'fichas_500': mesa.fichas_500,
+                    'fichas_1000': mesa.fichas_1000,
+                    'fichas_5000': mesa.fichas_5000,
+                    'fichas_10000': mesa.fichas_10000,
+                    'data_criacao': mesa.data_criacao.strftime('%d/%m/%Y %H:%M'),
+                    'data_atualizacao': mesa.data_atualizacao.strftime('%d/%m/%Y %H:%M'),
+                }
+            })
+        except Exception as e:
+            print(f"DEBUG - Erro: {str(e)}")  # Debug log
+            import traceback
+            print(f"DEBUG - Traceback: {traceback.format_exc()}")
+            return JsonResponse({
+                'success': False,
+                'message': f'Erro interno: {str(e)}'
+            }, status=400)
+    return JsonResponse({'success': False, 'message': 'Método não permitido'}, status=405)
+
 def listar_mesas_api(request):
     mesas = Mesa.objects.all()
     data = []

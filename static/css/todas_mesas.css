@@ -169,6 +169,23 @@
     min-height: 400px;
 }
 
+/* Modal de nova mesa - design limpo e profissional */
+#novaMesaModal {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+#modalContentNovaMesa {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    max-width: 800px;
+    width: 95%;
+    max-height: 90vh;
+    overflow: hidden;
+}
+
 /* Header do modal - design minimalista */
 .modal-header {
     background: #f8fafc;
@@ -369,6 +386,11 @@
         width: 90%;
     }
     
+    #modalContentNovaMesa {
+        max-width: 900px;
+        width: 90%;
+    }
+    
     .modal-body {
         padding: 2rem;
     }
@@ -388,12 +410,23 @@
         max-width: 700px;
         width: 90%;
     }
+    
+    #modalContentNovaMesa {
+        max-width: 800px;
+        width: 90%;
+    }
 }
 
 /* Tablet (768px - 1023px) */
 @media (min-width: 768px) and (max-width: 1023px) {
     #modalContentMesa {
         max-width: 600px;
+        width: 95%;
+        max-height: 85vh;
+    }
+    
+    #modalContentNovaMesa {
+        max-width: 700px;
         width: 95%;
         max-height: 85vh;
     }
@@ -419,6 +452,12 @@
 /* Mobile grande (640px - 767px) */
 @media (min-width: 640px) and (max-width: 767px) {
     #modalContentMesa {
+        width: 98%;
+        max-height: 90vh;
+        margin: 0.5rem;
+    }
+    
+    #modalContentNovaMesa {
         width: 98%;
         max-height: 90vh;
         margin: 0.5rem;
@@ -461,7 +500,18 @@
         padding: 0.5rem;
     }
     
+    #novaMesaModal {
+        padding: 0.5rem;
+    }
+    
     #modalContentMesa {
+        width: 100%;
+        max-height: 95vh;
+        margin: 0;
+        border-radius: 8px;
+    }
+    
+    #modalContentNovaMesa {
         width: 100%;
         max-height: 95vh;
         margin: 0;
@@ -535,6 +585,10 @@
 /* Orientação landscape em mobile */
 @media (max-width: 767px) and (orientation: landscape) {
     #modalContentMesa {
+        max-height: 85vh;
+    }
+    
+    #modalContentNovaMesa {
         max-height: 85vh;
     }
     
