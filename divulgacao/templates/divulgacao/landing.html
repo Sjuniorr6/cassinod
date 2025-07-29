@@ -291,36 +291,87 @@
         </div>
     </section>
 
-    <!-- Contact Section -->
-    <section id="contato" class="py-20 bg-gray-800">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Entre em Contato -->
+    <section id="contato" class="py-20 bg-gray-900">
+        <div class="container mx-auto px-4">
             <div class="text-center mb-16">
-                <h2 class="text-4xl font-bold mb-4">Entre em Contato</h2>
-                <p class="text-xl text-gray-400">Solicite uma demonstração ou tire suas dúvidas</p>
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                    Entre em <span class="text-red-400">Contato</span>
+                </h2>
+                <p class="text-xl text-gray-400 max-w-3xl mx-auto">
+                    Pronto para revolucionar a gestão do seu cassino? Entre em contato conosco e descubra como o Cass pode transformar seu negócio.
+                </p>
             </div>
-            
-            <div class="bg-gray-700 rounded-xl p-8">
-                <form id="contactForm" class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+                <!-- Formulário de Contato -->
+                <div class="bg-gray-800 rounded-2xl p-8">
+                    <h3 class="text-2xl font-semibold mb-6">Envie uma Mensagem</h3>
+                    <form id="contactForm" class="space-y-6">
                         <div>
-                            <label class="block text-sm font-medium mb-2">Nome</label>
-                            <input type="text" name="nome" required class="w-full px-4 py-3 bg-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none">
+                            <label for="nome" class="block text-sm font-medium text-gray-300 mb-2">Nome</label>
+                            <input type="text" id="nome" name="nome" required 
+                                   class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-400 transition-colors">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium mb-2">Email</label>
-                            <input type="email" name="email" required class="w-full px-4 py-3 bg-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none">
+                            <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                            <input type="email" id="email" name="email" required 
+                                   class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-400 transition-colors">
                         </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-2">Mensagem</label>
-                        <textarea name="mensagem" rows="4" required class="w-full px-4 py-3 bg-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none"></textarea>
-                    </div>
-                    <div class="text-center">
-                        <button type="submit" class="px-8 py-4 bg-red-600 rounded-lg text-lg font-semibold hover:bg-red-700 transition-colors">
+                        <div>
+                            <label for="mensagem" class="block text-sm font-medium text-gray-300 mb-2">Mensagem</label>
+                            <textarea id="mensagem" name="mensagem" rows="4" required 
+                                      class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-red-400 transition-colors resize-none"></textarea>
+                        </div>
+                        <button type="submit" 
+                                class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300 transform hover:scale-105">
                             Enviar Mensagem
                         </button>
+                    </form>
+                </div>
+
+                <!-- Informações de Contato -->
+                <div class="space-y-8">
+                    <div class="bg-gray-800 rounded-2xl p-8">
+                        <h3 class="text-2xl font-semibold mb-6">Informações de Contato</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-envelope text-red-400 text-xl mr-4"></i>
+                                <div>
+                                    <p class="text-gray-300 font-medium">Email</p>
+                                    <p class="text-gray-400">contato@cass.com.br</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-phone text-red-400 text-xl mr-4"></i>
+                                <div>
+                                    <p class="text-gray-300 font-medium">Telefone</p>
+                                    <p class="text-gray-400">(11) 92090-5637</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-map-marker-alt text-red-400 text-xl mr-4"></i>
+                                <div>
+                                    <p class="text-gray-300 font-medium">Localização</p>
+                                    <p class="text-gray-400">São Paulo, Brasil</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </form>
+
+                    <!-- WhatsApp -->
+                    <div class="bg-gray-800 rounded-2xl p-8">
+                        <h3 class="text-2xl font-semibold mb-6">Fale Conosco no WhatsApp</h3>
+                        <p class="text-gray-400 mb-6">
+                            Prefere uma conversa mais direta? Entre em contato conosco pelo WhatsApp para um atendimento mais rápido e personalizado.
+                        </p>
+                        <a href="https://wa.me/5511920905637" target="_blank" 
+                           class="inline-flex items-center justify-center w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-300 transform hover:scale-105">
+                            <i class="fab fa-whatsapp text-2xl mr-3"></i>
+                            Falar no WhatsApp
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
