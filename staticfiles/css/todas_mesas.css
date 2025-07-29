@@ -1,0 +1,658 @@
+/* Estilos específicos para a página de todas as mesas */
+
+/* Ajustes para os cards de mesa */
+.mesa-card-hover {
+    transition: all 0.3s ease;
+}
+
+.mesa-card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos para paginação */
+.pagination-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(239, 68, 68, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.pagination-button {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+.pagination-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.pagination-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-info {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(239, 68, 68, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+    color: #374151;
+}
+
+/* Animações de loading personalizadas */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.loading-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Estilos para os badges de status */
+.status-badge {
+    transition: all 0.3s ease;
+}
+
+.status-badge:hover {
+    transform: scale(1.05);
+}
+
+/* Responsividade específica para os cards de mesa */
+@media (max-width: 640px) {
+    .mesa-card-mobile {
+        padding: 1rem;
+    }
+    
+    .mesa-card-mobile .text-xl {
+        font-size: 1.125rem;
+    }
+    
+    .mesa-card-mobile .text-lg {
+        font-size: 1rem;
+    }
+    
+    .pagination-mobile {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .pagination-mobile .page-info {
+        order: -1;
+    }
+}
+
+/* Efeitos de hover para botões de ação */
+.action-button-hover {
+    transition: all 0.3s ease;
+}
+
+.action-button-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Animação de entrada para os cards */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Estilos para o estado vazio */
+.empty-state {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%);
+    backdrop-filter: blur(20px);
+}
+
+/* Melhorias para acessibilidade */
+.focus-visible:focus {
+    outline: 2px solid #ef4444;
+    outline-offset: 2px;
+}
+
+/* Transições suaves para mudanças de estado */
+.smooth-transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Grid responsivo para diferentes tamanhos de tela */
+@media (min-width: 640px) {
+    .mesas-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .mesas-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1280px) {
+    .mesas-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* ===== ESTILOS LIMPOS E MINIMALISTAS PARA TODOS OS MODAIS ===== */
+
+/* Modal principal - design limpo e profissional */
+#mesaModal {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+#modalContentMesa {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    max-width: 700px;
+    width: 95%;
+    max-height: 90vh;
+    min-height: 400px;
+}
+
+/* Modal de abrir/fechar/encerrar mesa - design limpo e profissional */
+#abrirMesaModal {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+#modalContentAbrirMesa {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    max-width: 700px;
+    width: 95%;
+    max-height: 90vh;
+    overflow: hidden;
+}
+
+/* Modal de nova mesa - design limpo e profissional */
+#novaMesaModal {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+#modalContentNovaMesa {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    max-width: 800px;
+    width: 95%;
+    max-height: 90vh;
+    overflow: hidden;
+}
+
+/* Modal de confirmação/erro genérico - design limpo e profissional */
+#confirmModal {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+#modalContentConfirm {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    max-width: 500px;
+    width: 95%;
+    max-height: 90vh;
+    overflow: hidden;
+}
+
+/* Header do modal - design minimalista */
+.modal-header {
+    background: #f8fafc;
+    border-bottom: 1px solid #e5e7eb;
+    border-radius: 12px 12px 0 0;
+    padding: 1.5rem;
+}
+
+.modal-header h2 {
+    color: #1f2937;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.modal-header button {
+    color: #6b7280;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.modal-header button:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+/* Corpo do modal - layout limpo */
+.modal-body {
+    padding: 1.5rem;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+    max-height: calc(90vh - 120px);
+    overflow-y: auto;
+}
+
+.modal-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 2px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+/* Conteúdo do modal - seções organizadas */
+#mesaModalContent, #abrirMesaModalContent {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Seções de informação - design clean */
+.info-section {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.25rem;
+}
+
+.info-section h3 {
+    color: #374151;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.info-value {
+    color: #1f2937;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+/* Valores monetários */
+.money-value {
+    color: #059669;
+    font-weight: 700;
+}
+
+.money-value.negative {
+    color: #dc2626;
+}
+
+/* Status badges - design minimalista */
+.status-badge-clean {
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.status-badge-clean.aberta {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-badge-clean.fechada {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-badge-clean.encerrada {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+/* Grid de fichas - layout organizado */
+.fichas-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+}
+
+.ficha-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+}
+
+.ficha-label {
+    color: #6b7280;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.ficha-value {
+    color: #1f2937;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+/* Botões do modal - design clean */
+.modal-footer {
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: auto;
+}
+
+.btn-close-clean {
+    background: #6b7280;
+    color: #ffffff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-close-clean:hover {
+    background: #4b5563;
+}
+
+.btn-primary {
+    background: #ef4444;
+    color: #ffffff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: #dc2626;
+}
+
+/* ===== RESPONSIVIDADE MELHORADA PARA TODOS OS MODAIS ===== */
+
+/* Desktop grande (1200px+) */
+@media (min-width: 1200px) {
+    #modalContentMesa, #modalContentAbrirMesa {
+        max-width: 800px;
+        width: 90%;
+    }
+    
+    #modalContentNovaMesa {
+        max-width: 900px;
+        width: 90%;
+    }
+    
+    #modalContentConfirm {
+        max-width: 600px;
+        width: 90%;
+    }
+    
+    .modal-body {
+        padding: 2rem;
+    }
+    
+    .info-section {
+        padding: 1.5rem;
+    }
+    
+    .fichas-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Desktop médio (1024px - 1199px) */
+@media (min-width: 1024px) and (max-width: 1199px) {
+    #modalContentMesa, #modalContentAbrirMesa {
+        max-width: 700px;
+        width: 90%;
+    }
+    
+    #modalContentNovaMesa {
+        max-width: 800px;
+        width: 90%;
+    }
+    
+    #modalContentConfirm {
+        max-width: 550px;
+        width: 90%;
+    }
+}
+
+/* Tablet (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    #modalContentMesa, #modalContentAbrirMesa {
+        max-width: 600px;
+        width: 95%;
+        max-height: 85vh;
+    }
+    
+    #modalContentNovaMesa {
+        max-width: 700px;
+        width: 95%;
+        max-height: 85vh;
+    }
+    
+    #modalContentConfirm {
+        max-width: 500px;
+        width: 95%;
+        max-height: 85vh;
+    }
+    
+    .modal-header {
+        padding: 1.25rem;
+    }
+    
+    .modal-body {
+        padding: 1.25rem;
+        max-height: calc(85vh - 100px);
+    }
+    
+    .info-section {
+        padding: 1rem;
+    }
+    
+    .fichas-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile grande (640px - 767px) */
+@media (min-width: 640px) and (max-width: 767px) {
+    #modalContentMesa, #modalContentAbrirMesa, #modalContentNovaMesa, #modalContentConfirm {
+        width: 98%;
+        max-height: 90vh;
+        margin: 0.5rem;
+    }
+    
+    .modal-header {
+        padding: 1rem;
+    }
+    
+    .modal-body {
+        padding: 1rem;
+        max-height: calc(90vh - 80px);
+    }
+    
+    .info-section {
+        padding: 0.875rem;
+    }
+    
+    .fichas-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+    
+    .ficha-item {
+        padding: 0.375rem;
+    }
+    
+    .ficha-label {
+        font-size: 0.7rem;
+    }
+    
+    .ficha-value {
+        font-size: 0.8rem;
+    }
+}
+
+/* Mobile pequeno (até 639px) */
+@media (max-width: 639px) {
+    #mesaModal, #abrirMesaModal, #novaMesaModal, #confirmModal {
+        padding: 0.5rem;
+    }
+    
+    #modalContentMesa, #modalContentAbrirMesa, #modalContentNovaMesa, #modalContentConfirm {
+        width: 100%;
+        max-height: 95vh;
+        margin: 0;
+        border-radius: 8px;
+    }
+    
+    .modal-header {
+        padding: 0.75rem;
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .modal-header h2 {
+        font-size: 1.125rem;
+    }
+    
+    .modal-body {
+        padding: 0.75rem;
+        max-height: calc(95vh - 70px);
+    }
+    
+    .info-section {
+        padding: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .info-section h3 {
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .info-item {
+        padding: 0.375rem 0;
+    }
+    
+    .info-label {
+        font-size: 0.8rem;
+    }
+    
+    .info-value {
+        font-size: 0.8rem;
+    }
+    
+    .fichas-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .ficha-item {
+        padding: 0.5rem;
+    }
+    
+    .ficha-label {
+        font-size: 0.75rem;
+    }
+    
+    .ficha-value {
+        font-size: 0.8rem;
+    }
+    
+    .status-badge-clean {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.5rem;
+    }
+    
+    .btn-close-clean, .btn-primary {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+    }
+    
+    .modal-footer {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* Orientação landscape em mobile */
+@media (max-width: 767px) and (orientation: landscape) {
+    #modalContentMesa, #modalContentAbrirMesa, #modalContentNovaMesa, #modalContentConfirm {
+        max-height: 85vh;
+    }
+    
+    .modal-body {
+        max-height: calc(85vh - 80px);
+    }
+    
+    .info-section {
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .fichas-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+} 
