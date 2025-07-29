@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'financeiro',
     'sange',
     'dashboard',
+    'divulgacao',
 ]
 
 MIDDLEWARE = [

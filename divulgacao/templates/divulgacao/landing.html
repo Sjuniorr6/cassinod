@@ -1,0 +1,431 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cass Cassino - Sistema de Gestão e Controle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .hero-bg {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('{% static "images/estilo-de-vida-fotorrealista-cassino.jpg" %}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        .animate-fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-effect">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center mr-3">
+                        <span class="text-white font-bold text-xl">C</span>
+                    </div>
+                    <span class="text-xl font-bold">Cass</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#inicio" class="hover:text-red-400 transition-colors">Início</a>
+                    <a href="#recursos" class="hover:text-red-400 transition-colors">Recursos</a>
+                    <a href="#sobre" class="hover:text-red-400 transition-colors">Sobre</a>
+                    <a href="#contato" class="hover:text-red-400 transition-colors">Contato</a>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="{% url 'usuarios:login' %}" class="px-4 py-2 text-red-400 border border-red-400 rounded-lg hover:bg-red-400 hover:text-white transition-colors">
+                        Login
+                    </a>
+                    <a href="{% url 'usuarios:register' %}" class="px-4 py-2 bg-red-600 rounded-lg hover:bg-red-700 transition-colors">
+                        Cadastre-se
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="hero-bg min-h-screen flex items-center justify-center">
+        <div class="text-center max-w-4xl mx-auto px-4">
+            <div class="animate-fade-in">
+                <h1 class="text-5xl md:text-7xl font-bold mb-6">
+                    <span class="text-red-400">Cass</span> Cassino
+                </h1>
+                <p class="text-xl md:text-2xl mb-8 text-gray-300">
+                    Sistema completo de gestão e controle para cassinos
+                </p>
+                <p class="text-lg mb-12 text-gray-400 max-w-2xl mx-auto">
+                    Gerencie mesas, clientes, vendas de fichas e tenha controle total do seu negócio com nossa plataforma moderna e intuitiva.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="{% url 'usuarios:register' %}" class="px-8 py-4 bg-red-600 rounded-lg text-xl font-semibold hover:bg-red-700 transition-colors">
+                        Começar Agora
+                    </a>
+                    <a href="#recursos" class="px-8 py-4 border border-white rounded-lg text-xl font-semibold hover:bg-white hover:text-gray-900 transition-colors">
+                        Ver Recursos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="recursos" class="py-20 bg-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Recursos Principais</h2>
+                <p class="text-xl text-gray-400">Tudo que você precisa para gerenciar seu cassino</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Dashboard -->
+                <div class="feature-card bg-gray-700 rounded-xl p-6 text-center">
+                    <div class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-chart-bar text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Dashboard Inteligente</h3>
+                    <p class="text-gray-400">Visualize estatísticas em tempo real, top performers e análises detalhadas do seu negócio.</p>
+                </div>
+
+                <!-- Gestão de Mesas -->
+                <div class="feature-card bg-gray-700 rounded-xl p-6 text-center">
+                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-table text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Gestão de Mesas</h3>
+                    <p class="text-gray-400">Controle completo das mesas de jogo, status, valores e fichas disponíveis.</p>
+                </div>
+
+                <!-- Sistema Financeiro -->
+                <div class="feature-card bg-gray-700 rounded-xl p-6 text-center">
+                    <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-dollar-sign text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Sistema Financeiro</h3>
+                    <p class="text-gray-400">Gerencie clientes, carteiras, saldos e transações com total segurança.</p>
+                </div>
+
+                <!-- Vendas de Fichas -->
+                <div class="feature-card bg-gray-700 rounded-xl p-6 text-center">
+                    <div class="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-coins text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Vendas de Fichas</h3>
+                    <p class="text-gray-400">Sistema completo de vendas, trocas e controle de estoque de fichas.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Screenshots Section -->
+    <section class="py-20 bg-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Interface Moderna</h2>
+                <p class="text-xl text-gray-400">Conheça nossa plataforma através das telas</p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-12">
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-semibold">Painel Principal</h3>
+                    <p class="text-gray-400 text-lg">
+                        Dashboard completo com métricas em tempo real, filtros avançados e visualização intuitiva de dados.
+                    </p>
+                    <ul class="space-y-3 text-gray-300">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            Métricas em tempo real
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            Filtros por período
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            Interface responsiva
+                        </li>
+                    </ul>
+                </div>
+                <div class="bg-gray-800 rounded-xl p-4">
+                    <img src="{% static 'images/screenshots/dashboard-screenshot.png' %}" alt="Dashboard Cass" class="w-full rounded-lg shadow-lg">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-12">
+                <div class="bg-gray-800 rounded-xl p-4 order-2 lg:order-1">
+                    <img src="{% static 'images/screenshots/financeiro-screenshot.png' %}" alt="Sistema Financeiro" class="w-full rounded-lg shadow-lg">
+                </div>
+                <div class="space-y-6 order-1 lg:order-2">
+                    <h3 class="text-2xl font-semibold">Sistema Financeiro</h3>
+                    <p class="text-gray-400 text-lg">
+                        Gestão completa de clientes, carteiras e transações financeiras com interface intuitiva.
+                    </p>
+                    <ul class="space-y-3 text-gray-300">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            Gestão de clientes
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            Controle de carteiras
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            Relatórios detalhados
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-12">
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-semibold">Gestão de Mesas</h3>
+                    <p class="text-gray-400 text-lg">
+                        Controle total das mesas de jogo com status em tempo real e gestão de fichas.
+                    </p>
+                    <ul class="space-y-3 text-gray-300">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            Status em tempo real
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            Controle de fichas
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            Histórico de operações
+                        </li>
+                    </ul>
+                </div>
+                <div class="bg-gray-800 rounded-xl p-4">
+                    <img src="{% static 'images/screenshots/mesas-screenshot.png' %}" alt="Gestão de Mesas" class="w-full rounded-lg shadow-lg">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="bg-gray-800 rounded-xl p-4 order-2 lg:order-1">
+                    <img src="{% static 'images/screenshots/login-screenshot.png' %}" alt="Tela de Login" class="w-full rounded-lg shadow-lg">
+                </div>
+                <div class="space-y-6 order-1 lg:order-2">
+                    <h3 class="text-2xl font-semibold">Segurança e Acesso</h3>
+                    <p class="text-gray-400 text-lg">
+                        Sistema de login seguro com controle de acesso e interface moderna.
+                    </p>
+                    <ul class="space-y-3 text-gray-300">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            Login seguro
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            Controle de acesso
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-400 mr-3"></i>
+                            Interface moderna
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="sobre" class="py-20 gradient-bg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Sobre o Sistema</h2>
+                <p class="text-xl text-gray-200">Desenvolvido para atender às necessidades específicas do mercado de cassinos</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shield-alt text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Segurança</h3>
+                    <p class="text-gray-200">Sistema seguro com controle de acesso e backup automático dos dados.</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-mobile-alt text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Responsivo</h3>
+                    <p class="text-gray-200">Interface adaptável para desktop, tablet e smartphone.</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-headset text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Suporte</h3>
+                    <p class="text-gray-200">Suporte técnico especializado e atualizações constantes.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contato" class="py-20 bg-gray-800">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Entre em Contato</h2>
+                <p class="text-xl text-gray-400">Solicite uma demonstração ou tire suas dúvidas</p>
+            </div>
+            
+            <div class="bg-gray-700 rounded-xl p-8">
+                <form id="contactForm" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Nome</label>
+                            <input type="text" name="nome" required class="w-full px-4 py-3 bg-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Email</label>
+                            <input type="email" name="email" required class="w-full px-4 py-3 bg-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Mensagem</label>
+                        <textarea name="mensagem" rows="4" required class="w-full px-4 py-3 bg-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none"></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="px-8 py-4 bg-red-600 rounded-lg text-lg font-semibold hover:bg-red-700 transition-colors">
+                            Enviar Mensagem
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center mr-2">
+                            <span class="text-white font-bold">C</span>
+                        </div>
+                        <span class="text-lg font-bold">Cass</span>
+                    </div>
+                    <p class="text-gray-400">Sistema completo de gestão para cassinos.</p>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Produto</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#recursos" class="hover:text-white">Recursos</a></li>
+                        <li><a href="#sobre" class="hover:text-white">Sobre</a></li>
+                        <li><a href="#contato" class="hover:text-white">Contato</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Suporte</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">Documentação</a></li>
+                        <li><a href="#" class="hover:text-white">FAQ</a></li>
+                        <li><a href="#" class="hover:text-white">Status</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Legal</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">Privacidade</a></li>
+                        <li><a href="#" class="hover:text-white">Termos</a></li>
+                        <li><a href="#" class="hover:text-white">Cookies</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 Cass Cassino. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Contact form
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {
+                nome: formData.get('nome'),
+                email: formData.get('email'),
+                mensagem: formData.get('mensagem')
+            };
+            
+            try {
+                const response = await fetch('{% url "divulgacao:enviar_contato" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(result.message);
+                    this.reset();
+                } else {
+                    alert('Erro ao enviar mensagem: ' + result.message);
+                }
+            } catch (error) {
+                alert('Erro ao enviar mensagem. Tente novamente.');
+            }
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 100) {
+                nav.classList.add('bg-gray-900', 'bg-opacity-95');
+            } else {
+                nav.classList.remove('bg-gray-900', 'bg-opacity-95');
+            }
+        });
+    </script>
+</body>
+</html> 

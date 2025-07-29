@@ -5,8 +5,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 def home(request):
-    from mesas.views import mesas_home
-    return mesas_home(request)
+    return render(request, 'home.html')
+
+def landing_page(request):
+    return render(request, 'divulgacao/landing.html')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -15,6 +17,8 @@ urlpatterns = [
     path('financeiro/', include('financeiro.urls')),
     path('sange/', include('sange.urls')),
     path('dashboard/', include('dashboard.urls')),
+    path('divulgacao/', include('divulgacao.urls')),
+    path('landing/', landing_page, name='landing_page'),
     path('', home, name='home'),
 ]
 
