@@ -17,11 +17,20 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
         .hero-bg {
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
                         url('{% static "images/estilo-de-vida-fotorrealista-cassino.jpg" %}');
             background-size: cover;
-            background-position: center;
+            background-position: center center;
+            background-repeat: no-repeat;
             background-attachment: fixed;
+            min-height: 100vh;
+            width: 100%;
+        }
+        @media (max-width: 768px) {
+            .hero-bg {
+                background-attachment: scroll;
+                background-position: center center;
+            }
         }
         .feature-card {
             transition: all 0.3s ease;
@@ -69,8 +78,8 @@
     </nav>
 
     <!-- Hero Section -->
-    <section id="inicio" class="hero-bg min-h-screen flex items-center justify-center">
-        <div class="text-center max-w-4xl mx-auto px-4">
+    <section id="inicio" class="hero-bg flex items-center justify-center relative">
+        <div class="text-center max-w-4xl mx-auto px-4 z-10">
             <div class="animate-fade-in">
                 <h1 class="text-5xl md:text-7xl font-bold mb-6">
                     <span class="text-red-400">Cass</span> Cassino
