@@ -1,6 +1,10 @@
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.conf import settings
+from django.contrib.auth import get_user
+import logging
+
+logger = logging.getLogger(__name__)
 
 class AuthenticationMiddleware:
     def __init__(self, get_response):
@@ -25,8 +29,16 @@ class AuthenticationMiddleware:
         # Check if current path is in public URLs
         is_public = any(current_path.startswith(url) for url in public_urls)
         
+        # Ensure user is properly loaded
+        if not hasattr(request, 'user') or request.user.is_anonymous:
+            request.user = get_user(request)
+        
+        # Debug logging
+        logger.info(f"Path: {current_path}, Is Public: {is_public}, Is Authenticated: {request.user.is_authenticated}, User: {request.user}")
+        
         # If not public and user is not authenticated, redirect to login
         if not is_public and not request.user.is_authenticated:
+            logger.info(f"Redirecting {current_path} to login")
             return redirect('usuarios:login')
         
         response = self.get_response(request)

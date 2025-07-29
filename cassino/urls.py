@@ -19,7 +19,7 @@ urlpatterns = [
     path('dashboard/', include('dashboard.urls')),
     path('divulgacao/', include('divulgacao.urls')),
     path('landing/', landing_page, name='landing_page'),
-    path('', home, name='home'),
+    path('home/', home, name='home'),
 ]
 
 if settings.DEBUG:

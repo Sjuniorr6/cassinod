@@ -146,4 +146,21 @@ AUTH_USER_MODEL = 'usuarios.Usuario'
 # Configurações de Login
 LOGIN_URL = '/usuarios/login/'
 LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/usuarios/login/' 
+LOGOUT_REDIRECT_URL = '/usuarios/login/'
+
+# Configuração de Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'cassino.middleware': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+    },
+} 
