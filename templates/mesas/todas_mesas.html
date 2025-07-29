@@ -352,7 +352,7 @@ function carregarMesas() {
     mesasContainer.style.display = 'none';
     errorMessage.style.display = 'none';
 
-    fetch('{% url "listar_mesas_api" %}')
+    fetch('{% url "mesas:listar_mesas_api" %}')
         .then(response => response.json())
         .then(data => {
             todasMesas = data.mesas || [];
