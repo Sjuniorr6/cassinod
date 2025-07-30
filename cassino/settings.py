@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-your-secret-key-here'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["www.casscontrol.com.br",'www.casscontrol.com.br','192.168.0.199',"192.168.100.102", "localhost", "3.85.168.7"]
+ALLOWED_HOSTS = ["www.casscontrol.com.br",'www.casscontrol.com.br','192.168.0.199',"192.168.100.106", "localhost", "3.85.168.7"]
 
 
 # Application definition
@@ -56,6 +56,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'cassino.middleware.AuthenticationMiddleware',
 ]
+
+# Configurações de CSRF
+CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_HTTPONLY = False
+CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://127.0.0.1:8000']
 
 ROOT_URLCONF = 'cassino.urls'
 

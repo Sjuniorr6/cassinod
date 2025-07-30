@@ -45,11 +45,18 @@
                         <span id="metricasText">Esconder Métricas</span>
                     </button>
                     
-                    <button id="btnCriarMesa" class="px-2 py-1 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white text-xs font-semibold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-1">
+                    <button id="btnCriarMesa" class="px-2 py-1 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white text-xs font-semibold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-1">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                         </svg>
-                        Criar Nova Mesa
+                        Abrir Mesa
+                    </button>
+                    
+                    <button id="btnRefresh" class="px-2 py-1 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white text-xs font-semibold rounded-md shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Atualizar
                     </button>
                 </div>
             </div>
@@ -139,7 +146,7 @@
 
             
             <!-- Cards de métricas -->
-            <div id="metricasContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div id="metricasContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                 <div class="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-red-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group">
                     <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     {% if filtro_ativo %}
@@ -153,18 +160,22 @@
                             </div>
                         </div>
                     {% endif %}
-                    <div class="text-2xl font-black text-red-600 mb-2" data-count="{{ receita_total|floatformat:0 }}">R$ 0</div>
-                    <div class="text-sm text-gray-600 font-semibold mb-2">
-                        {% if filtro_ativo %}
-                            {% if status_filtro %}
-                                Receita - {{ status_filtro|title }}
-                            {% else %}
-                                Receita do Período
-                            {% endif %}
-                        {% else %}
-                            Receita Total
-                        {% endif %}
-                    </div>
+                    <div class="text-2xl font-black text-red-600 mb-2" data-count="{{ receita_total|default:0|floatformat:0 }}">R$ {{ receita_total|default:0|floatformat:0 }}</div>
+                                   <div class="text-sm text-gray-600 font-semibold mb-2">
+                   {% if filtro_ativo %}
+                       {% if status_filtro and not data_inicio %}
+                           Receita - {{ status_filtro|title }}
+                       {% elif data_inicio and status_filtro %}
+                           Receita - {{ status_filtro|title }} (Período)
+                       {% elif data_inicio %}
+                           Receita do Período
+                       {% else %}
+                           Receita Total
+                       {% endif %}
+                   {% else %}
+                       Receita Total
+                   {% endif %}
+               </div>
                     <div class="text-xs font-medium text-gray-600 mb-1">{{ periodo_texto }}</div>
                     {% if filtro_ativo %}
                         <div class="text-xs font-medium text-blue-600 mb-1">
@@ -177,7 +188,7 @@
                         </div>
                     {% endif %}
                     <div class="text-xs font-medium {% if variacao_percentual >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
-                        {% if variacao_percentual >= 0 %}+{% endif %}{{ variacao_percentual|floatformat:1 }}% vs período anterior
+                        {% if variacao_percentual >= 0 %}+{% endif %}{{ variacao_percentual|default:0|floatformat:1 }}% vs período anterior
                     </div>
                     {% if filtro_ativo and mesas_periodo_count == 0 %}
                         <div class="text-xs font-medium text-orange-600 mt-2">
@@ -185,28 +196,31 @@
                         </div>
                     {% endif %}
                 </div>
+
                 <div class="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-red-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group">
                     <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div class="text-2xl font-black text-red-600 mb-2" data-count="10">0</div>
-                    <div class="text-sm text-gray-600 font-semibold mb-2">Jogadores Ativos</div>
-                    <div class="text-xs font-medium text-green-600">+3 na última hora</div>
-                </div>
-                <div class="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-red-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group">
-                    <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div class="text-2xl font-black text-red-600 mb-2" data-count="{{ mesas_ativas }}">0</div>
+                    <div class="text-2xl font-black text-red-600 mb-2" data-count="{{ mesas_ativas|default:0 }}">{{ mesas_ativas|default:0 }}</div>
                     <div class="text-sm text-gray-600 font-semibold mb-2">Mesas Ativas</div>
-                    <div class="text-xs font-medium text-red-600">de {{ total_mesas }} mesas no total</div>
+                    <div class="text-xs font-medium text-red-600">de {{ total_mesas|default:0 }} mesas no total</div>
+                    <div class="text-xs font-medium text-gray-600">Mesas abertas no momento</div>
                 </div>
                 <div class="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-red-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group">
                     <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div class="text-2xl font-black text-red-600 mb-2" data-count="{{ fichas_vendidas|floatformat:0 }}">R$ 0</div>
-                    <div class="text-sm text-gray-600 font-semibold mb-2">Fichas Vendidas</div>
-                    <div class="text-xs font-medium text-gray-600">Estoque restante: R$ {{ estoque_restante|floatformat:0 }}</div>
+                    <div class="text-2xl font-black text-red-600 mb-2" data-count="{{ fichas_vendidas|default:0|floatformat:0 }}">R$ {{ fichas_vendidas|default:0|floatformat:0 }}</div>
+                                   <div class="text-sm text-gray-600 font-semibold mb-2">Fichas Vendidas</div>
+               <div class="text-xs font-medium text-gray-600">
+                   {% if data_inicio %}
+                       Vendas do período filtrado
+                   {% else %}
+                       Total de vendas das sanges
+                   {% endif %}
+               </div>
+                    <div class="text-xs font-medium text-blue-600">Estoque: R$ {{ estoque_restante|default:0|floatformat:0 }}</div>
                 </div>
             </div>
 
             <!-- Mesas de Jogos -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-4" id="cards-container">
                 {% if mesas %}
                     {% for mesa in mesas %}
                     <div class="bg-white/95 backdrop-blur-xl rounded-lg p-4 shadow-xl border border-red-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group min-h-[70px]" 
@@ -296,11 +310,31 @@
                 {% else %}
                     <div class="col-span-full bg-white/95 backdrop-blur-xl rounded-2xl p-8 shadow-xl border border-red-500/10 text-center">
                         <div class="text-4xl mb-4">🎰</div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">Nenhuma Mesa Criada</h3>
-                        <p class="text-gray-600 mb-6">Não há mesas no sistema ainda.</p>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">
+                            {% if filtro_ativo %}
+                                Nenhuma Mesa Encontrada
+                            {% else %}
+                                Nenhuma Mesa Criada
+                            {% endif %}
+                        </h3>
+                        <p class="text-gray-600 mb-6">
+                            {% if filtro_ativo %}
+                                {% if status_filtro %}
+                                    Não há mesas com status "{{ status_filtro|title }}" no período selecionado.
+                                {% else %}
+                                    Não há mesas no período selecionado.
+                                {% endif %}
+                            {% else %}
+                                Não há mesas no sistema ainda.
+                            {% endif %}
+                        </p>
                         <button class="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300" 
                                 onclick="abrirModalCriarMesa()">
-                            Criar Primeira Mesa
+                            {% if filtro_ativo %}
+                                Criar Nova Mesa
+                            {% else %}
+                                Criar Primeira Mesa
+                            {% endif %}
                         </button>
                     </div>
                 {% endif %}
@@ -725,6 +759,22 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- URLs para JavaScript -->
+<script>
+    // URLs das APIs do sistema
+    window.API_URLS = {
+        fecharMesa: '{% url "mesas:fechar_mesa_api" 0 %}',
+        abrirMesa: '{% url "mesas:abrir_mesa_api" 0 %}',
+        encerrarMesa: '{% url "mesas:encerrar_mesa_api" 0 %}',
+        criarMesa: '{% url "mesas:criar_mesa_api" %}',
+        obterMesa: '{% url "mesas:obter_mesa_api" 0 %}',
+        editarMesa: '{% url "mesas:editar_mesa_api" 0 %}',
+        atualizarMetricas: '{% url "mesas:atualizar_metricas_api" %}',
+    };
+    
+    // Debug: Log das URLs
+    console.log('🔗 URLs das APIs:', window.API_URLS);
+</script>
 <!-- Importar JavaScript do home.js -->
 <script src="{% static 'js/home.js' %}"></script>
 {% endblock %} 

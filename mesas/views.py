@@ -34,18 +34,18 @@ def mesas_home(request):
     # Obter parâmetros de status do request
     status_filtro = request.GET.get('status', '')
     
-    # Se não foram fornecidas datas, usar o último mês como padrão
-    if not data_inicio or not data_fim:
-        data_fim = timezone.now().date()
-        data_inicio = data_fim - timedelta(days=30)
-    else:
+    # Converter datas apenas se foram fornecidas
+    data_inicio_parsed = None
+    data_fim_parsed = None
+    
+    if data_inicio and data_fim:
         try:
-            data_inicio = datetime.strptime(data_inicio, '%Y-%m-%d').date()
-            data_fim = datetime.strptime(data_fim, '%Y-%m-%d').date()
+            data_inicio_parsed = datetime.strptime(data_inicio, '%Y-%m-%d').date()
+            data_fim_parsed = datetime.strptime(data_fim, '%Y-%m-%d').date()
         except ValueError:
-            # Se as datas não são válidas, usar o último mês
-            data_fim = timezone.now().date()
-            data_inicio = data_fim - timedelta(days=30)
+            # Se as datas não são válidas, ignorar o filtro de data
+            data_inicio_parsed = None
+            data_fim_parsed = None
     
     # Filtrar mesas por status se especificado
     if status_filtro and status_filtro in ['aberta', 'fechada', 'encerrada']:
@@ -54,59 +54,87 @@ def mesas_home(request):
         # Filtrar apenas mesas que não estão encerradas (comportamento padrão)
         mesas = Mesa.objects.exclude(status='encerrada').order_by('numero_mesa')
     
-    # Calcular estatísticas gerais (sempre mostradas)
-    mesas_ativas = Mesa.objects.filter(status='aberta').count()
+    # Calcular estatísticas gerais
+    mesas_ativas = Mesa.objects.filter(status='aberta').count()  # Mesas abertas no momento
     total_mesas = Mesa.objects.exclude(status='encerrada').count()
     
-    # Calcular receita total do período selecionado
-    # Filtrar mesas pelo período de data_criacao
-    mesas_periodo_query = Mesa.objects.filter(data_criacao__date__gte=data_inicio, data_criacao__date__lte=data_fim)
-
-    # Filtrar por status se necessário
+    # Calcular receita total - soma do saldo das mesas no período filtrado ou com status filtrado
     if status_filtro and status_filtro in ['aberta', 'fechada', 'encerrada']:
-        mesas_periodo_query = mesas_periodo_query.filter(status=status_filtro)
-    # Se status_filtro for vazio ou 'todas', não filtra por status (pega todos)
-
-    mesas_periodo = mesas_periodo_query
-
-    receita_total = mesas_periodo.aggregate(
+        # Filtrar por status específico
+        mesas_filtradas = Mesa.objects.filter(status=status_filtro)
+    else:
+        # Filtrar apenas mesas que não estão encerradas (comportamento padrão)
+        mesas_filtradas = Mesa.objects.exclude(status='encerrada')
+    
+    # Se há filtro de data válido, aplicar também
+    if data_inicio_parsed and data_fim_parsed:
+        mesas_filtradas = mesas_filtradas.filter(
+            data_criacao__date__gte=data_inicio_parsed,
+            data_criacao__date__lte=data_fim_parsed
+        )
+    
+    # Calcular receita total como soma dos saldos das mesas filtradas
+    receita_total = mesas_filtradas.aggregate(
         total=models.Sum('saldo')
     )['total'] or 0
-
-    # Se não há mesas no período, mostrar 0
-    if not mesas_periodo.exists():
-        receita_total = 0
     
-    # Calcular total de fichas vendidas do SANGE (soma de todas as vendas de fichas)
-    fichas_vendidas = VendaFicha.objects.aggregate(
-        total=models.Sum('valor_total')
-    )['total'] or 0
+    # Calcular total de fichas vendidas do SANGE no período filtrado
+    try:
+        from sange.models import VendaFicha
+        if data_inicio_parsed and data_fim_parsed:
+            # Filtrar vendas por período
+            fichas_vendidas = VendaFicha.objects.filter(
+                data__date__gte=data_inicio_parsed,
+                data__date__lte=data_fim_parsed
+            ).aggregate(
+                total=models.Sum('valor_total')
+            )['total'] or 0
+        else:
+            # Todas as vendas se não há filtro de data
+            fichas_vendidas = VendaFicha.objects.aggregate(
+                total=models.Sum('valor_total')
+            )['total'] or 0
+    except:
+        fichas_vendidas = 0
     
     # Estoque restante (valor total atual de todos os caixas abertos do sange)
-    from sange.models import CaixaSange
-    estoque_restante = CaixaSange.objects.filter(data_fechamento__isnull=True).aggregate(
-        total=models.Sum('valor_total_atual')
-    )['total'] or 0
+    try:
+        from sange.models import CaixaSange
+        estoque_restante = CaixaSange.objects.filter(data_fechamento__isnull=True).aggregate(
+            total=models.Sum('valor_total_atual')
+        )['total'] or 0
+    except:
+        estoque_restante = 0
     
-    # Calcular variação percentual (comparar com período anterior)
-    periodo_anterior_inicio = data_inicio - timedelta(days=(data_fim - data_inicio).days)
-    periodo_anterior_fim = data_inicio - timedelta(days=1)
+    # Calcular variação percentual (simplificado - sempre 0 por enquanto)
+    variacao_percentual = 0
     
-    # Calcular receita do período anterior com a mesma lógica do período atual
-    if status_filtro and status_filtro in ['aberta', 'fechada', 'encerrada']:
-        mesas_periodo_anterior_query = Mesa.objects.filter(status=status_filtro)
+    # Determinar se há filtros ativos
+    filtro_ativo = bool((status_filtro and status_filtro in ['aberta', 'fechada', 'encerrada']) or (data_inicio_parsed and data_fim_parsed))
+    
+    # Gerar texto do período
+    if data_inicio_parsed and data_fim_parsed:
+        if status_filtro and status_filtro in ['aberta', 'fechada', 'encerrada']:
+            periodo_texto = f"Período: {data_inicio_parsed.strftime('%d/%m/%Y')} a {data_fim_parsed.strftime('%d/%m/%Y')} - Status: {status_filtro.title()}"
+        else:
+            periodo_texto = f"Período: {data_inicio_parsed.strftime('%d/%m/%Y')} a {data_fim_parsed.strftime('%d/%m/%Y')}"
+    elif status_filtro and status_filtro in ['aberta', 'fechada', 'encerrada']:
+        periodo_texto = f"Filtro: {status_filtro.title()}"
     else:
-        mesas_periodo_anterior_query = Mesa.objects.exclude(status='encerrada')
+        periodo_texto = "Todas as mesas ativas"
     
-    mesas_periodo_anterior = mesas_periodo_anterior_query.aggregate(
-        total=models.Sum('saldo')
-    )['total'] or 0
+    # Contar mesas filtradas
+    mesas_periodo_count = mesas_filtradas.count()
     
-    # Calcular variação percentual
-    if mesas_periodo_anterior > 0:
-        variacao_percentual = ((receita_total - mesas_periodo_anterior) / mesas_periodo_anterior) * 100
-    else:
-        variacao_percentual = 0 if receita_total == 0 else 100
+    # Garantir que todos os valores são números válidos
+    receita_total = float(receita_total) if receita_total is not None else 0.0
+    fichas_vendidas = float(fichas_vendidas) if fichas_vendidas is not None else 0.0
+    estoque_restante = float(estoque_restante) if estoque_restante is not None else 0.0
+    variacao_percentual = float(variacao_percentual) if variacao_percentual is not None else 0.0
+    mesas_ativas = int(mesas_ativas) if mesas_ativas is not None else 0
+    total_mesas = int(total_mesas) if total_mesas is not None else 0
+    
+
     
     context = {
         'mesas': mesas,
@@ -119,6 +147,9 @@ def mesas_home(request):
         'data_inicio': data_inicio,
         'data_fim': data_fim,
         'status_filtro': status_filtro,
+        'filtro_ativo': filtro_ativo,
+        'periodo_texto': periodo_texto,
+        'mesas_periodo_count': mesas_periodo_count,
     }
     
     return render(request, 'home.html', context)
@@ -242,7 +273,6 @@ def criar_mesa_api(request):
                 numero_mesa=numero_mesa,
                 tipo_jogo=data.get('tipo_jogo'),
                 status=data.get('status', 'aberta'),
-                valor_inicial=data.get('valor_inicial', 0),
                 fichas_5=safe_int(data.get('fichas_5'), 0),
                 fichas_25=safe_int(data.get('fichas_25'), 0),
                 fichas_100=safe_int(data.get('fichas_100'), 0),
@@ -254,6 +284,7 @@ def criar_mesa_api(request):
             
             print(f"DEBUG - Mesa criada com ID: {mesa.id}")
             print(f"DEBUG - Fichas salvas - 5: {mesa.fichas_5}, 25: {mesa.fichas_25}, 100: {mesa.fichas_100}")
+            print(f"DEBUG - Valor total: {mesa.valor_total}, Valor inicial: {mesa.valor_inicial}, Saldo: {mesa.saldo}")
             
             return JsonResponse({
                 'success': True,
@@ -289,6 +320,7 @@ def criar_mesa_api(request):
             }, status=400)
     return JsonResponse({'success': False, 'message': 'Método não permitido'}, status=405)
 
+@login_required(login_url='/usuarios/login/')
 def listar_mesas_api(request):
     mesas = Mesa.objects.all()
     data = []
@@ -305,9 +337,18 @@ def listar_mesas_api(request):
         })
     return JsonResponse({'mesas': data})
 
+@csrf_exempt
+@login_required(login_url='/usuarios/login/')
 def obter_mesa_api(request, mesa_id):
+    print(f"DEBUG - obter_mesa_api chamada para mesa_id: {mesa_id}")
+    print(f"DEBUG - Usuário autenticado: {request.user.is_authenticated}")
+    print(f"DEBUG - Método da requisição: {request.method}")
+    print(f"DEBUG - Path da requisição: {request.path}")
+    print(f"DEBUG - Headers da requisição: {dict(request.headers)}")
+    
     try:
         mesa = Mesa.objects.get(id=mesa_id)
+        print(f"DEBUG - Mesa encontrada: {mesa.numero_mesa}")
         data = {
             'success': True,
             'mesa': {
@@ -331,10 +372,16 @@ def obter_mesa_api(request, mesa_id):
                 'data_atualizacao': mesa.data_atualizacao.strftime('%d/%m/%Y %H:%M'),
             }
         }
+        print(f"DEBUG - Retornando dados da mesa: {data}")
         return JsonResponse(data)
     except Mesa.DoesNotExist:
+        print(f"DEBUG - Mesa {mesa_id} não encontrada")
         return JsonResponse({'success': False, 'message': 'Mesa não encontrada'}, status=404)
+    except Exception as e:
+        print(f"DEBUG - Erro inesperado na obter_mesa_api: {str(e)}")
+        return JsonResponse({'success': False, 'message': f'Erro interno: {str(e)}'}, status=500)
 
+@login_required(login_url='/usuarios/login/')
 def modelo_info_api(request):
     model_info = {
         'fields': {
@@ -725,60 +772,75 @@ def atualizar_metricas_api(request):
         data_fim = request.GET.get('data_fim')
         status_filtro = request.GET.get('status', '')
         
-        # Se não foram fornecidas datas, usar o último mês como padrão
-        if not data_inicio or not data_fim:
-            data_fim = timezone.now().date()
-            data_inicio = data_fim - timedelta(days=30)
-        else:
+        # Converter datas apenas se foram fornecidas
+        data_inicio_parsed = None
+        data_fim_parsed = None
+        
+        if data_inicio and data_fim:
             try:
-                data_inicio = datetime.strptime(data_inicio, '%Y-%m-%d').date()
-                data_fim = datetime.strptime(data_fim, '%Y-%m-%d').date()
+                data_inicio_parsed = datetime.strptime(data_inicio, '%Y-%m-%d').date()
+                data_fim_parsed = datetime.strptime(data_fim, '%Y-%m-%d').date()
             except ValueError:
-                data_fim = timezone.now().date()
-                data_inicio = data_fim - timedelta(days=30)
+                # Se as datas não são válidas, ignorar o filtro de data
+                data_inicio_parsed = None
+                data_fim_parsed = None
         
         # Calcular métricas atualizadas
-        mesas_ativas = Mesa.objects.filter(status='aberta').count()
+        mesas_ativas = Mesa.objects.filter(status='aberta').count()  # Mesas abertas no momento
         total_mesas = Mesa.objects.exclude(status='encerrada').count()
         
-        # Calcular receita total do período selecionado
-        mesas_periodo_query = Mesa.objects.filter(data_criacao__date__gte=data_inicio, data_criacao__date__lte=data_fim)
-        
+        # Calcular receita total - soma do saldo das mesas no período filtrado ou com status filtrado
         if status_filtro and status_filtro in ['aberta', 'fechada', 'encerrada']:
-            mesas_periodo_query = mesas_periodo_query.filter(status=status_filtro)
+            # Filtrar por status específico
+            mesas_filtradas = Mesa.objects.filter(status=status_filtro)
+        else:
+            # Filtrar apenas mesas que não estão encerradas (comportamento padrão)
+            mesas_filtradas = Mesa.objects.exclude(status='encerrada')
         
-        receita_total = mesas_periodo_query.aggregate(
+        # Se há filtro de data válido, aplicar também
+        if data_inicio_parsed and data_fim_parsed:
+            mesas_filtradas = mesas_filtradas.filter(
+                data_criacao__date__gte=data_inicio_parsed,
+                data_criacao__date__lte=data_fim_parsed
+            )
+        
+        # Calcular receita total como soma dos saldos das mesas filtradas
+        receita_total = mesas_filtradas.aggregate(
             total=models.Sum('saldo')
         )['total'] or 0
         
-        # Calcular total de fichas vendidas do SANGE
-        fichas_vendidas = VendaFicha.objects.aggregate(
-            total=models.Sum('valor_total')
-        )['total'] or 0
+
+        
+        # Calcular total de fichas vendidas do SANGE no período filtrado
+        try:
+            from sange.models import VendaFicha
+            if data_inicio_parsed and data_fim_parsed:
+                # Filtrar vendas por período
+                fichas_vendidas = VendaFicha.objects.filter(
+                    data__date__gte=data_inicio_parsed,
+                    data__date__lte=data_fim_parsed
+                ).aggregate(
+                    total=models.Sum('valor_total')
+                )['total'] or 0
+            else:
+                # Todas as vendas se não há filtro de data
+                fichas_vendidas = VendaFicha.objects.aggregate(
+                    total=models.Sum('valor_total')
+                )['total'] or 0
+        except:
+            fichas_vendidas = 0
         
         # Estoque restante (valor total atual de todos os caixas abertos do sange)
-        estoque_restante = CaixaSange.objects.filter(data_fechamento__isnull=True).aggregate(
-            total=models.Sum('valor_total_atual')
-        )['total'] or 0
+        try:
+            from sange.models import CaixaSange
+            estoque_restante = CaixaSange.objects.filter(data_fechamento__isnull=True).aggregate(
+                total=models.Sum('valor_total_atual')
+            )['total'] or 0
+        except:
+            estoque_restante = 0
         
-        # Calcular variação percentual
-        periodo_anterior_inicio = data_inicio - timedelta(days=(data_fim - data_inicio).days)
-        periodo_anterior_fim = data_inicio - timedelta(days=1)
-        
-        if status_filtro and status_filtro in ['aberta', 'fechada', 'encerrada']:
-            mesas_periodo_anterior_query = Mesa.objects.filter(status=status_filtro)
-        else:
-            mesas_periodo_anterior_query = Mesa.objects.exclude(status='encerrada')
-        
-        mesas_periodo_anterior = mesas_periodo_anterior_query.aggregate(
-            total=models.Sum('saldo')
-        )['total'] or 0
-        
-        # Calcular variação percentual
-        if mesas_periodo_anterior != 0:
-            variacao_percentual = ((receita_total - mesas_periodo_anterior) / abs(mesas_periodo_anterior)) * 100
-        else:
-            variacao_percentual = 0 if receita_total == 0 else 100
+        # Calcular variação percentual (simplificado - sempre 0 por enquanto)
+        variacao_percentual = 0
         
         # Obter todas as mesas com saldos atualizados
         if status_filtro and status_filtro in ['aberta', 'fechada', 'encerrada']:
@@ -808,15 +870,23 @@ def atualizar_metricas_api(request):
                 'fichas_10000': mesa.fichas_10000 or 0,
             })
         
+        # Garantir que todos os valores são números válidos
+        receita_total = float(receita_total) if receita_total is not None else 0.0
+        fichas_vendidas = float(fichas_vendidas) if fichas_vendidas is not None else 0.0
+        estoque_restante = float(estoque_restante) if estoque_restante is not None else 0.0
+        variacao_percentual = float(variacao_percentual) if variacao_percentual is not None else 0.0
+        mesas_ativas = int(mesas_ativas) if mesas_ativas is not None else 0
+        total_mesas = int(total_mesas) if total_mesas is not None else 0
+        
         return JsonResponse({
             'success': True,
             'metricas': {
-                'receita_total': float(receita_total),
+                'receita_total': receita_total,
                 'mesas_ativas': mesas_ativas,
                 'total_mesas': total_mesas,
-                'fichas_vendidas': float(fichas_vendidas),
-                'estoque_restante': float(estoque_restante),
-                'variacao_percentual': float(variacao_percentual)
+                'fichas_vendidas': fichas_vendidas,
+                'estoque_restante': estoque_restante,
+                'variacao_percentual': variacao_percentual
             },
             'mesas': mesas_data
         })

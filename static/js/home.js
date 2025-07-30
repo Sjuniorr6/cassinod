@@ -41,8 +41,8 @@
         });
     }, { threshold: 0.3 });
 
-    // Observar cards de métricas (agora usando classes Tailwind)
-    const metricCards = document.querySelectorAll('.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4 > div');
+    // Observar cards de métricas (corrigido para usar o seletor correto)
+    const metricCards = document.querySelectorAll('#metricasContainer > div');
     metricCards.forEach(card => {
         observer.observe(card);
     });
@@ -61,7 +61,7 @@
                 const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
                 console.log('🔑 CSRF Token:', csrfToken ? 'Presente' : 'Ausente');
                 
-                fetch(`/mesas/api/mesa/${mesaId}/fechar/`, {
+                fetch(window.API_URLS.fecharMesa.replace('0', mesaId), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -114,7 +114,7 @@
                 const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
                 console.log('🔑 CSRF Token:', csrfToken ? 'Presente' : 'Ausente');
                 
-                fetch(`/mesas/api/mesa/${mesaId}/abrir/`, {
+                fetch(window.API_URLS.abrirMesa.replace('0', mesaId), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -167,7 +167,7 @@
                 const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
                 console.log('🔑 CSRF Token:', csrfToken ? 'Presente' : 'Ausente');
                 
-                fetch(`/mesas/api/mesa/${mesaId}/encerrar/`, {
+                fetch(window.API_URLS.encerrarMesa.replace('0', mesaId), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -288,8 +288,6 @@
         
         const formData = new FormData(formCriarMesa);
         
-
-        
         const data = {
             numero_mesa: parseInt(formData.get('numero_mesa')),
             tipo_jogo: formData.get('tipo_jogo'),
@@ -303,8 +301,6 @@
             fichas_10000: parseInt(formData.get('fichas_10000') || '0')
         };
         
-
-
         // Validação
         if (!data.numero_mesa || data.numero_mesa < 1) {
             showErrorModal('Por favor, insira um número de mesa válido.');
@@ -328,7 +324,7 @@
         console.log('📤 Enviando dados para criar mesa:', data);
 
         try {
-            const response = await fetch('/mesas/criar/', {
+            const response = await fetch(window.API_URLS.criarMesa, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -343,26 +339,30 @@
                 // Fechar modal primeiro
                 fecharModalCriarMesa();
                 
-                // Criar novo card na interface se os dados da mesa foram retornados
-                if (result.mesa_criada) {
-                    // Aguardar um pouco para o modal fechar completamente
+                // Mostrar modal de sucesso
+                showSuccessModal(result.message);
+                
+                // Aguardar um pouco e então aplicar filtros para mostrar a nova mesa
+                setTimeout(() => {
+                    // Verificar se há filtros ativos
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const hasFilters = urlParams.has('data_inicio') || urlParams.has('data_fim') || urlParams.has('status');
+                    
+                    if (hasFilters) {
+                        // Se há filtros, aplicar filtros dinamicamente
+                        filtrarMesasDinamicamente();
+                    } else {
+                        // Se não há filtros, apenas criar o card da nova mesa
+                        if (result.mesa_criada) {
+                            criarNovoCardMesa(result.mesa_criada);
+                        }
+                    }
+                    
+                    // Atualizar métricas e saldos dinamicamente
                     setTimeout(() => {
-                        criarNovoCardMesa(result.mesa_criada);
-                        
-                        // Mostrar modal de sucesso após criar o card
-                        showSuccessModal(result.message);
-                        
-                        // Atualizar métricas e saldos dinamicamente
-                        setTimeout(() => {
-                            atualizarMetricasESaldos();
-                        }, 1000);
-                    }, 400);
-                } else {
-                    // Recarregar a página se não temos os dados da mesa
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
-                }
+                        atualizarMetricasESaldos();
+                    }, 1000);
+                }, 400);
             } else {
                 showErrorModal('Erro: ' + result.message);
             }
@@ -382,9 +382,24 @@
     function editarMesa(mesaId) {
         console.log('🔧 Iniciando edição da mesa:', mesaId);
         
-        fetch(`/mesas/api/mesa/${mesaId}/obter/`)
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const url = window.API_URLS.obterMesa.replace('0', mesaId);
+        console.log('🔗 URL da API:', url);
+        
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
             .then(response => {
-                console.log('📥 Resposta da API:', response.status);
+                console.log('📥 Resposta da API:', response.status, response.statusText);
+                
+                // Verificar se a resposta é JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('Resposta não é JSON válido. Status: ' + response.status);
+                }
+                
                 return response.json();
             })
             .then(result => {
@@ -463,7 +478,17 @@
             })
             .catch(error => {
                 console.error('❌ Erro ao buscar dados da mesa:', error);
-                showErrorModal('Erro ao buscar dados da mesa: ' + error.message);
+                
+                // Verificar se é erro de autenticação
+                if (error.message.includes('Status: 302') || error.message.includes('Status: 403')) {
+                    showErrorModal('Sessão expirada. Por favor, faça login novamente.');
+                    // Redirecionar para login após 2 segundos
+                    setTimeout(() => {
+                        window.location.href = '/usuarios/login/';
+                    }, 2000);
+                } else {
+                    showErrorModal('Erro ao buscar dados da mesa: ' + error.message);
+                }
             });
     }
 
@@ -574,7 +599,7 @@
         console.log('🔄 Criando novo card para mesa:', mesaData);
         
         // Encontrar o container de mesas
-        const mesasContainer = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-3.xl\\:grid-cols-4.2xl\\:grid-cols-6');
+        const mesasContainer = document.getElementById('cards-container');
         if (!mesasContainer) {
             console.error('❌ Container de mesas não encontrado');
             return;
@@ -647,11 +672,11 @@
         }
         
         // Determinar texto de tempo
-        let timeText = '3 horas atrás';
+        let timeText = 'Agora mesmo';
         if (mesaData.status === 'aberta') {
-            timeText = '5 minutos atrás';
+            timeText = 'Agora mesmo';
         } else if (mesaData.status === 'fechada') {
-            timeText = '1 hora atrás';
+            timeText = 'Agora mesmo';
         }
         
         // Criar o HTML do card
@@ -862,6 +887,15 @@
     function atualizarMetricasESaldos() {
         console.log('🔄 Iniciando atualização de métricas e saldos...');
         
+        // Verificar se o container existe
+        const metricasContainer = document.getElementById('metricasContainer');
+        if (!metricasContainer) {
+            console.error('❌ Container de métricas não encontrado!');
+            return;
+        }
+        
+        console.log('✅ Container de métricas encontrado');
+        
         // Obter parâmetros de filtro atuais
         const urlParams = new URLSearchParams(window.location.search);
         const dataInicio = urlParams.get('data_inicio') || '';
@@ -881,13 +915,29 @@
         
         console.log('📡 Fazendo requisição para:', apiUrl);
         
-        fetch(apiUrl)
+        // Obter token CSRF
+        const csrfElement = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (!csrfElement) {
+            console.error('❌ CSRF token não encontrado!');
+            return;
+        }
+        const csrfToken = csrfElement.value;
+        console.log('🔑 CSRF Token:', csrfToken ? 'Presente' : 'Ausente');
+        
+        fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/json',
+            },
+        })
             .then(response => {
                 console.log('📥 Resposta recebida:', response.status);
                 return response.json();
             })
             .then(data => {
                 console.log('📊 Dados recebidos:', data);
+                console.log('💰 Receita Total recebida:', data.metricas.receita_total);
                 if (!data.success) {
                     console.log('❌ Dados não foram bem-sucedidos');
                     return;
@@ -897,51 +947,47 @@
                 const metricas = data.metricas;
                 
                 // Atualizar receita total
-                const receitaElements = document.querySelectorAll('[data-count]');
-                receitaElements.forEach(element => {
-                    const parentCard = element.closest('.bg-white');
-                    if (parentCard) {
-                        const titleElement = parentCard.querySelector('.text-sm.text-gray-600.font-semibold');
-                        if (titleElement && titleElement.textContent.includes('Receita')) {
-                            element.textContent = `R$ ${parseFloat(metricas.receita_total).toLocaleString()}`;
-                            element.setAttribute('data-count', parseFloat(metricas.receita_total).toFixed(0));
-                        }
-                    }
-                });
+                const receitaElement = document.querySelector('#metricasContainer > div:nth-child(1) [data-count]');
+                console.log('🔍 Elemento receita encontrado:', !!receitaElement);
+                if (receitaElement) {
+                    const oldValue = receitaElement.textContent;
+                    const newValue = `R$ ${parseFloat(metricas.receita_total).toLocaleString()}`;
+                    console.log('🔄 Atualizando Receita Total:', oldValue, '→', newValue);
+                    receitaElement.textContent = newValue;
+                    receitaElement.setAttribute('data-count', parseFloat(metricas.receita_total).toFixed(0));
+                } else {
+                    console.error('❌ Elemento de receita não encontrado');
+                }
                 
                 // Atualizar mesas ativas
-                receitaElements.forEach(element => {
-                    const parentCard = element.closest('.bg-white');
-                    if (parentCard) {
-                        const titleElement = parentCard.querySelector('.text-sm.text-gray-600.font-semibold');
-                        if (titleElement && titleElement.textContent.includes('Mesas Ativas')) {
-                            element.textContent = metricas.mesas_ativas;
-                            element.setAttribute('data-count', metricas.mesas_ativas);
-                        }
-                    }
-                });
+                const mesasAtivasElement = document.querySelector('#metricasContainer > div:nth-child(2) [data-count]');
+                console.log('🔍 Elemento mesas ativas encontrado:', !!mesasAtivasElement);
+                if (mesasAtivasElement) {
+                    mesasAtivasElement.textContent = metricas.mesas_ativas;
+                    mesasAtivasElement.setAttribute('data-count', metricas.mesas_ativas);
+                } else {
+                    console.error('❌ Elemento de mesas ativas não encontrado');
+                }
                 
                 // Atualizar fichas vendidas
-                receitaElements.forEach(element => {
-                    const parentCard = element.closest('.bg-white');
-                    if (parentCard) {
-                        const titleElement = parentCard.querySelector('.text-sm.text-gray-600.font-semibold');
-                        if (titleElement && titleElement.textContent.includes('Fichas Vendidas')) {
-                            element.textContent = `R$ ${parseFloat(metricas.fichas_vendidas).toLocaleString()}`;
-                            element.setAttribute('data-count', parseFloat(metricas.fichas_vendidas).toFixed(0));
-                        }
-                    }
-                });
+                const fichasVendidasElement = document.querySelector('#metricasContainer > div:nth-child(3) [data-count]');
+                console.log('🔍 Elemento fichas vendidas encontrado:', !!fichasVendidasElement);
+                if (fichasVendidasElement) {
+                    fichasVendidasElement.textContent = `R$ ${parseFloat(metricas.fichas_vendidas).toLocaleString()}`;
+                    fichasVendidasElement.setAttribute('data-count', parseFloat(metricas.fichas_vendidas).toFixed(0));
+                } else {
+                    console.error('❌ Elemento de fichas vendidas não encontrado');
+                }
                 
                 // Atualizar estoque restante
-                const estoqueElement = document.querySelector('.text-xs.font-medium.text-gray-600');
-                if (estoqueElement && estoqueElement.textContent.includes('Estoque restante')) {
-                    estoqueElement.textContent = `Estoque restante: R$ ${parseFloat(metricas.estoque_restante).toLocaleString()}`;
+                const estoqueElement = document.querySelector('#metricasContainer > div:nth-child(3) .text-xs.font-medium.text-blue-600');
+                if (estoqueElement) {
+                    estoqueElement.textContent = `Estoque: R$ ${parseFloat(metricas.estoque_restante).toLocaleString()}`;
                 }
                 
                 // Atualizar variação percentual
-                const variacaoElement = document.querySelector('.text-xs.font-medium');
-                if (variacaoElement && variacaoElement.textContent.includes('% vs período anterior')) {
+                const variacaoElement = document.querySelector('#metricasContainer > div:nth-child(1) .text-xs.font-medium');
+                if (variacaoElement) {
                     const variacao = parseFloat(metricas.variacao_percentual);
                     variacaoElement.textContent = `${variacao >= 0 ? '+' : ''}${variacao.toFixed(1)}% vs período anterior`;
                     variacaoElement.className = `text-xs font-medium ${variacao >= 0 ? 'text-green-600' : 'text-red-600'}`;
@@ -1010,6 +1056,87 @@
             });
     }
 
+    // Função para filtrar mesas dinamicamente
+    function filtrarMesasDinamicamente() {
+        console.log('🔄 Filtrando mesas dinamicamente...');
+        
+        // Obter parâmetros de filtro atuais
+        const urlParams = new URLSearchParams(window.location.search);
+        const dataInicio = urlParams.get('data_inicio') || '';
+        const dataFim = urlParams.get('data_fim') || '';
+        const statusFiltro = urlParams.get('status') || '';
+        
+        // Construir URL da API com parâmetros
+        let apiUrl = '/mesas/api/atualizar-metricas/';
+        const params = new URLSearchParams();
+        if (dataInicio) params.append('data_inicio', dataInicio);
+        if (dataFim) params.append('data_fim', dataFim);
+        if (statusFiltro) params.append('status', statusFiltro);
+        
+        if (params.toString()) {
+            apiUrl += '?' + params.toString();
+        }
+        
+        console.log('📡 Fazendo requisição para filtrar mesas:', apiUrl);
+        console.log('🔍 Parâmetros de filtro:', { dataInicio, dataFim, statusFiltro });
+        
+        // Obter token CSRF
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        console.log('🔑 CSRF Token (filtro):', csrfToken ? 'Presente' : 'Ausente');
+        
+        fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    console.log('❌ Dados não foram bem-sucedidos');
+                    return;
+                }
+                
+                // Atualizar container de mesas
+                const mesasContainer = document.getElementById('cards-container');
+                if (!mesasContainer) {
+                    console.error('❌ Container de mesas não encontrado');
+                    return;
+                }
+                
+                // Limpar container
+                mesasContainer.innerHTML = '';
+                
+                // Adicionar mesas filtradas
+                if (data.mesas && data.mesas.length > 0) {
+                    data.mesas.forEach(mesa => {
+                        criarNovoCardMesa(mesa);
+                    });
+                } else {
+                    // Mostrar mensagem de nenhuma mesa encontrada
+                    const noMesasHTML = `
+                        <div class="col-span-full bg-white/95 backdrop-blur-xl rounded-2xl p-8 shadow-xl border border-red-500/10 text-center">
+                            <div class="text-4xl mb-4">🎰</div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Nenhuma Mesa Encontrada</h3>
+                            <p class="text-gray-600 mb-6">
+                                ${statusFiltro ? `Não há mesas com status "${statusFiltro}"` : 'Não há mesas no período selecionado'}.
+                            </p>
+                            <button class="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300" 
+                                    onclick="abrirModalCriarMesa()">
+                                Criar Nova Mesa
+                            </button>
+                        </div>
+                    `;
+                    mesasContainer.innerHTML = noMesasHTML;
+                }
+                
+                console.log('✅ Filtro aplicado com sucesso');
+            })
+            .catch(error => {
+                console.log('❌ Erro ao filtrar mesas:', error);
+            });
+    }
 
 
     // Toggle Filtro e Métricas
@@ -1144,8 +1271,16 @@
             url.searchParams.delete('status');
         }
         
-        // Redirecionar com os filtros
-        window.location.href = url.toString();
+        // Atualizar URL sem recarregar a página
+        window.history.pushState({}, '', url.toString());
+        
+        // Aplicar filtros dinamicamente
+        filtrarMesasDinamicamente();
+        
+        // Atualizar métricas
+        setTimeout(() => {
+            atualizarMetricasESaldos();
+        }, 500);
     });
 
     // Limpar filtro
@@ -1153,8 +1288,24 @@
         // Limpar o input de status
         statusFiltroInput.value = '';
         
-        // Redirecionar para a página sem parâmetros
-        window.location.href = window.location.pathname;
+        // Limpar inputs de data
+        dataInicio.value = '';
+        dataFim.value = '';
+        
+        // Atualizar URL para remover parâmetros
+        const url = new URL(window.location);
+        url.searchParams.delete('data_inicio');
+        url.searchParams.delete('data_fim');
+        url.searchParams.delete('status');
+        window.history.pushState({}, '', url.toString());
+        
+        // Aplicar filtros dinamicamente (sem filtros)
+        filtrarMesasDinamicamente();
+        
+        // Atualizar métricas
+        setTimeout(() => {
+            atualizarMetricasESaldos();
+        }, 500);
     });
 
     // Atualizar data fim quando data início mudar
@@ -1196,8 +1347,22 @@
                 button.classList.add('bg-gradient-to-r', 'from-red-600', 'to-red-500', 'text-white', 'shadow-lg');
             }
             
-            // Submeter o formulário automaticamente
-            filtroDatas.submit();
+            // Atualizar URL com o novo status
+            const url = new URL(window.location);
+            if (status) {
+                url.searchParams.set('status', status);
+            } else {
+                url.searchParams.delete('status');
+            }
+            window.history.pushState({}, '', url.toString());
+            
+            // Aplicar filtros dinamicamente
+            filtrarMesasDinamicamente();
+            
+            // Atualizar métricas
+            setTimeout(() => {
+                atualizarMetricasESaldos();
+            }, 500);
         });
     });
 
@@ -1395,16 +1560,54 @@
 
     // Atualizar métricas e saldos quando a página carrega
     document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 DOM carregado, iniciando atualização de métricas...');
+        
+        // Verificar se os elementos existem
+        const metricasContainer = document.getElementById('metricasContainer');
+        console.log('🔍 Container de métricas encontrado:', !!metricasContainer);
+        
+        if (metricasContainer) {
+            const cards = metricasContainer.querySelectorAll('div');
+            console.log('🔍 Número de cards de métricas encontrados:', cards.length);
+        }
+        
         // Aguardar um pouco para garantir que todos os elementos estão carregados
         setTimeout(() => {
+            console.log('⏰ Executando atualização de métricas após delay...');
             atualizarMetricasESaldos();
         }, 1000);
+        
+        // Botão de refresh para atualizar métricas e saldos
+        const refreshBtn = document.getElementById('btnRefresh');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                // Mostrar indicador de carregamento
+                refreshBtn.innerHTML = `
+                    <svg class="w-3 h-3 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    Atualizando...
+                `;
+                refreshBtn.disabled = true;
+                
+                // Aplicar filtros dinamicamente
+                filtrarMesasDinamicamente();
+                
+                // Atualizar métricas
+                setTimeout(() => {
+                    atualizarMetricasESaldos();
+                    
+                    // Restaurar botão
+                    setTimeout(() => {
+                        refreshBtn.innerHTML = `
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                            Atualizar
+                        `;
+                        refreshBtn.disabled = false;
+                    }, 1000);
+                }, 500);
+            });
+        }
     });
-
-                // Botão de refresh para atualizar métricas e saldos
-            const refreshBtn = document.getElementById('refreshBtn');
-            if (refreshBtn) {
-                refreshBtn.addEventListener('click', () => {
-                    window.location.reload(); // Faz um refresh completo da página, igual ao F5
-                });
-            }
