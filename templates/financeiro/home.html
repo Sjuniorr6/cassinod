@@ -5,7 +5,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
-                <link rel="stylesheet" href="{% static 'css/financeiro.css' %}?v=7.2">
+                <link rel="stylesheet" href="{% static 'css/financeiro.css' %}?v=7.4">
 {% endblock %}
 
 {% block content %}
@@ -305,6 +305,33 @@
     </div>
 </div>
 
+<!-- Modal Adicionar Fichas -->
+<div id="modalAdicionarFichas" class="modal hidden modal-adicionar-fichas">
+    <div class="modal-overlay" onclick="fecharModalAdicionarFichas()"></div>
+    <div class="modal-content modal-clean">
+        <div class="modal-header">
+            <h2 class="modal-title">Adicionar Fichas</h2>
+            <button onclick="fecharModalAdicionarFichas()" class="modal-close">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="formAdicionarFichas" class="form-clean">
+                <div class="form-group">
+                    <label for="quantidadeAdicionarFichas" class="form-label">Quantidade de Fichas</label>
+                    <input type="number" id="quantidadeAdicionarFichas" name="quantidade" class="form-input" step="1" min="1" placeholder="Digite a quantidade" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" onclick="fecharModalAdicionarFichas()" class="btn-cancel">Cancelar</button>
+                    <button type="submit" class="btn-confirm">Adicionar Fichas</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Popup de Alerta -->
 <div id="alertPopup" class="alert-popup hidden">
     <div class="alert-overlay" onclick="fecharAlertPopup()"></div>
@@ -498,6 +525,12 @@
                 document.getElementById('formDarBaixaFichas').addEventListener('submit', function(e) {
                     e.preventDefault();
                     darBaixaFichasCliente();
+                });
+
+                // Form de adicionar fichas
+                document.getElementById('formAdicionarFichas').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    adicionarFichasCliente();
                 });
     }
 
@@ -1104,6 +1137,48 @@
         } catch (error) {
             console.error('Erro ao adicionar fichas:', error);
             mostrarAlertPopup('Erro', 'Erro ao adicionar fichas. Tente novamente.', 'error');
+        }
+    }
+
+    // Dar baixa de fichas
+    async function darBaixaFichasCliente() {
+        const form = document.getElementById('formDarBaixaFichas');
+        const quantidade = parseInt(form.quantidade.value);
+        
+        if (!quantidade || quantidade <= 0) {
+            mostrarAlertPopup('Validação', 'Por favor, insira uma quantidade válida', 'warning');
+            return;
+        }
+
+        try {
+            const resultado = await FinanceiroAPI.darBaixaFichas(window.clienteAtualId, quantidade);
+            
+            if (resultado.success) {
+                mostrarAlertPopup(
+                    'Sucesso!', 
+                    `${quantidade} fichas removidas com sucesso!\n\nValor removido: R$ ${resultado.valor_remocao.toFixed(2)}`, 
+                    'success',
+                    true,
+                    4000
+                );
+                fecharModalDarBaixaFichas();
+                
+                // Atualizar saldo com efeito visual
+                atualizarSaldoComEfeito(resultado.saldo_fichas, 'fichas');
+                
+                // Recarregar detalhes do cliente para atualizar histórico
+                if (window.clienteAtualId) {
+                    verDetalhesCliente(window.clienteAtualId);
+                }
+                
+                // Recarregar lista de clientes para atualizar as métricas
+                carregarClientes();
+            } else {
+                mostrarAlertPopup('Erro', 'Erro ao dar baixa nas fichas. Tente novamente.', 'error');
+            }
+        } catch (error) {
+            console.error('Erro ao dar baixa nas fichas:', error);
+            mostrarAlertPopup('Erro', 'Erro ao dar baixa nas fichas. Tente novamente.', 'error');
         }
     }
 

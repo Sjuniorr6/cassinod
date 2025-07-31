@@ -207,15 +207,14 @@
                 <div class="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-red-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden group">
                     <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-600 to-red-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div class="text-2xl font-black text-red-600 mb-2" data-count="{{ fichas_vendidas|default:0|floatformat:0 }}">R$ {{ fichas_vendidas|default:0|floatformat:0 }}</div>
-                                   <div class="text-sm text-gray-600 font-semibold mb-2">Fichas Vendidas</div>
-               <div class="text-xs font-medium text-gray-600">
-                   {% if data_inicio %}
-                       Vendas do período filtrado
-                   {% else %}
-                       Total de vendas das sanges
-                   {% endif %}
-               </div>
-                    <div class="text-xs font-medium text-blue-600">Estoque: R$ {{ estoque_restante|default:0|floatformat:0 }}</div>
+                    <div class="text-sm text-gray-600 font-semibold mb-2">Fichas Vendidas</div>
+                    <div class="text-xs font-medium text-gray-600">
+                        {% if data_inicio %}
+                            Vendas do período filtrado
+                        {% else %}
+                            Total de vendas (SANGE + Financeiro)
+                        {% endif %}
+                    </div>
                 </div>
             </div>
 

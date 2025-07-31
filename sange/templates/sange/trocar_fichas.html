@@ -57,36 +57,57 @@
                     
                     <div class="form-section">
                         <h3 class="section-title">Informações da Troca</h3>
-                        <p class="section-description">Registre a troca de fichas de um valor por outro</p>
+                        <p class="section-description">Digite o valor total a ser trocado e selecione os tipos de fichas</p>
                         
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="valor_original" class="form-label">Valor Original *</label>
-                                <select id="valor_original" name="valor_original" class="form-input" required onchange="verificarDisponibilidade()">
-                                    <option value="">Selecione o valor</option>
-                                    {% for valor in valores_fichas %}
-                                        <option value="{{ valor }}">R$ {{ valor }}</option>
-                                    {% endfor %}
-                                </select>
-                                <p class="form-help" id="disponibilidadeOriginal">Disponível: -</p>
-                            </div>
+                        <div class="form-group">
+                            <label for="valor_total_troca" class="form-label">Valor Total a Ser Trocado *</label>
+                            <input type="number" id="valor_total_troca" name="valor_total_troca" class="form-input" 
+                                   min="1" step="1" required onchange="atualizarSelecaoFichas()" placeholder="Digite o valor total">
+                            <p class="form-help">Digite o valor total que deseja trocar por outros tipos de fichas</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Fichas a Serem Trocadas</label>
+                            <p class="form-help mb-3">Selecione os tipos e quantidades de fichas que somem exatamente o valor total</p>
                             
-                            <div class="form-group">
-                                <label for="valor_ficha_troca" class="form-label">Valor da Ficha de Troca *</label>
-                                <select id="valor_ficha_troca" name="valor_ficha_troca" class="form-input" required onchange="calcularQuantidadeGerada()">
-                                    <option value="">Selecione o valor</option>
-                                    {% for valor in valores_fichas %}
-                                        <option value="{{ valor }}">R$ {{ valor }}</option>
-                                    {% endfor %}
-                                </select>
+                            <div id="selecaoFichas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {% for valor in valores_fichas %}
+                                <div class="ficha-selecao bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="font-semibold text-gray-700">R$ {{ valor }}</span>
+                                        <span class="text-sm text-gray-500" id="disponivel_{{ valor }}">Disponível: 0</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <button type="button" class="btn-quantidade" onclick="alterarQuantidade('{{ valor }}', -1)" disabled>-</button>
+                                        <input type="number" id="quantidade_{{ valor }}" name="quantidade_{{ valor }}" 
+                                               class="form-input text-center w-16" min="0" value="0" 
+                                               onchange="calcularTotalSelecionado()" readonly>
+                                        <button type="button" class="btn-quantidade" onclick="alterarQuantidade('{{ valor }}', 1)" disabled>+</button>
+                                    </div>
+                                    <div class="text-sm text-gray-600 mt-1">
+                                        Subtotal: <span id="subtotal_{{ valor }}">R$ 0</span>
+                                    </div>
+                                </div>
+                                {% endfor %}
                             </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="valor_ficha_troca" class="form-label">Valor da Ficha de Troca *</label>
+                            <select id="valor_ficha_troca" name="valor_ficha_troca" class="form-input" required onchange="calcularQuantidadeGerada()">
+                                <option value="">Selecione o valor</option>
+                                {% for valor in valores_fichas %}
+                                    <option value="{{ valor }}">R$ {{ valor }}</option>
+                                {% endfor %}
+                            </select>
+                            <p class="form-help">Selecione o valor das fichas que deseja receber na troca</p>
                         </div>
                         
                         <div class="troca-resultado">
                             <div class="troca-info">
                                 <div class="troca-item">
-                                    <span class="troca-label">Valor Original:</span>
-                                    <span class="troca-value" id="displayValorOriginal">-</span>
+                                    <span class="troca-label">Valor Total Selecionado:</span>
+                                    <span class="troca-value" id="displayValorTotal">R$ 0</span>
                                 </div>
                                 <div class="troca-item">
                                     <span class="troca-label">Ficha de Troca:</span>
@@ -127,53 +148,98 @@
 <script>
 // Dados das fichas disponíveis
 const fichasDisponiveis = {{ caixa.fichas_atuais|safe }};
+const valoresFichas = {{ valores_fichas|safe }};
 
-function verificarDisponibilidade() {
-    const valorOriginal = document.getElementById('valor_original');
-    const disponibilidadeOriginal = document.getElementById('disponibilidadeOriginal');
+function atualizarSelecaoFichas() {
+    const valorTotal = parseInt(document.getElementById('valor_total_troca').value) || 0;
     
-    if (valorOriginal.value) {
-        const disponivel = fichasDisponiveis[valorOriginal.value] || 0;
-        disponibilidadeOriginal.textContent = `Disponível: ${disponivel}`;
+    // Atualiza disponibilidade e habilita/desabilita botões
+    valoresFichas.forEach(valor => {
+        const disponivel = fichasDisponiveis[valor] || 0;
+        document.getElementById(`disponivel_${valor}`).textContent = `Disponível: ${disponivel}`;
         
-        if (disponivel === 0) {
-            disponibilidadeOriginal.style.color = '#ef4444';
+        const btnMenos = document.querySelector(`[onclick="alterarQuantidade('${valor}', -1)"]`);
+        const btnMais = document.querySelector(`[onclick="alterarQuantidade('${valor}', 1)"]`);
+        const input = document.getElementById(`quantidade_${valor}`);
+        
+        if (disponivel > 0) {
+            btnMenos.disabled = false;
+            btnMais.disabled = false;
+            input.readOnly = false;
         } else {
-            disponibilidadeOriginal.style.color = '#6b7280';
+            btnMenos.disabled = true;
+            btnMais.disabled = true;
+            input.readOnly = true;
         }
-    } else {
-        disponibilidadeOriginal.textContent = 'Disponível: -';
+    });
+    
+    calcularTotalSelecionado();
+}
+
+function alterarQuantidade(valor, delta) {
+    const input = document.getElementById(`quantidade_${valor}`);
+    const disponivel = fichasDisponiveis[valor] || 0;
+    let quantidade = parseInt(input.value) || 0;
+    
+    quantidade += delta;
+    
+    if (quantidade >= 0 && quantidade <= disponivel) {
+        input.value = quantidade;
+        calcularSubtotal(valor);
+        calcularTotalSelecionado();
     }
+}
+
+function calcularSubtotal(valor) {
+    const quantidade = parseInt(document.getElementById(`quantidade_${valor}`).value) || 0;
+    const subtotal = quantidade * parseInt(valor);
+    document.getElementById(`subtotal_${valor}`).textContent = `R$ ${subtotal.toLocaleString('pt-BR')}`;
+}
+
+function calcularTotalSelecionado() {
+    const valorTotalDesejado = parseInt(document.getElementById('valor_total_troca').value) || 0;
+    let totalSelecionado = 0;
+    
+    valoresFichas.forEach(valor => {
+        const quantidade = parseInt(document.getElementById(`quantidade_${valor}`).value) || 0;
+        totalSelecionado += quantidade * parseInt(valor);
+    });
+    
+    document.getElementById('displayValorTotal').textContent = `R$ ${totalSelecionado.toLocaleString('pt-BR')}`;
     
     calcularQuantidadeGerada();
 }
 
 function calcularQuantidadeGerada() {
-    const valorOriginal = document.getElementById('valor_original');
+    const valorTotalSelecionado = parseInt(document.getElementById('displayValorTotal').textContent.replace('R$ ', '').replace('.', '')) || 0;
     const valorTroca = document.getElementById('valor_ficha_troca');
     const btnTrocar = document.getElementById('btnTrocar');
     const mensagem = document.getElementById('trocaMensagem');
     
-    // Atualiza displays
-    document.getElementById('displayValorOriginal').textContent = valorOriginal.value ? `R$ ${valorOriginal.value}` : '-';
+    // Atualiza display da ficha de troca
     document.getElementById('displayValorTroca').textContent = valorTroca.value ? `R$ ${valorTroca.value}` : '-';
     
-    if (valorOriginal.value && valorTroca.value) {
-        const original = parseInt(valorOriginal.value);
+    if (valorTotalSelecionado > 0 && valorTroca.value) {
+        const total = valorTotalSelecionado;
         const troca = parseInt(valorTroca.value);
         
         // Verifica se a divisão é exata
-        if (original % troca === 0) {
-            const quantidade = original / troca;
+        if (total % troca === 0) {
+            const quantidade = total / troca;
             document.getElementById('displayQuantidadeGerada').textContent = quantidade;
             
-            // Verifica disponibilidade
-            const disponivel = fichasDisponiveis[valorOriginal.value] || 0;
-            if (disponivel > 0) {
+            // Verifica se o valor total selecionado confere com o desejado
+            const valorTotalDesejado = parseInt(document.getElementById('valor_total_troca').value) || 0;
+            
+            if (valorTotalSelecionado === valorTotalDesejado) {
                 mensagem.innerHTML = '<div class="alert alert-success">Troca válida! Clique em "Registrar Troca" para confirmar.</div>';
                 btnTrocar.disabled = false;
+            } else if (valorTotalSelecionado > valorTotalDesejado) {
+                mensagem.innerHTML = '<div class="alert alert-error">Valor selecionado é maior que o desejado!</div>';
+                btnTrocar.disabled = true;
             } else {
-                mensagem.innerHTML = '<div class="alert alert-error">Fichas insuficientes para realizar a troca.</div>';
+                const diferenca = valorTotalDesejado - valorTotalSelecionado;
+                mensagem.innerHTML = `<div class="alert alert-warning">Faltam R$ ${diferenca.toLocaleString('pt-BR')} para completar o valor desejado.</div>`;
                 btnTrocar.disabled = true;
             }
         } else {
@@ -190,7 +256,29 @@ function calcularQuantidadeGerada() {
 
 // Inicializa quando a página carrega
 document.addEventListener('DOMContentLoaded', function() {
-    verificarDisponibilidade();
+    atualizarSelecaoFichas();
 });
 </script>
+
+<style>
+.btn-quantidade {
+    @apply w-8 h-8 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200;
+}
+
+.alert {
+    @apply p-3 rounded-lg text-sm font-medium;
+}
+
+.alert-success {
+    @apply bg-green-100 text-green-800 border border-green-200;
+}
+
+.alert-error {
+    @apply bg-red-100 text-red-800 border border-red-200;
+}
+
+.alert-warning {
+    @apply bg-yellow-100 text-yellow-800 border border-yellow-200;
+}
+</style>
 {% endblock %} 

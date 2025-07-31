@@ -108,37 +108,61 @@ def vender_fichas(request, caixa_id):
     
     if request.method == 'POST':
         try:
-            valor_unitario = int(request.POST.get('valor_unitario'))
-            quantidade = int(request.POST.get('quantidade'))
+            valor_total_venda = int(request.POST.get('valor_total_venda'))
             jogador_id = request.POST.get('jogador')
             
-            # Verifica se há fichas suficientes
-            fichas_disponiveis = caixa.fichas_atuais.get(str(valor_unitario), 0)
-            if fichas_disponiveis < quantidade:
-                messages.error(request, f'Fichas insuficientes! Disponível: {fichas_disponiveis}')
+            # Coleta as quantidades de cada tipo de ficha
+            fichas_vendidas = {}
+            valores_fichas = [5, 10, 25, 50, 100, 500, 1000, 5000, 10000]
+            total_calculado = 0
+            
+            for valor in valores_fichas:
+                quantidade = int(request.POST.get(f'quantidade_{valor}', 0))
+                if quantidade > 0:
+                    fichas_vendidas[str(valor)] = quantidade
+                    total_calculado += valor * quantidade
+            
+            # Verifica se o total calculado é igual ao valor total informado
+            if total_calculado != valor_total_venda:
+                messages.error(request, f'Valor total não confere! Calculado: R$ {total_calculado}, Informado: R$ {valor_total_venda}')
                 return render(request, 'sange/vender_fichas.html', {
                     'caixa': caixa,
-                    'jogadores': Cliente.objects.all().order_by('nome')
+                    'jogadores': Cliente.objects.all().order_by('nome'),
+                    'valores_fichas': valores_fichas
                 })
             
-            # Cria a venda
+            # Verifica se há fichas suficientes para cada tipo
+            for valor, quantidade in fichas_vendidas.items():
+                fichas_disponiveis = caixa.fichas_atuais.get(valor, 0)
+                if fichas_disponiveis < quantidade:
+                    messages.error(request, f'Fichas de R$ {valor} insuficientes! Disponível: {fichas_disponiveis}, Solicitado: {quantidade}')
+                    return render(request, 'sange/vender_fichas.html', {
+                        'caixa': caixa,
+                        'jogadores': Cliente.objects.all().order_by('nome'),
+                        'valores_fichas': valores_fichas
+                    })
+            
+            # Cria as vendas para cada tipo de ficha
             jogador = None
             if jogador_id:
                 jogador = Cliente.objects.get(id=jogador_id)
             
-            venda = VendaFicha.objects.create(
-                caixa_sange=caixa,
-                jogador=jogador,
-                valor_unitario=valor_unitario,
-                quantidade=quantidade
-            )
+            vendas_criadas = []
+            for valor, quantidade in fichas_vendidas.items():
+                venda = VendaFicha.objects.create(
+                    caixa_sange=caixa,
+                    jogador=jogador,
+                    valor_unitario=int(valor),
+                    quantidade=quantidade
+                )
+                vendas_criadas.append(venda)
             
             # Atualiza o saldo do jogador se foi selecionado
             if jogador:
-                valor_total_venda = Decimal(str(venda.valor_total))
+                valor_total_venda_decimal = Decimal(str(valor_total_venda))
                 
                 # Atualizar saldo em dinheiro
-                jogador.saldo += valor_total_venda
+                jogador.saldo += valor_total_venda_decimal
                 jogador.save()
                 
                 # Atualizar ou criar carteira com saldo de fichas
@@ -149,13 +173,13 @@ def vender_fichas(request, caixa_id):
                     carteira = Carteira.objects.create(cliente=jogador, saldo_fichas=0)
                 
                 # Adicionar fichas à carteira (cada R$ 1,00 = 1 ficha)
-                fichas_adicionadas = int(valor_total_venda)
+                fichas_adicionadas = int(valor_total_venda_decimal)
                 carteira.saldo_fichas += fichas_adicionadas
                 carteira.save()
                 
-                messages.success(request, f'Venda registrada: {quantidade}x R$ {valor_unitario} = R$ {venda.valor_total}. Saldo do jogador atualizado: R$ {jogador.saldo} ({fichas_adicionadas} fichas adicionadas)')
+                messages.success(request, f'Venda registrada: R$ {valor_total_venda} em fichas. Saldo do jogador atualizado: R$ {jogador.saldo} ({fichas_adicionadas} fichas adicionadas)')
             else:
-                messages.success(request, f'Venda registrada: {quantidade}x R$ {valor_unitario} = R$ {venda.valor_total}')
+                messages.success(request, f'Venda registrada: R$ {valor_total_venda} em fichas')
             
             return redirect('sange:detalhes_caixa', caixa_id=caixa.id)
             
@@ -179,37 +203,57 @@ def trocar_fichas(request, caixa_id):
     
     if request.method == 'POST':
         try:
-            valor_original = int(request.POST.get('valor_original'))
+            valor_total_troca = int(request.POST.get('valor_total_troca'))
             valor_ficha_troca = int(request.POST.get('valor_ficha_troca'))
             
-            # Verifica se há fichas do valor original
-            fichas_originais = caixa.fichas_atuais.get(str(valor_original), 0)
-            if fichas_originais < 1:
-                messages.error(request, f'Fichas de R$ {valor_original} insuficientes!')
+            # Coleta as quantidades de cada tipo de ficha a ser trocada
+            fichas_trocadas = {}
+            valores_fichas = [5, 10, 25, 50, 100, 500, 1000, 5000, 10000]
+            total_calculado = 0
+            
+            for valor in valores_fichas:
+                quantidade = int(request.POST.get(f'quantidade_{valor}', 0))
+                if quantidade > 0:
+                    fichas_trocadas[str(valor)] = quantidade
+                    total_calculado += valor * quantidade
+            
+            # Verifica se o total calculado é igual ao valor total informado
+            if total_calculado != valor_total_troca:
+                messages.error(request, f'Valor total não confere! Calculado: R$ {total_calculado}, Informado: R$ {valor_total_troca}')
                 return render(request, 'sange/trocar_fichas.html', {
                     'caixa': caixa,
-                    'valores_fichas': [5, 10, 25, 50, 100, 500, 1000, 5000, 10000]
+                    'valores_fichas': valores_fichas
                 })
+            
+            # Verifica se há fichas suficientes para cada tipo
+            for valor, quantidade in fichas_trocadas.items():
+                fichas_disponiveis = caixa.fichas_atuais.get(valor, 0)
+                if fichas_disponiveis < quantidade:
+                    messages.error(request, f'Fichas de R$ {valor} insuficientes! Disponível: {fichas_disponiveis}, Solicitado: {quantidade}')
+                    return render(request, 'sange/trocar_fichas.html', {
+                        'caixa': caixa,
+                        'valores_fichas': valores_fichas
+                    })
             
             # Verifica se a divisão é exata
-            if valor_original % valor_ficha_troca != 0:
-                messages.error(request, f'Valor R$ {valor_original} não é divisível por R$ {valor_ficha_troca}!')
+            if valor_total_troca % valor_ficha_troca != 0:
+                messages.error(request, f'Valor R$ {valor_total_troca} não é divisível por R$ {valor_ficha_troca}!')
                 return render(request, 'sange/trocar_fichas.html', {
                     'caixa': caixa,
-                    'valores_fichas': [5, 10, 25, 50, 100, 500, 1000, 5000, 10000]
+                    'valores_fichas': valores_fichas
                 })
             
-            quantidade_gerada = valor_original // valor_ficha_troca
+            quantidade_gerada = valor_total_troca // valor_ficha_troca
             
             # Cria a troca
             troca = TrocaFicha.objects.create(
                 caixa_sange=caixa,
-                valor_original=valor_original,
+                valor_original=valor_total_troca,
                 valor_ficha_troca=valor_ficha_troca,
                 quantidade_gerada=quantidade_gerada
             )
             
-            messages.success(request, f'Troca registrada: R$ {valor_original} por {quantidade_gerada}x R$ {valor_ficha_troca}')
+            messages.success(request, f'Troca registrada: R$ {valor_total_troca} por {quantidade_gerada}x R$ {valor_ficha_troca}')
             return redirect('sange:detalhes_caixa', caixa_id=caixa.id)
             
         except Exception as e:

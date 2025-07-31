@@ -57,7 +57,7 @@
                     
                     <div class="form-section">
                         <h3 class="section-title">Informações da Venda</h3>
-                        <p class="section-description">Registre a venda de fichas para um jogador</p>
+                        <p class="section-description">Digite o valor total da venda e selecione os tipos de fichas</p>
                         
                         <div class="form-group">
                             <label for="jogador" class="form-label">Jogador (Opcional)</label>
@@ -70,30 +70,45 @@
                             <p class="form-help">Selecione o jogador que está comprando as fichas (opcional)</p>
                         </div>
                         
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="valor_unitario" class="form-label">Valor da Ficha *</label>
-                                <select id="valor_unitario" name="valor_unitario" class="form-input" required onchange="atualizarQuantidadeDisponivel()">
-                                    <option value="">Selecione o valor</option>
-                                    {% for valor in valores_fichas %}
-                                        <option value="{{ valor }}">R$ {{ valor }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
+                        <div class="form-group">
+                            <label for="valor_total_venda" class="form-label">Valor Total da Venda *</label>
+                            <input type="number" id="valor_total_venda" name="valor_total_venda" class="form-input" 
+                                   min="1" step="1" required onchange="atualizarSelecaoFichas()" placeholder="Digite o valor total">
+                            <p class="form-help">Digite o valor total que deseja vender em fichas</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Seleção de Fichas</label>
+                            <p class="form-help mb-3">Selecione os tipos e quantidades de fichas que somem exatamente o valor total</p>
                             
-                            <div class="form-group">
-                                <label for="quantidade" class="form-label">Quantidade *</label>
-                                <input type="number" id="quantidade" name="quantidade" class="form-input" 
-                                       min="1" required onchange="calcularValorTotal()">
-                                <p class="form-help" id="quantidadeDisponivel">Quantidade disponível: -</p>
+                            <div id="selecaoFichas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {% for valor in valores_fichas %}
+                                <div class="ficha-selecao bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="font-semibold text-gray-700">R$ {{ valor }}</span>
+                                        <span class="text-sm text-gray-500" id="disponivel_{{ valor }}">Disponível: 0</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <button type="button" class="btn-quantidade" onclick="alterarQuantidade('{{ valor }}', -1)" disabled>-</button>
+                                        <input type="number" id="quantidade_{{ valor }}" name="quantidade_{{ valor }}" 
+                                               class="form-input text-center w-16" min="0" value="0" 
+                                               onchange="calcularTotalSelecionado()" readonly>
+                                        <button type="button" class="btn-quantidade" onclick="alterarQuantidade('{{ valor }}', 1)" disabled>+</button>
+                                    </div>
+                                    <div class="text-sm text-gray-600 mt-1">
+                                        Subtotal: <span id="subtotal_{{ valor }}">R$ 0</span>
+                                    </div>
+                                </div>
+                                {% endfor %}
                             </div>
                         </div>
                         
                         <div class="valor-total-section">
                             <div class="valor-total-display">
-                                <span class="valor-total-label">Valor Total da Venda:</span>
-                                <span class="valor-total-value" id="valorTotalVenda">R$ 0,00</span>
+                                <span class="valor-total-label">Total Selecionado:</span>
+                                <span class="valor-total-value" id="totalSelecionado">R$ 0,00</span>
                             </div>
+                            <div id="mensagemTotal" class="mt-2"></div>
                         </div>
                     </div>
                     
@@ -105,7 +120,7 @@
                             <span class="hidden sm:inline">Cancelar</span>
                             <span class="sm:hidden">Cancelar</span>
                         </a>
-                        <button type="submit" class="btn-primary" id="btnVender">
+                        <button type="submit" class="btn-primary" id="btnVender" disabled>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
                             </svg>
@@ -122,56 +137,109 @@
 <script>
 // Dados das fichas disponíveis
 const fichasDisponiveis = {{ caixa.fichas_atuais|safe }};
+const valoresFichas = {{ valores_fichas|safe }};
 
-function atualizarQuantidadeDisponivel() {
-    const valorSelect = document.getElementById('valor_unitario');
-    const quantidadeDisponivel = document.getElementById('quantidadeDisponivel');
-    const quantidadeInput = document.getElementById('quantidade');
+function atualizarSelecaoFichas() {
+    const valorTotal = parseInt(document.getElementById('valor_total_venda').value) || 0;
     
-    if (valorSelect.value) {
-        const valor = valorSelect.value;
+    // Atualiza disponibilidade e habilita/desabilita botões
+    valoresFichas.forEach(valor => {
         const disponivel = fichasDisponiveis[valor] || 0;
+        document.getElementById(`disponivel_${valor}`).textContent = `Disponível: ${disponivel}`;
         
-        quantidadeDisponivel.textContent = `Quantidade disponível: ${disponivel}`;
-        quantidadeInput.max = disponivel;
+        const btnMenos = document.querySelector(`[onclick="alterarQuantidade('${valor}', -1)"]`);
+        const btnMais = document.querySelector(`[onclick="alterarQuantidade('${valor}', 1)"]`);
+        const input = document.getElementById(`quantidade_${valor}`);
         
-        if (disponivel === 0) {
-            quantidadeDisponivel.style.color = '#ef4444';
-            quantidadeInput.disabled = true;
+        if (disponivel > 0) {
+            btnMenos.disabled = false;
+            btnMais.disabled = false;
+            input.readOnly = false;
         } else {
-            quantidadeDisponivel.style.color = '#6b7280';
-            quantidadeInput.disabled = false;
+            btnMenos.disabled = true;
+            btnMais.disabled = true;
+            input.readOnly = true;
         }
-    } else {
-        quantidadeDisponivel.textContent = 'Quantidade disponível: -';
-        quantidadeInput.disabled = true;
-    }
+    });
     
-    calcularValorTotal();
+    calcularTotalSelecionado();
 }
 
-function calcularValorTotal() {
-    const valorSelect = document.getElementById('valor_unitario');
-    const quantidadeInput = document.getElementById('quantidade');
-    const valorTotalSpan = document.getElementById('valorTotalVenda');
+function alterarQuantidade(valor, delta) {
+    const input = document.getElementById(`quantidade_${valor}`);
+    const disponivel = fichasDisponiveis[valor] || 0;
+    let quantidade = parseInt(input.value) || 0;
+    
+    quantidade += delta;
+    
+    if (quantidade >= 0 && quantidade <= disponivel) {
+        input.value = quantidade;
+        calcularSubtotal(valor);
+        calcularTotalSelecionado();
+    }
+}
+
+function calcularSubtotal(valor) {
+    const quantidade = parseInt(document.getElementById(`quantidade_${valor}`).value) || 0;
+    const subtotal = quantidade * parseInt(valor);
+    document.getElementById(`subtotal_${valor}`).textContent = `R$ ${subtotal.toLocaleString('pt-BR')}`;
+}
+
+function calcularTotalSelecionado() {
+    const valorTotalDesejado = parseInt(document.getElementById('valor_total_venda').value) || 0;
+    let totalSelecionado = 0;
+    
+    valoresFichas.forEach(valor => {
+        const quantidade = parseInt(document.getElementById(`quantidade_${valor}`).value) || 0;
+        totalSelecionado += quantidade * parseInt(valor);
+    });
+    
+    document.getElementById('totalSelecionado').textContent = `R$ ${totalSelecionado.toLocaleString('pt-BR')}`;
+    
+    const mensagem = document.getElementById('mensagemTotal');
     const btnVender = document.getElementById('btnVender');
     
-    if (valorSelect.value && quantidadeInput.value) {
-        const valor = parseInt(valorSelect.value);
-        const quantidade = parseInt(quantidadeInput.value);
-        const total = valor * quantidade;
-        
-        valorTotalSpan.textContent = `R$ ${total.toLocaleString('pt-BR')}`;
+    if (valorTotalDesejado === 0) {
+        mensagem.innerHTML = '';
+        btnVender.disabled = true;
+    } else if (totalSelecionado === valorTotalDesejado) {
+        mensagem.innerHTML = '<div class="alert alert-success">✓ Valor exato! Venda pode ser registrada.</div>';
         btnVender.disabled = false;
+    } else if (totalSelecionado > valorTotalDesejado) {
+        mensagem.innerHTML = '<div class="alert alert-error">✗ Valor selecionado é maior que o desejado!</div>';
+        btnVender.disabled = true;
     } else {
-        valorTotalSpan.textContent = 'R$ 0,00';
+        const diferenca = valorTotalDesejado - totalSelecionado;
+        mensagem.innerHTML = `<div class="alert alert-warning">Faltam R$ ${diferenca.toLocaleString('pt-BR')} para completar o valor desejado.</div>`;
         btnVender.disabled = true;
     }
 }
 
 // Inicializa quando a página carrega
 document.addEventListener('DOMContentLoaded', function() {
-    atualizarQuantidadeDisponivel();
+    atualizarSelecaoFichas();
 });
 </script>
+
+<style>
+.btn-quantidade {
+    @apply w-8 h-8 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200;
+}
+
+.alert {
+    @apply p-3 rounded-lg text-sm font-medium;
+}
+
+.alert-success {
+    @apply bg-green-100 text-green-800 border border-green-200;
+}
+
+.alert-error {
+    @apply bg-red-100 text-red-800 border border-red-200;
+}
+
+.alert-warning {
+    @apply bg-yellow-100 text-yellow-800 border border-yellow-200;
+}
+</style>
 {% endblock %} 

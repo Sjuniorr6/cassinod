@@ -979,11 +979,7 @@
                     console.error('❌ Elemento de fichas vendidas não encontrado');
                 }
                 
-                // Atualizar estoque restante
-                const estoqueElement = document.querySelector('#metricasContainer > div:nth-child(3) .text-xs.font-medium.text-blue-600');
-                if (estoqueElement) {
-                    estoqueElement.textContent = `Estoque: R$ ${parseFloat(metricas.estoque_restante).toLocaleString()}`;
-                }
+
                 
                 // Atualizar variação percentual
                 const variacaoElement = document.querySelector('#metricasContainer > div:nth-child(1) .text-xs.font-medium');

@@ -455,16 +455,19 @@ html, body {
     backdrop-filter: blur(4px);
 }
 
+/* Ajustes para modais - Garantir que botões não sejam cortados */
 .modal-content {
     background: white !important;
     border-radius: 0.75rem !important;
     max-width: 500px !important;
     width: 90% !important;
-    max-height: 90vh !important;
+    max-height: 85vh !important; /* Reduzido de 90vh para 85vh */
     overflow-y: auto !important;
     position: relative !important;
     z-index: 1 !important;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 .modal-header {
@@ -499,6 +502,9 @@ html, body {
 
 .modal-body {
     padding: 1.5rem;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    min-height: 0 !important; /* Importante para flexbox */
 }
 
 /* Formulários */
@@ -1419,6 +1425,74 @@ html, body {
     margin-top: 2rem;
 }
 
+/* Modal Adicionar Fichas - Empilhamento */
+#modalAdicionarFichas {
+    z-index: 10000 !important;
+}
+
+#modalAdicionarFichas .modal-overlay {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+}
+
+#modalAdicionarFichas .modal-content {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid #e5e7eb;
+    max-width: 500px;
+    width: 90%;
+}
+
+#modalAdicionarFichas .modal-header {
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1.5rem;
+}
+
+#modalAdicionarFichas .modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+#modalAdicionarFichas .modal-body {
+    padding: 1.5rem;
+}
+
+#modalAdicionarFichas .form-group {
+    margin-bottom: 1.5rem;
+}
+
+#modalAdicionarFichas .form-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+#modalAdicionarFichas .form-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+}
+
+#modalAdicionarFichas .form-input:focus {
+    outline: none;
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+#modalAdicionarFichas .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
 /* Responsividade para os modais empilhados */
 @media (max-width: 768px) {
     #modalDarBaixaFichas .modal-content {
@@ -1446,6 +1520,32 @@ html, body {
     #modalDarBaixaFichas .btn-confirm {
         width: 100%;
     }
+    
+    #modalAdicionarFichas .modal-content {
+        width: 95%;
+        max-width: none;
+        margin: 1rem;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    #modalAdicionarFichas .modal-header {
+        padding: 1rem;
+    }
+    
+    #modalAdicionarFichas .modal-body {
+        padding: 1rem;
+    }
+    
+    #modalAdicionarFichas .form-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    #modalAdicionarFichas .btn-cancel,
+    #modalAdicionarFichas .btn-confirm {
+        width: 100%;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1468,17 +1568,50 @@ html, body {
     }
     
     #modalDarBaixaFichas .form-label {
-        font-size: 0.875rem;
+        font-size: 0.8rem;
     }
     
     #modalDarBaixaFichas .form-input {
-        font-size: 0.875rem;
         padding: 0.625rem;
+        font-size: 0.8rem;
     }
     
     #modalDarBaixaFichas .btn-cancel,
     #modalDarBaixaFichas .btn-confirm {
-        padding: 0.75rem 1rem;
+        padding: 0.75rem;
+        font-size: 0.875rem;
+    }
+    
+    #modalAdicionarFichas .modal-content {
+        width: 98%;
+        margin: 0.5rem;
+        max-height: 95vh;
+    }
+    
+    #modalAdicionarFichas .modal-header {
+        padding: 0.75rem;
+    }
+    
+    #modalAdicionarFichas .modal-body {
+        padding: 0.75rem;
+    }
+    
+    #modalAdicionarFichas .modal-title {
+        font-size: 1.125rem;
+    }
+    
+    #modalAdicionarFichas .form-label {
+        font-size: 0.8rem;
+    }
+    
+    #modalAdicionarFichas .form-input {
+        padding: 0.625rem;
+        font-size: 0.8rem;
+    }
+    
+    #modalAdicionarFichas .btn-cancel,
+    #modalAdicionarFichas .btn-confirm {
+        padding: 0.75rem;
         font-size: 0.875rem;
     }
 }
@@ -2915,9 +3048,9 @@ html, body {
 
 /* Modal Novo - Container Principal */
 .modal-novo {
-    max-width: 700px !important;
+    max-width: 800px !important; /* Aumentado de 700px para 800px */
     width: 95% !important;
-    max-height: 90vh !important;
+    max-height: 85vh !important; /* Reduzido de 90vh para 85vh */
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
     border: none !important;
     border-radius: 24px !important;
@@ -2928,6 +3061,8 @@ html, body {
     overflow: hidden !important;
     position: relative !important;
     backdrop-filter: blur(20px) !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 .modal-novo::before {
@@ -3063,9 +3198,11 @@ html, body {
 /* Body Novo */
 .modal-body-novo {
     padding: 2.5rem !important;
-    max-height: calc(90vh - 200px) !important;
+    max-height: calc(85vh - 200px) !important; /* Ajustado para 85vh */
     overflow-y: auto !important;
     background: white !important;
+    flex: 1 !important;
+    min-height: 0 !important;
 }
 
 /* Footer Novo */
@@ -3074,6 +3211,7 @@ html, body {
     padding: 2rem 2.5rem !important;
     border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
     position: relative !important;
+    flex-shrink: 0 !important; /* Impede que o footer encolha */
 }
 
 .acoes-container {
@@ -3128,7 +3266,7 @@ html, body {
 
 .btn-adicionar:hover {
     background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
-    transform: translateY(-3px) scale(1.02) !important;
+    transform: translateY(-3px) !important;
     box-shadow: 0 12px 35px rgba(16, 185, 129, 0.4) !important;
 }
 
@@ -3140,7 +3278,7 @@ html, body {
 
 .btn-remover:hover {
     background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
-    transform: translateY(-3px) scale(1.02) !important;
+    transform: translateY(-3px) !important;
     box-shadow: 0 12px 35px rgba(239, 68, 68, 0.4) !important;
 }
 
@@ -3672,5 +3810,315 @@ html, body {
             opacity: 1;
             transform: scale(1);
         }
+    }
+}
+
+/* Modal Clean - Ajustes para modais de formulário */
+.modal-clean .modal-content {
+    max-width: 450px !important;
+    max-height: 80vh !important; /* Reduzido para garantir espaço */
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.modal-clean .modal-body {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    min-height: 0 !important;
+    padding: 2rem !important;
+}
+
+.modal-clean .form-actions {
+    margin-top: 2rem !important;
+    padding-top: 1.5rem !important;
+    border-top: 1px solid #e5e7eb !important;
+    display: flex !important;
+    gap: 1rem !important;
+    justify-content: flex-end !important;
+    flex-shrink: 0 !important; /* Impede que os botões encolham */
+}
+
+        /* Estilos específicos para modal de adicionar fichas */
+        .modal-adicionar-fichas .modal-content {
+            max-width: 450px !important;
+            max-height: 80vh !important;
+        }
+
+/* Responsividade para modais */
+@media (max-width: 768px) {
+    .modal-content {
+        max-height: 90vh !important;
+        width: 95% !important;
+    }
+    
+    .modal-novo {
+        max-width: 95% !important;
+        max-height: 90vh !important;
+    }
+    
+    .modal-body-novo {
+        max-height: calc(90vh - 180px) !important;
+        padding: 1.5rem !important;
+    }
+    
+    .modal-footer-novo {
+        padding: 1.5rem !important;
+    }
+    
+    .modal-clean .modal-content {
+        max-height: 85vh !important;
+    }
+    
+    .modal-clean .modal-body {
+        padding: 1.5rem !important;
+    }
+    
+    .modal-clean .form-actions {
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+    }
+    
+    .modal-clean .btn-cancel,
+    .modal-clean .btn-confirm {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        max-height: 95vh !important;
+        width: 98% !important;
+    }
+    
+    .modal-novo {
+        max-width: 98% !important;
+        max-height: 95vh !important;
+    }
+    
+    .modal-body-novo {
+        max-height: calc(95vh - 160px) !important;
+        padding: 1rem !important;
+    }
+    
+    .modal-footer-novo {
+        padding: 1rem !important;
+    }
+    
+    .modal-clean .modal-content {
+        max-height: 90vh !important;
+    }
+    
+    .modal-clean .modal-body {
+        padding: 1rem !important;
+    }
+    
+    .modal-clean .form-actions {
+        margin-top: 1.5rem !important;
+        padding-top: 1rem !important;
+    }
+}
+
+/* Estilos para Popups de Alerta e Confirmação */
+.alert-popup, .confirm-popup {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 9999 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    backdrop-filter: blur(4px) !important;
+}
+
+.alert-popup.hidden, .confirm-popup.hidden {
+    display: none !important;
+}
+
+.alert-overlay, .confirm-overlay {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+}
+
+.alert-content, .confirm-content {
+    background: white !important;
+    border-radius: 16px !important;
+    max-width: 400px !important;
+    width: 90% !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+    position: relative !important;
+    z-index: 1 !important;
+    overflow: hidden !important;
+    animation: popup-slide-in 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+@keyframes popup-slide-in {
+    0% {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.alert-header, .confirm-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 1.5rem 1.5rem 0 1.5rem !important;
+}
+
+.alert-icon, .confirm-icon {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 1.5rem !important;
+    margin-right: 1rem !important;
+}
+
+.alert-icon.success {
+    background: #dcfce7 !important;
+    color: #16a34a !important;
+}
+
+.alert-icon.error {
+    background: #fef2f2 !important;
+    color: #dc2626 !important;
+}
+
+.alert-icon.warning {
+    background: #fef3c7 !important;
+    color: #d97706 !important;
+}
+
+.alert-icon.info {
+    background: #dbeafe !important;
+    color: #2563eb !important;
+}
+
+.confirm-icon {
+    background: #f3f4f6 !important;
+    color: #6b7280 !important;
+}
+
+.alert-close, .confirm-close {
+    background: none !important;
+    border: none !important;
+    cursor: pointer !important;
+    color: #6b7280 !important;
+    padding: 0.5rem !important;
+    border-radius: 0.5rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.alert-close:hover, .confirm-close:hover {
+    background: #f3f4f6 !important;
+    color: #1f2937 !important;
+}
+
+.alert-body, .confirm-body {
+    padding: 1rem 1.5rem !important;
+}
+
+.alert-title, .confirm-title {
+    font-size: 1.25rem !important;
+    font-weight: 700 !important;
+    color: #1f2937 !important;
+    margin: 0 0 0.5rem 0 !important;
+}
+
+.alert-message, .confirm-message {
+    font-size: 1rem !important;
+    color: #6b7280 !important;
+    margin: 0 !important;
+    line-height: 1.5 !important;
+}
+
+.alert-footer, .confirm-footer {
+    padding: 1rem 1.5rem 1.5rem 1.5rem !important;
+    display: flex !important;
+    gap: 0.75rem !important;
+    justify-content: flex-end !important;
+}
+
+.alert-btn, .confirm-btn {
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 0.5rem !important;
+    font-weight: 600 !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    font-size: 0.875rem !important;
+}
+
+.alert-btn-primary, .confirm-btn-primary {
+    background: #dc2626 !important;
+    color: white !important;
+}
+
+.alert-btn-primary:hover, .confirm-btn-primary:hover {
+    background: #b91c1c !important;
+    transform: translateY(-1px) !important;
+}
+
+.confirm-btn-secondary {
+    background: #6b7280 !important;
+    color: white !important;
+}
+
+.confirm-btn-secondary:hover {
+    background: #4b5563 !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Responsividade para popups */
+@media (max-width: 768px) {
+    .alert-content, .confirm-content {
+        max-width: 90% !important;
+        margin: 1rem !important;
+    }
+    
+    .alert-header, .confirm-header {
+        padding: 1rem 1rem 0 1rem !important;
+    }
+    
+    .alert-body, .confirm-body {
+        padding: 0.75rem 1rem !important;
+    }
+    
+    .alert-footer, .confirm-footer {
+        padding: 0.75rem 1rem 1rem 1rem !important;
+        flex-direction: column !important;
+    }
+    
+    .alert-btn, .confirm-btn {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .alert-content, .confirm-content {
+        max-width: 95% !important;
+        margin: 0.5rem !important;
+    }
+    
+    .alert-title, .confirm-title {
+        font-size: 1.125rem !important;
+    }
+    
+    .alert-message, .confirm-message {
+        font-size: 0.875rem !important;
     }
 }

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Cards</title>
+    <style>
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 1px solid rgba(239, 68, 68, 0.1);
+            transition: all 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: 900;
+            color: #dc2626;
+            margin-bottom: 8px;
+        }
+        .metric-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4b5563;
+            margin-bottom: 8px;
+        }
+        .metric-subtitle {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-button {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .test-button:hover {
+            background: #b91c1c;
+        }
+    </style>
+</head>
+<body>
+    <div style="text-align: center; padding: 20px;">
+        <h1>Teste dos Cards de Métricas</h1>
+        <button class="test-button" onclick="testarAPI()">Testar API</button>
+        <button class="test-button" onclick="atualizarCards()">Atualizar Cards</button>
+        <button class="test-button" onclick="verificarElementos()">Verificar Elementos</button>
+    </div>
+
+    <div class="container" id="metricasContainer">
+        <div class="card">
+            <div class="metric-value" data-count="0">R$ 0</div>
+            <div class="metric-title">Receita Total</div>
+            <div class="metric-subtitle">Todas as mesas ativas</div>
+            <div class="metric-subtitle" style="color: #059669;">+0.0% vs período anterior</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-value" data-count="0">0</div>
+            <div class="metric-title">Mesas Ativas</div>
+            <div class="metric-subtitle" style="color: #dc2626;">de 0 mesas no total</div>
+            <div class="metric-subtitle">Mesas abertas no momento</div>
+        </div>
+
+        <div class="card">
+            <div class="metric-value" data-count="0">R$ 0</div>
+            <div class="metric-title">Fichas Vendidas</div>
+            <div class="metric-subtitle">Total de vendas das sanges</div>
+            <div class="metric-subtitle" style="color: #2563eb;">Estoque: R$ 0</div>
+        </div>
+    </div>
+
+    <div id="resultado" style="padding: 20px; max-width: 1200px; margin: 0 auto;"></div>
+
+    <script>
+        function verificarElementos() {
+            const resultado = document.getElementById('resultado');
+            const container = document.getElementById('metricasContainer');
+            
+            let html = '<h3>Verificação de Elementos:</h3>';
+            html += `<p>Container encontrado: ${!!container}</p>`;
+            
+            if (container) {
+                const cards = container.querySelectorAll('.card');
+                html += `<p>Número de cards: ${cards.length}</p>`;
+                
+                cards.forEach((card, index) => {
+                    const dataCountElement = card.querySelector('[data-count]');
+                    html += `<p>Card ${index + 1}: ${dataCountElement ? 'OK' : 'ERRO - data-count não encontrado'}</p>`;
+                    if (dataCountElement) {
+                        html += `<p>  - Valor atual: ${dataCountElement.textContent}</p>`;
+                        html += `<p>  - Data-count: ${dataCountElement.getAttribute('data-count')}</p>`;
+                    }
+                });
+            }
+            
+            resultado.innerHTML = html;
+        }
+
+        async function testarAPI() {
+            const resultado = document.getElementById('resultado');
+            resultado.innerHTML = '<h3>Testando API...</h3>';
+            
+            try {
+                const response = await fetch('/mesas/api/atualizar-metricas/', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                const data = await response.json();
+                
+                resultado.innerHTML = `
+                    <h3>Resposta da API:</h3>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                
+                console.log('Dados da API:', data);
+            } catch (error) {
+                resultado.innerHTML = `
+                    <h3>Erro na API:</h3>
+                    <pre>${error.message}</pre>
+                `;
+                console.error('Erro:', error);
+            }
+        }
+
+        function atualizarCards() {
+            const resultado = document.getElementById('resultado');
+            resultado.innerHTML = '<h3>Atualizando cards...</h3>';
+            
+            // Simular dados da API
+            const dadosTeste = {
+                receita_total: 15000,
+                mesas_ativas: 5,
+                fichas_vendidas: 8000,
+                estoque_restante: 12000
+            };
+            
+            // Atualizar receita total
+            const receitaElement = document.querySelector('#metricasContainer > div:nth-child(1) [data-count]');
+            if (receitaElement) {
+                receitaElement.textContent = `R$ ${dadosTeste.receita_total.toLocaleString()}`;
+                receitaElement.setAttribute('data-count', dadosTeste.receita_total);
+                console.log('✅ Receita atualizada');
+            } else {
+                console.error('❌ Elemento de receita não encontrado');
+            }
+            
+            // Atualizar mesas ativas
+            const mesasAtivasElement = document.querySelector('#metricasContainer > div:nth-child(2) [data-count]');
+            if (mesasAtivasElement) {
+                mesasAtivasElement.textContent = dadosTeste.mesas_ativas;
+                mesasAtivasElement.setAttribute('data-count', dadosTeste.mesas_ativas);
+                console.log('✅ Mesas ativas atualizadas');
+            } else {
+                console.error('❌ Elemento de mesas ativas não encontrado');
+            }
+            
+            // Atualizar fichas vendidas
+            const fichasVendidasElement = document.querySelector('#metricasContainer > div:nth-child(3) [data-count]');
+            if (fichasVendidasElement) {
+                fichasVendidasElement.textContent = `R$ ${dadosTeste.fichas_vendidas.toLocaleString()}`;
+                fichasVendidasElement.setAttribute('data-count', dadosTeste.fichas_vendidas);
+                console.log('✅ Fichas vendidas atualizadas');
+            } else {
+                console.error('❌ Elemento de fichas vendidas não encontrado');
+            }
+            
+            // Atualizar estoque
+            const estoqueElement = document.querySelector('#metricasContainer > div:nth-child(3) .metric-subtitle:last-child');
+            if (estoqueElement) {
+                estoqueElement.textContent = `Estoque: R$ ${dadosTeste.estoque_restante.toLocaleString()}`;
+                console.log('✅ Estoque atualizado');
+            } else {
+                console.error('❌ Elemento de estoque não encontrado');
+            }
+            
+            resultado.innerHTML = '<h3>Cards atualizados com dados de teste!</h3>';
+        }
+
+        // Executar verificação inicial
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Página carregada');
+            verificarElementos();
+        });
+    </script>
+</body>
+</html> 

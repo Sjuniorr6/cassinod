@@ -83,7 +83,7 @@ def mesas_home(request):
         from sange.models import VendaFicha
         if data_inicio_parsed and data_fim_parsed:
             # Filtrar vendas por período
-            fichas_vendidas = VendaFicha.objects.filter(
+            fichas_vendidas_sange = VendaFicha.objects.filter(
                 data__date__gte=data_inicio_parsed,
                 data__date__lte=data_fim_parsed
             ).aggregate(
@@ -91,20 +91,33 @@ def mesas_home(request):
             )['total'] or 0
         else:
             # Todas as vendas se não há filtro de data
-            fichas_vendidas = VendaFicha.objects.aggregate(
+            fichas_vendidas_sange = VendaFicha.objects.aggregate(
                 total=models.Sum('valor_total')
             )['total'] or 0
     except:
-        fichas_vendidas = 0
+        fichas_vendidas_sange = 0
     
-    # Estoque restante (valor total atual de todos os caixas abertos do sange)
+    # Calcular total de fichas vendidas do FINANCEIRO no período filtrado
     try:
-        from sange.models import CaixaSange
-        estoque_restante = CaixaSange.objects.filter(data_fechamento__isnull=True).aggregate(
-            total=models.Sum('valor_total_atual')
-        )['total'] or 0
+        from financeiro.models import VendaFicha as VendaFichaFinanceiro
+        if data_inicio_parsed and data_fim_parsed:
+            # Filtrar vendas por período
+            fichas_vendidas_financeiro = VendaFichaFinanceiro.objects.filter(
+                data_venda__date__gte=data_inicio_parsed,
+                data_venda__date__lte=data_fim_parsed
+            ).aggregate(
+                total=models.Sum('quantidade')
+            )['total'] or 0
+        else:
+            # Todas as vendas se não há filtro de data
+            fichas_vendidas_financeiro = VendaFichaFinanceiro.objects.aggregate(
+                total=models.Sum('quantidade')
+            )['total'] or 0
     except:
-        estoque_restante = 0
+        fichas_vendidas_financeiro = 0
+    
+    # Soma total das fichas vendidas (SANGE + FINANCEIRO)
+    fichas_vendidas = fichas_vendidas_sange + fichas_vendidas_financeiro
     
     # Calcular variação percentual (simplificado - sempre 0 por enquanto)
     variacao_percentual = 0
@@ -129,7 +142,6 @@ def mesas_home(request):
     # Garantir que todos os valores são números válidos
     receita_total = float(receita_total) if receita_total is not None else 0.0
     fichas_vendidas = float(fichas_vendidas) if fichas_vendidas is not None else 0.0
-    estoque_restante = float(estoque_restante) if estoque_restante is not None else 0.0
     variacao_percentual = float(variacao_percentual) if variacao_percentual is not None else 0.0
     mesas_ativas = int(mesas_ativas) if mesas_ativas is not None else 0
     total_mesas = int(total_mesas) if total_mesas is not None else 0
@@ -142,7 +154,6 @@ def mesas_home(request):
         'total_mesas': total_mesas,
         'receita_total': receita_total,
         'fichas_vendidas': fichas_vendidas,
-        'estoque_restante': estoque_restante,
         'variacao_percentual': variacao_percentual,
         'data_inicio': data_inicio,
         'data_fim': data_fim,
@@ -816,7 +827,7 @@ def atualizar_metricas_api(request):
             from sange.models import VendaFicha
             if data_inicio_parsed and data_fim_parsed:
                 # Filtrar vendas por período
-                fichas_vendidas = VendaFicha.objects.filter(
+                fichas_vendidas_sange = VendaFicha.objects.filter(
                     data__date__gte=data_inicio_parsed,
                     data__date__lte=data_fim_parsed
                 ).aggregate(
@@ -824,20 +835,33 @@ def atualizar_metricas_api(request):
                 )['total'] or 0
             else:
                 # Todas as vendas se não há filtro de data
-                fichas_vendidas = VendaFicha.objects.aggregate(
+                fichas_vendidas_sange = VendaFicha.objects.aggregate(
                     total=models.Sum('valor_total')
                 )['total'] or 0
         except:
-            fichas_vendidas = 0
+            fichas_vendidas_sange = 0
         
-        # Estoque restante (valor total atual de todos os caixas abertos do sange)
+        # Calcular total de fichas vendidas do FINANCEIRO no período filtrado
         try:
-            from sange.models import CaixaSange
-            estoque_restante = CaixaSange.objects.filter(data_fechamento__isnull=True).aggregate(
-                total=models.Sum('valor_total_atual')
-            )['total'] or 0
+            from financeiro.models import VendaFicha as VendaFichaFinanceiro
+            if data_inicio_parsed and data_fim_parsed:
+                # Filtrar vendas por período
+                fichas_vendidas_financeiro = VendaFichaFinanceiro.objects.filter(
+                    data_venda__date__gte=data_inicio_parsed,
+                    data_venda__date__lte=data_fim_parsed
+                ).aggregate(
+                    total=models.Sum('quantidade')
+                )['total'] or 0
+            else:
+                # Todas as vendas se não há filtro de data
+                fichas_vendidas_financeiro = VendaFichaFinanceiro.objects.aggregate(
+                    total=models.Sum('quantidade')
+                )['total'] or 0
         except:
-            estoque_restante = 0
+            fichas_vendidas_financeiro = 0
+        
+        # Soma total das fichas vendidas (SANGE + FINANCEIRO)
+        fichas_vendidas = fichas_vendidas_sange + fichas_vendidas_financeiro
         
         # Calcular variação percentual (simplificado - sempre 0 por enquanto)
         variacao_percentual = 0
@@ -873,7 +897,6 @@ def atualizar_metricas_api(request):
         # Garantir que todos os valores são números válidos
         receita_total = float(receita_total) if receita_total is not None else 0.0
         fichas_vendidas = float(fichas_vendidas) if fichas_vendidas is not None else 0.0
-        estoque_restante = float(estoque_restante) if estoque_restante is not None else 0.0
         variacao_percentual = float(variacao_percentual) if variacao_percentual is not None else 0.0
         mesas_ativas = int(mesas_ativas) if mesas_ativas is not None else 0
         total_mesas = int(total_mesas) if total_mesas is not None else 0
@@ -885,7 +908,6 @@ def atualizar_metricas_api(request):
                 'mesas_ativas': mesas_ativas,
                 'total_mesas': total_mesas,
                 'fichas_vendidas': fichas_vendidas,
-                'estoque_restante': estoque_restante,
                 'variacao_percentual': variacao_percentual
             },
             'mesas': mesas_data
