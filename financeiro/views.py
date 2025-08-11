@@ -40,8 +40,8 @@ def listar_clientes(request):
                 'sobrenome': cliente.sobrenome,
                 'nome_completo': cliente.nome_completo,
                 'cpf': cliente.cpf,
-                'saldo': float(cliente.saldo),
-                'saldo_formatado': cliente.saldo_formatado,
+                'saldo': saldo_fichas,  # Usar saldo de fichas como saldo principal
+                'saldo_formatado': f'{saldo_fichas} fichas',
                 'telefone': cliente.telefone,
                 'data_criacao': cliente.data_criacao.strftime('%d/%m/%Y %H:%M'),
                 'data_atualizacao': cliente.data_atualizacao.strftime('%d/%m/%Y %H:%M'),
@@ -98,8 +98,8 @@ def obter_cliente(request, cliente_id):
             'sobrenome': cliente.sobrenome,
             'nome_completo': cliente.nome_completo,
             'cpf': cliente.cpf,
-            'saldo': float(cliente.saldo),
-            'saldo_formatado': cliente.saldo_formatado,
+            'saldo': saldo_fichas,  # Usar saldo de fichas como saldo principal
+            'saldo_formatado': f'{saldo_fichas} fichas',
             'telefone': cliente.telefone,
             'data_criacao': cliente.data_criacao.strftime('%d/%m/%Y %H:%M'),
             'data_atualizacao': cliente.data_atualizacao.strftime('%d/%m/%Y %H:%M'),
@@ -143,11 +143,11 @@ def criar_cliente(request):
             nome=nome,
             sobrenome=sobrenome,
             cpf=cpf,
-            saldo=saldo,
+            saldo=0,  # Saldo em dinheiro sempre zero
             telefone=telefone
         )
         
-        # Criar carteira com saldo de fichas igual ao saldo em dinheiro
+        # Criar carteira com saldo de fichas
         saldo_fichas = int(saldo)  # Cada R$ 1,00 = 1 ficha
         carteira = Carteira.objects.create(cliente=cliente, saldo_fichas=saldo_fichas)
         
@@ -162,8 +162,8 @@ def criar_cliente(request):
             'sobrenome': cliente.sobrenome,
             'nome_completo': cliente.nome_completo,
             'cpf': cliente.cpf,
-            'saldo': float(cliente.saldo),
-            'saldo_formatado': cliente.saldo_formatado,
+            'saldo': carteira.saldo_fichas,  # Usar saldo de fichas como saldo principal
+            'saldo_formatado': f'{carteira.saldo_fichas} fichas',
             'telefone': cliente.telefone,
             'data_criacao': cliente.data_criacao.strftime('%d/%m/%Y %H:%M'),
             'data_atualizacao': cliente.data_atualizacao.strftime('%d/%m/%Y %H:%M'),
@@ -196,12 +196,20 @@ def adicionar_fichas(request, cliente_id):
     """API para adicionar fichas a um cliente (nova venda) e ao saldo em dinheiro"""
     from decimal import Decimal
     
+    print(f"=== ADICIONAR FICHAS - Cliente ID: {cliente_id} ===")
+    print(f"Request body: {request.body}")
+    
     try:
         data = json.loads(request.body)
         quantidade = int(data.get('quantidade', 0))
+        print(f"Quantidade solicitada: {quantidade}")
+        
         if quantidade <= 0:
+            print("Erro: Quantidade deve ser maior que zero")
             return JsonResponse({'success': False, 'error': 'Quantidade deve ser maior que zero.'}, status=400)
+        
         cliente = Cliente.objects.get(id=cliente_id)
+        print(f"Cliente encontrado: {cliente.nome_completo}")
         
         # Verificar se tem carteira, se não tiver, criar uma
         carteira = getattr(cliente, 'carteira', None)
@@ -210,8 +218,12 @@ def adicionar_fichas(request, cliente_id):
             carteira = Carteira.objects.create(cliente=cliente, saldo_fichas=0)
             print(f"Carteira criada com saldo inicial: {carteira.saldo_fichas}")
         
+        print(f"Saldo atual de fichas: {carteira.saldo_fichas}")
+        print(f"Saldo atual em dinheiro: {cliente.saldo}")
+        
         # Calcular valor em dinheiro (cada ficha = R$ 1,00)
         valor_adicao = Decimal(str(quantidade))
+        print(f"Valor a adicionar: R$ {valor_adicao}")
         
         # Registrar venda
         venda = VendaFicha.objects.create(cliente=cliente, quantidade=quantidade)
@@ -219,10 +231,7 @@ def adicionar_fichas(request, cliente_id):
         # Atualizar carteira
         carteira.saldo_fichas += quantidade
         carteira.save()
-        
-        # Atualizar saldo em dinheiro
-        cliente.saldo += valor_adicao
-        cliente.save()
+        print(f"Novo saldo de fichas: {carteira.saldo_fichas}")
         
         return JsonResponse({
             'success': True,
@@ -233,7 +242,6 @@ def adicionar_fichas(request, cliente_id):
                 'data_venda': venda.data_venda.strftime('%d/%m/%Y %H:%M')
             },
             'saldo_fichas': carteira.saldo_fichas,
-            'saldo_dinheiro': float(cliente.saldo),
             'valor_adicao': float(valor_adicao)
         })
     except Cliente.DoesNotExist:
@@ -270,53 +278,30 @@ def dar_baixa_fichas(request, cliente_id):
             print(f"Carteira criada com saldo inicial: {carteira.saldo_fichas}")
         
         print(f"Saldo atual de fichas: {carteira.saldo_fichas}")
-        print(f"Saldo atual em dinheiro: {cliente.saldo}")
         
         # Calcular valor em dinheiro (cada ficha = R$ 1,00)
         valor_baixa = Decimal(str(quantidade))
         
-        # Verificar se há saldo suficiente (fichas + dinheiro)
-        saldo_total_disponivel = carteira.saldo_fichas + int(cliente.saldo)
+        # Verificar se há saldo suficiente apenas em fichas
+        if carteira.saldo_fichas < quantidade:
+            print(f"Erro: Saldo de fichas insuficiente. Fichas disponíveis: {carteira.saldo_fichas}, Solicitado: {quantidade}")
+            return JsonResponse({
+                'success': False, 
+                'error': f'Saldo de fichas insuficiente. Disponível: {carteira.saldo_fichas}, Solicitado: {quantidade}'
+            }, status=400)
         
-        if saldo_total_disponivel < quantidade:
-            print(f"Erro: Saldo total insuficiente. Fichas: {carteira.saldo_fichas}, Dinheiro: {cliente.saldo}, Total: {saldo_total_disponivel}, Solicitado: {quantidade}")
-            return JsonResponse({'success': False, 'error': 'Saldo total insuficiente (fichas + dinheiro).'}, status=400)
-        
-        # Estratégia de dedução: primeiro usar fichas, depois dinheiro
-        fichas_a_deduzir = min(carteira.saldo_fichas, quantidade)
-        dinheiro_a_deduzir = quantidade - fichas_a_deduzir
-        
-        print(f"Estratégia de dedução: {fichas_a_deduzir} fichas + {dinheiro_a_deduzir} em dinheiro")
-        
-        # Subtrair fichas primeiro
-        if fichas_a_deduzir > 0:
-            carteira.saldo_fichas -= fichas_a_deduzir
-            carteira.save()
-            print(f"Fichas deduzidas: {fichas_a_deduzir}. Novo saldo de fichas: {carteira.saldo_fichas}")
-        
-        # Subtrair dinheiro se necessário
-        if dinheiro_a_deduzir > 0:
-            cliente.saldo -= Decimal(str(dinheiro_a_deduzir))
-            cliente.save()
-            print(f"Dinheiro deduzido: {dinheiro_a_deduzir}. Novo saldo em dinheiro: {cliente.saldo}")
-        
-        print(f"Novo saldo de fichas: {carteira.saldo_fichas}")
-        print(f"Novo saldo em dinheiro: {cliente.saldo}")
-        
-        # Criar mensagem detalhada sobre a dedução
-        if dinheiro_a_deduzir > 0:
-            message = f'Baixa realizada: {fichas_a_deduzir} fichas + R$ {dinheiro_a_deduzir} em dinheiro'
-        else:
-            message = f'Baixa de {fichas_a_deduzir} fichas realizada com sucesso'
+        # Subtrair fichas
+        carteira.saldo_fichas -= quantidade
+        carteira.save()
+        print(f"Fichas deduzidas: {quantidade}. Novo saldo de fichas: {carteira.saldo_fichas}")
         
         return JsonResponse({
             'success': True,
-            'message': message,
+            'message': f'Baixa de {quantidade} fichas realizada com sucesso',
             'saldo_fichas': carteira.saldo_fichas,
-            'saldo_dinheiro': float(cliente.saldo),
             'valor_baixa': float(valor_baixa),
-            'fichas_deduzidas': fichas_a_deduzir,
-            'dinheiro_deduzido': dinheiro_a_deduzir
+            'fichas_deduzidas': quantidade,
+            'dinheiro_deduzido': 0
         })
     except Cliente.DoesNotExist:
         print(f"Erro: Cliente {cliente_id} não encontrado")

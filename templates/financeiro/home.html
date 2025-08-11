@@ -62,8 +62,8 @@
                             </svg>
                         </div>
                         <div class="metric-content">
-                            <h3 class="metric-title">Saldo Total</h3>
-                            <p class="metric-value" id="saldoTotal">R$ 0,00</p>
+                            <h3 class="metric-title">Total de Fichas</h3>
+                            <p class="metric-value" id="saldoTotal">0 fichas</p>
                         </div>
                     </div>
 
@@ -75,7 +75,7 @@
                         </div>
                         <div class="metric-content">
                             <h3 class="metric-title">Média por Cliente</h3>
-                            <p class="metric-value" id="mediaCliente">R$ 0,00</p>
+                            <p class="metric-value" id="mediaCliente">0 fichas</p>
                         </div>
                     </div>
 
@@ -87,7 +87,7 @@
                         </div>
                         <div class="metric-content">
                             <h3 class="metric-title">Maior Saldo</h3>
-                            <p class="metric-value" id="maiorSaldo">R$ 0,00</p>
+                            <p class="metric-value" id="maiorSaldo">0 fichas</p>
                         </div>
                     </div>
                 </div>
@@ -612,9 +612,9 @@
         const maiorSaldo = Math.max(...clientes.map(c => c.saldo), 0);
 
         document.getElementById('totalClientes').textContent = total;
-        document.getElementById('saldoTotal').textContent = formatarMoeda(saldoTotal);
-        document.getElementById('mediaCliente').textContent = formatarMoeda(media);
-        document.getElementById('maiorSaldo').textContent = formatarMoeda(maiorSaldo);
+        document.getElementById('saldoTotal').textContent = `${saldoTotal} fichas`;
+        document.getElementById('mediaCliente').textContent = `${Math.round(media)} fichas`;
+        document.getElementById('maiorSaldo').textContent = `${maiorSaldo} fichas`;
     }
 
     // Filtrar clientes
@@ -836,17 +836,6 @@
             <div class="cliente-details-novo">
                 <!-- Cards de Saldo -->
                 <div class="saldos-cards">
-                    <div class="saldo-card dinheiro">
-                        <div class="saldo-header">
-                            <div class="saldo-icon">💰</div>
-                            <div class="saldo-info">
-                                <div class="saldo-label">Saldo em Dinheiro</div>
-                                <div class="saldo-valor">${cliente.saldo_formatado}</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    ${temFichas ? `
                     <div class="saldo-card fichas">
                         <div class="saldo-header">
                             <div class="saldo-icon">🎰</div>
@@ -857,7 +846,6 @@
                             </div>
                         </div>
                     </div>
-                    ` : ''}
                 </div>
 
                 <!-- Grid de Informações -->
@@ -1078,18 +1066,16 @@
     }
 
     // Atualizar saldo com efeito visual
-    function atualizarSaldoComEfeito(novoSaldo, tipo = 'fichas') {
-        const saldoElement = document.querySelector(`.saldo-card.${tipo} .saldo-valor`);
+    function atualizarSaldoComEfeito(novoSaldo) {
+        console.log(`Atualizando saldo de fichas: ${novoSaldo}`);
+        
+        const saldoElement = document.querySelector('.saldo-card.fichas .saldo-valor');
         if (saldoElement) {
             // Adicionar classe de animação
             saldoElement.classList.add('updated');
             
             // Atualizar valor
-            if (tipo === 'fichas') {
-                saldoElement.textContent = `${novoSaldo} fichas`;
-            } else {
-                saldoElement.textContent = novoSaldo;
-            }
+            saldoElement.textContent = `${novoSaldo} fichas`;
             
             // Remover classe após animação
             setTimeout(() => {
@@ -1114,7 +1100,7 @@
             if (resultado.success) {
                 mostrarAlertPopup(
                     'Sucesso!', 
-                    `${quantidade} fichas adicionadas com sucesso!\n\nValor adicionado: R$ ${resultado.valor_adicao.toFixed(2)}`, 
+                    `${quantidade} fichas adicionadas com sucesso!`, 
                     'success',
                     true,
                     4000
@@ -1122,7 +1108,7 @@
                 fecharModalAdicionarFichas();
                 
                 // Atualizar saldo com efeito visual
-                atualizarSaldoComEfeito(resultado.saldo_fichas, 'fichas');
+                atualizarSaldoComEfeito(resultado.saldo_fichas);
                 
                 // Recarregar detalhes do cliente para atualizar histórico
                 if (window.clienteAtualId) {
@@ -1142,8 +1128,13 @@
 
     // Dar baixa de fichas
     async function darBaixaFichasCliente() {
+        console.log('=== INICIANDO DAR BAIXA FICHAS ===');
+        
         const form = document.getElementById('formDarBaixaFichas');
         const quantidade = parseInt(form.quantidade.value);
+        
+        console.log('Quantidade:', quantidade);
+        console.log('Cliente atual ID:', window.clienteAtualId);
         
         if (!quantidade || quantidade <= 0) {
             mostrarAlertPopup('Validação', 'Por favor, insira uma quantidade válida', 'warning');
@@ -1151,12 +1142,14 @@
         }
 
         try {
+            console.log('Chamando API darBaixaFichas...');
             const resultado = await FinanceiroAPI.darBaixaFichas(window.clienteAtualId, quantidade);
+            console.log('Resultado da API:', resultado);
             
             if (resultado.success) {
                 mostrarAlertPopup(
                     'Sucesso!', 
-                    `${quantidade} fichas removidas com sucesso!\n\nValor removido: R$ ${resultado.valor_remocao.toFixed(2)}`, 
+                    `${quantidade} fichas removidas com sucesso!`, 
                     'success',
                     true,
                     4000
@@ -1164,7 +1157,7 @@
                 fecharModalDarBaixaFichas();
                 
                 // Atualizar saldo com efeito visual
-                atualizarSaldoComEfeito(resultado.saldo_fichas, 'fichas');
+                atualizarSaldoComEfeito(resultado.saldo_fichas);
                 
                 // Recarregar detalhes do cliente para atualizar histórico
                 if (window.clienteAtualId) {
@@ -1178,7 +1171,17 @@
             }
         } catch (error) {
             console.error('Erro ao dar baixa nas fichas:', error);
-            mostrarAlertPopup('Erro', 'Erro ao dar baixa nas fichas. Tente novamente.', 'error');
+            
+            // Verificar se é erro de saldo insuficiente
+            if (error.message.includes('Saldo de fichas insuficiente')) {
+                mostrarAlertPopup(
+                    'Saldo Insuficiente', 
+                    error.message, 
+                    'warning'
+                );
+            } else {
+                mostrarAlertPopup('Erro', `Erro ao dar baixa nas fichas: ${error.message}`, 'error');
+            }
         }
     }
 
