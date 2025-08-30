@@ -1,3 +1,90 @@
+/* Croupiers page custom styles - complements Tailwind (no CDN required) */
+
+/* Metric cards */
+.metric-card {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+/* Table header block */
+.croupiers-table .table-header {
+    background: linear-gradient(180deg, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.95) 100%);
+    border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 16px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+}
+
+.croupiers-table .table-content {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+/* Status badges */
+.status-active,
+.status-inactive {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    font-weight: 600;
+}
+
+.status-active {
+    color: #065f46;
+    background: #ecfdf5;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.status-inactive {
+    color: #991b1b;
+    background: #fef2f2;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* Empty state */
+.empty-state {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+.empty-state-icon {
+    width: 56px;
+    height: 56px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+    border-radius: 12px;
+    background: #f3f4f6;
+    font-size: 24px;
+}
+
+/* Small refinements */
+.croupiers-table table th {
+    font-weight: 700;
+    letter-spacing: .02em;
+}
+.croupiers-table table td, .croupiers-table table th {
+    vertical-align: middle;
+}
+
+@media (max-width: 640px) {
+    .metric-card { padding: 1rem; }
+    .croupiers-table .table-header { padding: 0.75rem 1rem; }
+}
+
 /* ===== CROUPIERS PAGE STYLES ===== */
 
 /* Reset e configurações base */
