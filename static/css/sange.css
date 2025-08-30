@@ -51,6 +51,39 @@
     min-height: 100vh;
 }
 
+/* Toolbar e resumo (estilo banco) */
+.toolbar {
+    position: sticky;
+    top: 0.5rem;
+    z-index: 10;
+    width: 100%;
+    max-width: 1400px;
+    margin-bottom: 1rem;
+}
+.toolbar-form {
+    display: flex;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+    padding: 0.5rem 0.75rem;
+}
+.toolbar-row { display: flex; flex-wrap: wrap; gap: 0.75rem; width: 100%; align-items: end; }
+.toolbar-group { display: flex; flex-direction: column; gap: 0.25rem; }
+.toolbar-label { font-size: 0.75rem; color: #6b7280; }
+.toolbar-input { padding: 0.45rem 0.65rem; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.9rem; min-width: 160px; background: #fff; }
+.toolbar-actions { margin-left: auto; display: flex; gap: 0.5rem; }
+.btn-sm { padding: 0.5rem 0.75rem; min-height: 34px; }
+
+.summary-grid { width: 100%; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; margin: 0.75rem 0 1rem 0; }
+.summary-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 0.875rem 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.summary-label { font-size: 0.8rem; color: #6b7280; margin-bottom: 0.25rem; }
+.summary-value { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; }
+.summary-value.positive { color: #059669; }
+.summary-value.negative { color: #dc2626; }
+.summary-value.info { color: #2563eb; }
+.summary-value.muted { color: #374151; }
+
 /* Espaçamento para botão mobile */
 @media (max-width: 1023px) {
     .main-header {
@@ -291,6 +324,14 @@
     overflow: hidden;
     letter-spacing: 0.025em;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Botão extra pequeno */
+.btn-xs {
+    padding: 0.35rem 0.6rem;
+    font-size: 0.8rem;
+    min-height: 28px;
+    min-width: auto;
 }
 
 .btn-primary {
@@ -974,17 +1015,105 @@
 
 .data-table th,
 .data-table td {
-    padding: 1rem;
+    padding: 0.75rem 0.875rem;
     text-align: left;
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
+/* Cabeçalho fixo para tabelas longas */
+.table-container {
+    max-height: 60vh;
+    overflow: auto;
+}
+.sticky-header th {
+    position: sticky;
+    top: 0;
+    background: rgba(248, 250, 252, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 1;
+}
+
+/* Badges de tipo */
+.badge-tipo {
+    display: inline-block;
+    padding: 0.35rem 0.65rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+}
+.badge-venda {
+    background: rgba(16, 185, 129, 0.12);
+    color: #047857;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+.badge-troca {
+    background: rgba(59, 130, 246, 0.12);
+    color: #1d4ed8;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* Larguras e alinhamentos no desktop */
+@media (min-width: 1024px) {
+    .table-container {
+        max-height: none; /* sem limite de altura no desktop */
+        overflow: visible;
+    }
+    .col-data { width: 140px; white-space: nowrap; }
+    .col-jogador { width: 220px; }
+    .col-tipo { width: 120px; text-align: center; }
+    .col-sange { width: 200px; }
+    .col-caixa { width: 90px; text-align: center; }
+    .col-valor { width: 140px; text-align: right; white-space: nowrap; }
+    .col-descricao { min-width: 240px; }
+}
+
+/* Zebra rows para melhor leitura */
+.data-table tbody tr:nth-child(odd) { background: #fafafa; }
+.data-table tbody tr:hover { background: #f5f7fb; }
+
 .data-table th {
-    background: rgba(248, 250, 252, 0.8);
+    background: #f8fafc;
     font-weight: 600;
     color: #374151;
     font-size: 0.9rem;
     letter-spacing: 0.025em;
+}
+
+/* Responsividade da toolbar e resumo */
+@media (max-width: 1023px) {
+    .toolbar { position: static; }
+    .toolbar-input { min-width: 140px; }
+    .summary-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 767px) {
+    .toolbar-input { min-width: 120px; font-size: 0.85rem; }
+    .toolbar-actions { width: 100%; justify-content: stretch; }
+    .btn-sm { width: 100%; }
+    .summary-grid { grid-template-columns: 1fr 1fr; }
+    /* removido grid de cards em favor da tabela completa no mobile */
+}
+@media (max-width: 479px) {
+    .summary-grid { grid-template-columns: 1fr; }
+    .mobile-card { padding: 0.5rem; }
+    .data-table { font-size: 0.75rem; }
+    .data-table th, .data-table td { padding: 0.375rem; }
+    .col-jogador { max-width: 120px; }
+    .col-descricao { max-width: 140px; }
+    .badge-tipo { font-size: 0.65rem; }
+}
+
+@media (max-width: 639px) {
+    .data-table { font-size: 0.8rem; table-layout: fixed; }
+    .data-table th, .data-table td { padding: 0.5rem; }
+    .col-sange, .col-caixa { display: none; }
+    .col-data, .col-jogador, .col-descricao { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .col-jogador { max-width: 140px; }
+    .col-descricao { max-width: 180px; }
+    .col-valor { white-space: nowrap; }
+    .badge-tipo { font-size: 0.7rem; padding: 0.25rem 0.5rem; }
+    .historico-card { padding: 0.75rem; }
+    .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }
 
 .data-table td {
@@ -1638,6 +1767,34 @@
     
     .troca-value {
         font-size: 0.85rem;
+    }
+
+    /* Ajustes para cards do histórico no mobile */
+    .historico-card {
+        padding: 1rem;
+        border-radius: 16px;
+        margin: 0 0.5rem 1rem 0.5rem;
+    }
+    .caixa-header {
+        gap: 0.5rem;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .caixa-header h3 {
+        font-size: 1.125rem;
+    }
+    .detail-row {
+        padding: 0.5rem 0;
+    }
+
+    /* Histórico ainda mais compacto em telas muito pequenas */
+    .historico-card {
+        padding: 0.75rem;
+        margin: 0 0.25rem 0.75rem 0.25rem;
+    }
+    .detail-row {
+        padding: 0.375rem 0;
     }
 }
 

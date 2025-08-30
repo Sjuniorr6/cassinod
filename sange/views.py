@@ -25,6 +25,104 @@ def listar_sanges(request):
     })
 
 @login_required
+def historico_movimentos(request):
+    """Histórico unificado de vendas e trocas com filtros."""
+    # Filtros
+    data_inicio = request.GET.get('data_inicio')
+    data_fim = request.GET.get('data_fim')
+    sange_id = request.GET.get('sange')
+    caixa_id = request.GET.get('caixa')
+    jogador_id = request.GET.get('jogador')
+    tipo = request.GET.get('tipo')  # 'venda', 'troca' ou None
+
+    vendas_qs = VendaFicha.objects.select_related('caixa_sange__sange', 'jogador')
+    trocas_qs = TrocaFicha.objects.select_related('caixa_sange__sange')
+
+    # Aplicar filtros
+    from django.utils.dateparse import parse_date
+    if data_inicio:
+        di = parse_date(data_inicio)
+        if di:
+            vendas_qs = vendas_qs.filter(data__date__gte=di)
+            trocas_qs = trocas_qs.filter(data__date__gte=di)
+    if data_fim:
+        df = parse_date(data_fim)
+        if df:
+            vendas_qs = vendas_qs.filter(data__date__lte=df)
+            trocas_qs = trocas_qs.filter(data__date__lte=df)
+    if sange_id:
+        vendas_qs = vendas_qs.filter(caixa_sange__sange_id=sange_id)
+        trocas_qs = trocas_qs.filter(caixa_sange__sange_id=sange_id)
+    if caixa_id:
+        vendas_qs = vendas_qs.filter(caixa_sange_id=caixa_id)
+        trocas_qs = trocas_qs.filter(caixa_sange_id=caixa_id)
+    if jogador_id:
+        vendas_qs = vendas_qs.filter(jogador_id=jogador_id)
+    # tipo: aplicamos abaixo quando unificar
+
+    # Unificar em uma lista com campos comuns
+    movimentos = []
+    total_vendas_valor = Decimal('0.00')
+    total_trocas_valor = Decimal('0.00')
+    for v in vendas_qs:
+        movimentos.append({
+            'tipo': 'venda',
+            'data': v.data,
+            'sange': v.caixa_sange.sange.nome,
+            'caixa_id': v.caixa_sange_id,
+            'descricao': f"Venda {v.quantidade}x R$ {v.valor_unitario}",
+            'valor': float(v.valor_total),
+            'jogador': v.jogador.nome_completo if v.jogador else '—',
+        })
+        try:
+            total_vendas_valor += Decimal(v.valor_total)
+        except Exception:
+            total_vendas_valor += Decimal(str(v.valor_total))
+    for t in trocas_qs:
+        movimentos.append({
+            'tipo': 'troca',
+            'data': t.data,
+            'sange': t.caixa_sange.sange.nome,
+            'caixa_id': t.caixa_sange_id,
+            'descricao': f"Troca R$ {t.valor_original} por {t.quantidade_gerada}x R$ {t.valor_ficha_troca}",
+            'valor': float(t.valor_original),
+            'jogador': '—',
+        })
+        total_trocas_valor += Decimal(str(t.valor_original))
+
+    if tipo in ('venda', 'troca'):
+        movimentos = [m for m in movimentos if m['tipo'] == tipo]
+
+    # Ordenar por data desc
+    movimentos.sort(key=lambda m: m['data'], reverse=True)
+
+    # Opções de selects
+    sanges = Sange.objects.all().order_by('nome')
+    caixas = CaixaSange.objects.all().order_by('-data_abertura')
+    jogadores = Cliente.objects.all().order_by('nome')
+
+    return render(request, 'sange/historico.html', {
+        'movimentos': movimentos,
+        'sanges': sanges,
+        'caixas': caixas,
+        'jogadores': jogadores,
+        'totais': {
+            'vendas': float(total_vendas_valor),
+            'trocas': float(total_trocas_valor),
+            'saldo': float(total_vendas_valor - total_trocas_valor),
+            'qtd_movimentos': len(movimentos),
+        },
+        'f': {
+            'data_inicio': data_inicio or '',
+            'data_fim': data_fim or '',
+            'sange': int(sange_id) if sange_id else '',
+            'caixa': int(caixa_id) if caixa_id else '',
+            'jogador': int(jogador_id) if jogador_id else '',
+            'tipo': tipo or '',
+        }
+    })
+
+@login_required
 def nova_sange(request):
     """Cria uma nova sange sem caixa aberto"""
     if request.method == 'POST':
@@ -148,6 +246,7 @@ def vender_fichas(request, caixa_id):
                 jogador = Cliente.objects.get(id=jogador_id)
             
             vendas_criadas = []
+            canhoto = request.POST.get('canhoto', '').strip()
             for valor, quantidade in fichas_vendidas.items():
                 venda = VendaFicha.objects.create(
                     caixa_sange=caixa,
@@ -177,9 +276,11 @@ def vender_fichas(request, caixa_id):
                 carteira.saldo_fichas += fichas_adicionadas
                 carteira.save()
                 
-                messages.success(request, f'Venda registrada: R$ {valor_total_venda} em fichas. Saldo do jogador atualizado: R$ {jogador.saldo} ({fichas_adicionadas} fichas adicionadas)')
+                mensagem_extra = f" | Canhoto: {canhoto}" if canhoto else ""
+                messages.success(request, f'Venda registrada: R$ {valor_total_venda} em fichas. Saldo do jogador atualizado: R$ {jogador.saldo} ({fichas_adicionadas} fichas adicionadas){mensagem_extra}')
             else:
-                messages.success(request, f'Venda registrada: R$ {valor_total_venda} em fichas')
+                mensagem_extra = f" | Canhoto: {canhoto}" if canhoto else ""
+                messages.success(request, f'Venda registrada: R$ {valor_total_venda} em fichas{mensagem_extra}')
             
             return redirect('sange:detalhes_caixa', caixa_id=caixa.id)
             
@@ -189,7 +290,8 @@ def vender_fichas(request, caixa_id):
     return render(request, 'sange/vender_fichas.html', {
         'caixa': caixa,
         'jogadores': Cliente.objects.all().order_by('nome'),
-        'valores_fichas': [5, 10, 25, 50, 100, 500, 1000, 5000, 10000]
+        # Remover fichas de 10 e 50
+        'valores_fichas': [5, 25, 100, 500, 1000, 5000, 10000]
     })
 
 @login_required

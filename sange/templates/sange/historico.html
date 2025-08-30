@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Histórico de Movimentos - Sanges{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link rel="stylesheet" href="{% static 'css/sange.css' %}?v=3.4">
+{% endblock %}
+
+{% block content %}
+<div class="bg-cassino"></div>
+<div class="bg-overlay"></div>
+
+<div class="main-content">
+    {% include 'components/_sidebar.html' %}
+
+    <div class="content-wrapper">
+        <button id="mobileSidebarBtn" class="mobile-sidebar-btn lg:hidden">Cass</button>
+
+        <header class="main-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1 class="main-title">Movimentações</h1>
+                    <p class="main-subtitle">Vendas e Trocas de Fichas</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="cards-container">
+            {% if messages %}
+                <div class="messages-container">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} mb-2">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="toolbar">
+                <form method="get" class="toolbar-form">
+                    <div class="toolbar-row">
+                        <div class="toolbar-group">
+                            <label class="toolbar-label" for="data_inicio">Início</label>
+                            <input id="data_inicio" type="date" name="data_inicio" value="{{ f.data_inicio }}" class="toolbar-input">
+                        </div>
+                        <div class="toolbar-group">
+                            <label class="toolbar-label" for="data_fim">Fim</label>
+                            <input id="data_fim" type="date" name="data_fim" value="{{ f.data_fim }}" class="toolbar-input">
+                        </div>
+                        <div class="toolbar-group">
+                            <label class="toolbar-label" for="tipo">Tipo</label>
+                            <select id="tipo" name="tipo" class="toolbar-input">
+                                <option value="">Todos</option>
+                                <option value="venda" {% if f.tipo == 'venda' %}selected{% endif %}>Vendas</option>
+                                <option value="troca" {% if f.tipo == 'troca' %}selected{% endif %}>Trocas</option>
+                            </select>
+                        </div>
+                        <div class="toolbar-group">
+                            <label class="toolbar-label" for="sange">Sange</label>
+                            <select id="sange" name="sange" class="toolbar-input">
+                                <option value="">Todas</option>
+                                {% for s in sanges %}
+                                    <option value="{{ s.id }}" {% if f.sange == s.id %}selected{% endif %}>{{ s.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="toolbar-group hidden md:block">
+                            <label class="toolbar-label" for="caixa">Caixa</label>
+                            <select id="caixa" name="caixa" class="toolbar-input">
+                                <option value="">Todos</option>
+                                {% for c in caixas %}
+                                    <option value="{{ c.id }}" {% if f.caixa == c.id %}selected{% endif %}>{{ c }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="toolbar-group hidden lg:block">
+                            <label class="toolbar-label" for="jogador">Jogador</label>
+                            <select id="jogador" name="jogador" class="toolbar-input">
+                                <option value="">Todos</option>
+                                {% for j in jogadores %}
+                                    <option value="{{ j.id }}" {% if f.jogador == j.id %}selected{% endif %}>{{ j.nome_completo }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="toolbar-actions">
+                            <a href="{% url 'sange:historico_movimentos' %}" class="btn-secondary btn-sm">Limpar</a>
+                            <button type="submit" class="btn-primary btn-sm">Aplicar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="summary-label">Total de Vendas</div>
+                    <div class="summary-value positive">R$ {{ totais.vendas|floatformat:2 }}</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Total de Trocas</div>
+                    <div class="summary-value info">R$ {{ totais.trocas|floatformat:2 }}</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Saldo</div>
+                    <div class="summary-value {% if totais.saldo >= 0 %}positive{% else %}negative{% endif %}">R$ {{ totais.saldo|floatformat:2 }}</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">Movimentos</div>
+                    <div class="summary-value muted">{{ totais.qtd_movimentos }}</div>
+                </div>
+            </div>
+
+            {% if movimentos %}
+                <!-- Tabela em todas as telas -->
+                <div class="historico-card">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead class="sticky-header">
+                                <tr>
+                                    <th class="col-data">Data</th>
+                                    <th class="col-jogador">Jogador</th>
+                                    <th class="col-tipo">Tipo</th>
+                                    <th class="col-sange">Sange</th>
+                                    <th class="col-caixa hidden sm:table-cell">Caixa</th>
+                                    <th class="col-descricao">Descrição</th>
+                                    <th class="col-valor text-right">Valor (R$)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for m in movimentos %}
+                                    <tr>
+                                        <td class="col-data">{{ m.data|date:"d/m/Y H:i" }}</td>
+                                        <td class="col-jogador truncate">{% if m.jogador and m.jogador != '—' %}{{ m.jogador }}{% else %}—{% endif %}</td>
+                                        <td class="col-tipo" style="text-align:center;"><span class="badge-tipo {% if m.tipo == 'venda' %}badge-venda{% else %}badge-troca{% endif %}">{{ m.tipo|title }}</span></td>
+                                        <td class="col-sange">{{ m.sange }}</td>
+                                        <td class="col-caixa hidden sm:table-cell" style="text-align:center;">#{{ m.caixa_id }}</td>
+                                        <td class="col-descricao whitespace-normal break-words">{{ m.descricao }}</td>
+                                        <td class="col-valor money text-right">R$ {{ m.valor|floatformat:2 }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                
+            {% else %}
+                <div class="empty-state">
+                    <h2 class="empty-title">Sem movimentos</h2>
+                    <p class="empty-description">Ajuste os filtros para localizar registros</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+

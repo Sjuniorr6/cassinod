@@ -8,21 +8,66 @@
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
     <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
     <style>
-    /* Responsividade global */
-    @media (max-width: 1024px) {
+    /* Responsividade global otimizada para iPads e tablets */
+    
+    /* iPad Pro (1024px e acima) - Desktop-like experience */
+    @media (min-width: 1024px) and (max-width: 1366px) {
+        .content-wrapper {
+            margin-left: 110px !important; /* Sidebar fechada */
+            padding: 0 2rem !important;
+        }
+        
+        .main-header {
+            padding: 2.5rem 0 2rem 0 !important;
+        }
+        
+        .main-title {
+            font-size: 3rem !important;
+        }
+        
+        .main-subtitle {
+            font-size: 1.25rem !important;
+        }
+        
+        .cards-container {
+            padding: 0 0 2rem 0 !important;
+        }
+        
+        /* Grid responsivo para iPad */
+        .grid {
+            gap: 1.5rem !important;
+        }
+        
+        /* Cards com tamanho otimizado */
+        .bg-white\/95 {
+            max-width: none !important;
+        }
+        
+        /* Métricas em 2 colunas no iPad */
+        .metricas-container {
+            grid-template-columns: repeat(2, 1fr) !important;
+        }
+        
+        /* Mesas em 2 colunas no iPad */
+        .mesas-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+        }
+    }
+    
+    /* iPad Air/Regular (768px - 1023px) */
+    @media (min-width: 768px) and (max-width: 1023px) {
         .content-wrapper {
             margin-left: 0 !important;
-            padding: 0 1rem !important;
-            text-align: center !important;
+            padding: 0 1.5rem !important;
         }
         
         .main-header {
             text-align: center !important;
-            padding: 2rem 1rem 1rem 1rem !important;
+            padding: 2rem 1.5rem 1.5rem 1.5rem !important;
         }
         
         .main-title {
-            font-size: 2.5rem !important;
+            font-size: 2.75rem !important;
             text-align: center !important;
         }
         
@@ -32,76 +77,226 @@
         }
         
         .cards-container {
-            padding: 0 1rem 1rem 1rem !important;
-            text-align: center !important;
+            padding: 0 1.5rem 1.5rem 1.5rem !important;
         }
         
-        /* Centralizar botões */
+        /* Grid responsivo para iPad */
+        .grid {
+            gap: 1.25rem !important;
+        }
+        
+        /* Métricas em 2 colunas */
+        .metricas-container {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 1.25rem !important;
+        }
+        
+        /* Mesas em 2 colunas */
+        .mesas-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 1.25rem !important;
+        }
+        
+        /* Cards otimizados para iPad */
+        .bg-white\/95 {
+            margin: 0 !important;
+            max-width: none !important;
+        }
+        
+        /* Botões de controle centralizados */
         .control-buttons {
             justify-content: center !important;
             flex-wrap: wrap !important;
+            gap: 0.75rem !important;
         }
         
-        /* Centralizar grids */
-        .grid {
-            justify-items: center !important;
+        /* Filtros otimizados para iPad */
+        .filtro-container {
+            flex-direction: column !important;
+            gap: 1rem !important;
         }
         
-        /* Centralizar cards */
+        .filtro-container form {
+            flex-direction: column !important;
+            gap: 1rem !important;
+        }
+    }
+    
+    /* iPad Mini e tablets pequenos (768px - 820px) */
+    @media (min-width: 768px) and (max-width: 820px) {
+        .content-wrapper {
+            padding: 0 1rem !important;
+        }
+        
+        .main-header {
+            padding: 1.5rem 1rem 1rem 1rem !important;
+        }
+        
+        .main-title {
+            font-size: 2.5rem !important;
+        }
+        
+        .cards-container {
+            padding: 0 1rem 1rem 1rem !important;
+        }
+        
+        /* Métricas em 1 coluna para melhor legibilidade */
+        .metricas-container {
+            grid-template-columns: 1fr !important;
+        }
+        
+        /* Mesas em 1 coluna */
+        .mesas-grid {
+            grid-template-columns: 1fr !important;
+        }
+    }
+    
+    /* Mobile (abaixo de 768px) */
+    @media (max-width: 767px) {
+        .content-wrapper {
+            margin-left: 0 !important;
+            padding: 0 0.75rem !important;
+        }
+        
+        .main-header {
+            text-align: center !important;
+            padding: 1.5rem 0.75rem 1rem 0.75rem !important;
+        }
+        
+        .main-title {
+            font-size: 2rem !important;
+            text-align: center !important;
+        }
+        
+        .main-subtitle {
+            font-size: 1rem !important;
+            text-align: center !important;
+        }
+        
+        .cards-container {
+            padding: 0 0.75rem 0.75rem 0.75rem !important;
+        }
+        
+        /* Métricas em 1 coluna */
+        .metricas-container {
+            grid-template-columns: 1fr !important;
+            gap: 1rem !important;
+        }
+        
+        /* Mesas em 1 coluna */
+        .mesas-grid {
+            grid-template-columns: 1fr !important;
+            gap: 1rem !important;
+        }
+        
+        /* Cards centralizados */
         .bg-white\/95 {
             margin: 0 auto !important;
             max-width: 100% !important;
         }
+        
+        /* Botões de controle */
+        .control-buttons {
+            justify-content: center !important;
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+        }
+        
+        /* Filtros em coluna */
+        .filtro-container {
+            flex-direction: column !important;
+            gap: 0.75rem !important;
+        }
+        
+        .filtro-container form {
+            flex-direction: column !important;
+            gap: 0.75rem !important;
+        }
     }
     
-    @media (max-width: 768px) {
+    /* Mobile pequeno (abaixo de 640px) */
+    @media (max-width: 639px) {
         .content-wrapper {
             padding: 0 0.5rem !important;
         }
         
         .main-header {
-            padding: 1.5rem 0.5rem 1rem 0.5rem !important;
+            padding: 1rem 0.5rem 0.75rem 0.5rem !important;
         }
         
         .main-title {
-            font-size: 2rem !important;
+            font-size: 1.75rem !important;
+        }
+        
+        .main-subtitle {
+            font-size: 0.875rem !important;
         }
         
         .cards-container {
             padding: 0 0.5rem 0.5rem 0.5rem !important;
         }
         
-        /* Centralizar métricas */
-        .metricas-container {
-            grid-template-columns: 1fr !important;
-            justify-items: center !important;
-        }
-        
-        /* Centralizar mesas */
-        .mesas-grid {
-            grid-template-columns: 1fr !important;
-            justify-items: center !important;
-        }
-    }
-    
-    @media (max-width: 640px) {
-        .main-title {
-            font-size: 1.75rem !important;
-        }
-        
-        .main-subtitle {
-            font-size: 1rem !important;
-        }
-        
-        /* Centralizar tudo em telas muito pequenas */
+        /* Centralizar tudo */
         .content-wrapper > * {
             text-align: center !important;
         }
         
-        /* Ajustar padding para telas pequenas */
+        /* Cards com margem reduzida */
         .bg-white\/95 {
             margin: 0.5rem auto !important;
             width: calc(100% - 1rem) !important;
+        }
+        
+        /* Botões menores */
+        .control-buttons button {
+            padding: 0.5rem 0.75rem !important;
+            font-size: 0.875rem !important;
+        }
+    }
+    
+    /* Orientação landscape em tablets */
+    @media (min-width: 768px) and (max-width: 1023px) and (orientation: landscape) {
+        .content-wrapper {
+            padding: 0 2rem !important;
+        }
+        
+        .main-header {
+            padding: 1.5rem 0 1rem 0 !important;
+        }
+        
+        .main-title {
+            font-size: 2.25rem !important;
+        }
+        
+        /* Métricas em 3 colunas em landscape */
+        .metricas-container {
+            grid-template-columns: repeat(3, 1fr) !important;
+        }
+        
+        /* Mesas em 3 colunas em landscape */
+        .mesas-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+        }
+    }
+    
+    /* Orientação portrait em tablets */
+    @media (min-width: 768px) and (max-width: 1023px) and (orientation: portrait) {
+        .main-title {
+            font-size: 3rem !important;
+        }
+        
+        .main-subtitle {
+            font-size: 1.25rem !important;
+        }
+        
+        /* Métricas em 2 colunas em portrait */
+        .metricas-container {
+            grid-template-columns: repeat(2, 1fr) !important;
+        }
+        
+        /* Mesas em 2 colunas em portrait */
+        .mesas-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
         }
     }
     </style>
@@ -117,11 +312,11 @@
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             if (sidebar) {
-                if (window.innerWidth <= 1024) {
-                    // Mobile: toggle mobile-open class
+                if (window.innerWidth <= 1023) {
+                    // Mobile/Tablet: toggle mobile-open class
                     sidebar.classList.toggle('mobile-open');
                 } else {
-                    // Desktop: toggle closed class
+                    // Desktop/iPad Pro: toggle closed class
                     sidebar.classList.toggle('closed');
                 }
                 console.log('Sidebar toggled');
@@ -146,8 +341,8 @@
                 sidebar.style.visibility = 'visible';
                 sidebar.style.opacity = '1';
                 
-                // Em desktop, começar fechado
-                if (window.innerWidth > 1024) {
+                // Em desktop/iPad Pro, começar fechado
+                if (window.innerWidth > 1023) {
                     sidebar.classList.add('closed');
                 }
                 
@@ -172,28 +367,28 @@
                 });
             }
 
-            // Fechar sidebar no mobile ao clicar fora
+            // Fechar sidebar no mobile/tablet ao clicar fora
             document.addEventListener('click', function(e) {
-                if (window.innerWidth <= 1024) {
+                if (window.innerWidth <= 1023) {
                     if (sidebar && !sidebar.contains(e.target) && !mobileSidebarBtn.contains(e.target)) {
                         sidebar.classList.remove('mobile-open');
                     }
                 }
             });
 
-            // Ajustar sidebar quando a janela é redimensionada
-            window.addEventListener('resize', function() {
-                if (window.innerWidth > 1024) {
-                    // Desktop: remover mobile-open e adicionar closed se não estiver
-                    sidebar.classList.remove('mobile-open');
-                    if (!sidebar.classList.contains('closed')) {
-                        sidebar.classList.add('closed');
-                    }
-                } else {
-                    // Mobile: remover closed
-                    sidebar.classList.remove('closed');
+                    // Ajustar sidebar quando a janela é redimensionada
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 1023) {
+                // Desktop/iPad Pro: remover mobile-open e adicionar closed se não estiver
+                sidebar.classList.remove('mobile-open');
+                if (!sidebar.classList.contains('closed')) {
+                    sidebar.classList.add('closed');
                 }
-            });
+            } else {
+                // Mobile/Tablet: remover closed
+                sidebar.classList.remove('closed');
+            }
+        });
         });
     </script>
     

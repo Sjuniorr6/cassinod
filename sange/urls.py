@@ -7,6 +7,7 @@ urlpatterns = [
     # Páginas principais
     path('', views.listar_sanges, name='listar_sanges'),
     path('nova/', views.nova_sange, name='nova_sange'),
+    path('historico/', views.historico_movimentos, name='historico_movimentos'),
     
     # Gerenciamento de caixas
     path('sange/<int:sange_id>/abrir-caixa/', views.abrir_caixa, name='abrir_caixa'),

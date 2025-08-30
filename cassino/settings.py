@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'sange',
     'dashboard',
     'divulgacao',
+    'croupiers',
 ]
 
 MIDDLEWARE = [

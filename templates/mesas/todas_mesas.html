@@ -118,7 +118,7 @@
                             <label for="filtroStatus" class="block text-sm font-medium text-gray-700 mb-2">Status</label>
                             <select id="filtroStatus" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
                                 <option value="">Todos os status</option>
-                                <option value="aberta">Abertas</option>
+                                <option value="aberta" selected>Abertas</option>
                                 <option value="fechada">Fechadas</option>
                                 <option value="encerrada">Encerradas</option>
                             </select>
@@ -139,6 +139,12 @@
                         
                         <!-- Botões de Ação -->
                         <div class="flex items-end gap-2">
+                            <button onclick="abrirModalCriarMesa()" class="px-4 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2" title="Criar nova mesa">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                </svg>
+                                Nova Mesa
+                            </button>
                             <button onclick="aplicarFiltros()" class="flex-1 px-4 py-3 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"/>
@@ -215,9 +221,106 @@
     </div>
 </div>
 
-
-
-
+<!-- Modal para criar/editar mesa -->
+<div id="criarMesaModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display: none;">
+    <div class="transform transition-all duration-300 scale-95 opacity-0" id="modalContentCriarMesa">
+        <!-- Header -->
+        <div class="modal-header">
+            <div class="flex items-center justify-between">
+                <h2 id="criarMesaTitle">Criar Nova Mesa</h2>
+                <button onclick="fecharModalCriarMesa()" title="Fechar">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- Content -->
+        <div class="modal-body">
+            <form id="formCriarMesa" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Número da Mesa -->
+                    <div>
+                        <label for="numeroMesa" class="block text-sm font-medium text-gray-700 mb-2">Número da Mesa *</label>
+                        <input type="number" id="numeroMesa" name="numeroMesa" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                    </div>
+                    
+                    <!-- Tipo de Jogo -->
+                    <div>
+                        <label for="tipoJogo" class="block text-sm font-medium text-gray-700 mb-2">Tipo de Jogo *</label>
+                        <select id="tipoJogo" name="tipoJogo" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                            <option value="">Selecione...</option>
+                            <option value="poker">Poker</option>
+                            <option value="caribenho">Poker Caribenho</option>
+                            <option value="ultimate">Poker Ultimate</option>
+                            <option value="baccarat">Baccarat</option>
+                            <option value="roleta">Roleta</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Croupier -->
+                    <div>
+                        <label for="croupier" class="block text-sm font-medium text-gray-700 mb-2">Nome do Croupier</label>
+                        <input type="text" id="croupier" name="croupier" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="Digite o nome do croupier">
+                    </div>
+                    
+                    <!-- Status -->
+                    <div>
+                        <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Status *</label>
+                        <select id="status" name="status" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                            <option value="aberta">Aberta</option>
+                            <option value="fechada">Fechada</option>
+                            <option value="encerrada">Encerrada</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Fichas -->
+                <div class="border-t pt-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Fichas Iniciais</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                            <label for="fichas5" class="block text-sm font-medium text-gray-700 mb-2">R$ 5,00</label>
+                            <input type="number" id="fichas5" name="fichas5" value="0" min="0" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="fichas25" class="block text-sm font-medium text-gray-700 mb-2">R$ 25,00</label>
+                            <input type="number" id="fichas25" name="fichas25" value="0" min="0" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="fichas100" class="block text-sm font-medium text-gray-700 mb-2">R$ 100,00</label>
+                            <input type="number" id="fichas100" name="fichas100" value="0" min="0" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="fichas500" class="block text-sm font-medium text-gray-700 mb-2">R$ 500,00</label>
+                            <input type="number" id="fichas500" name="fichas500" value="0" min="0" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="fichas1000" class="block text-sm font-medium text-gray-700 mb-2">R$ 1.000,00</label>
+                            <input type="number" id="fichas1000" name="fichas1000" value="0" min="0" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="fichas5000" class="block text-sm font-medium text-gray-700 mb-2">R$ 5.000,00</label>
+                            <input type="number" id="fichas5000" name="fichas5000" value="0" min="0" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="fichas10000" class="block text-sm font-medium text-gray-700 mb-2">R$ 10.000,00</label>
+                            <input type="number" id="fichas10000" name="fichas10000" value="0" min="0" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button onclick="fecharModalCriarMesa()" class="btn-close-clean">
+                    Cancelar
+                </button>
+                <button onclick="salvarMesa()" class="btn-primary">
+                    Salvar Mesa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Modal de confirmação/erro genérico -->
 <div id="confirmModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display: none;">
@@ -264,7 +367,7 @@ let mesaParaEncerrar = null;
 // Filtros ativos
 let filtrosAtivos = {
     data: '',
-    status: '',
+    status: 'aberta',  // Filtro padrão: mesas abertas
     tipoJogo: ''
 };
 
@@ -325,6 +428,10 @@ function renderizarMesas() {
                     <p class="text-lg font-bold text-gray-800">${mesa.tipo_jogo_display}</p>
                 </div>
                 <div>
+                    <p class="text-sm text-gray-600 font-semibold">Croupier</p>
+                    <p class="text-lg font-bold text-blue-600">${mesa.croupier || 'Não informado'}</p>
+                </div>
+                <div>
                     <p class="text-sm text-gray-600 font-semibold">Saldo</p>
                     <p class="text-lg font-bold text-red-600">R$ ${parseFloat(mesa.saldo).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
                 </div>
@@ -337,6 +444,14 @@ function renderizarMesas() {
                     </svg>
                     Ver Detalhes
                 </button>
+                <button class="w-full px-3 py-2 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white text-sm font-semibold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-1" onclick="abrirModalEditarMesa(${mesa.id})" title="Editar mesa">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                    Editar
+                </button>
+            </div>
+            <div class="flex gap-2 mt-2">
                 ${mesa.status === 'aberta' ? `
                     <button class="w-full px-3 py-2 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white text-sm font-semibold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-1" onclick="fecharMesa(${mesa.id})" title="Fechar mesa">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -412,6 +527,10 @@ function verMesa(mesaId) {
                         <div class="info-item">
                             <span class="info-label">Status</span>
                             <span class="status-badge-clean ${mesa.status}">${mesa.status_display}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Croupier</span>
+                            <span class="info-value">${mesa.croupier || 'Não informado'}</span>
                         </div>
                     </div>
                     
@@ -869,23 +988,161 @@ function aplicarFiltros() {
     renderizarMesas();
 }
 
+// Funções para o modal de criação/edição de mesa
+let mesaEmEdicao = null;
+
+function abrirModalCriarMesa() {
+    mesaEmEdicao = null;
+    document.getElementById('criarMesaTitle').textContent = 'Criar Nova Mesa';
+    limparFormularioMesa();
+    
+    const modal = document.getElementById('criarMesaModal');
+    const modalContent = document.getElementById('modalContentCriarMesa');
+    
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => {
+        modalContent.classList.remove('scale-95', 'opacity-0');
+        modalContent.classList.add('scale-100', 'opacity-100');
+    }, 10);
+}
+
+function abrirModalEditarMesa(mesaId) {
+    mesaEmEdicao = mesaId;
+    document.getElementById('criarMesaTitle').textContent = 'Editar Mesa';
+    
+    // Carregar dados da mesa
+    fetch(`/mesas/api/mesa/${mesaId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const mesa = data.mesa;
+                preencherFormularioMesa(mesa);
+                
+                const modal = document.getElementById('criarMesaModal');
+                const modalContent = document.getElementById('modalContentCriarMesa');
+                
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                setTimeout(() => {
+                    modalContent.classList.remove('scale-95', 'opacity-0');
+                    modalContent.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            } else {
+                mostrarModalConfirm('Erro', 'Erro ao carregar dados da mesa', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar mesa:', error);
+            mostrarModalConfirm('Erro', 'Erro ao carregar dados da mesa', 'error');
+        });
+}
+
+function fecharModalCriarMesa() {
+    const modal = document.getElementById('criarMesaModal');
+    const modalContent = document.getElementById('modalContentCriarMesa');
+    
+    modalContent.classList.add('scale-95', 'opacity-0');
+    modalContent.classList.remove('scale-100', 'opacity-100');
+    setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        mesaEmEdicao = null;
+    }, 300);
+}
+
+function limparFormularioMesa() {
+    document.getElementById('formCriarMesa').reset();
+    document.getElementById('numeroMesa').value = '';
+    document.getElementById('tipoJogo').value = '';
+    document.getElementById('croupier').value = '';
+    document.getElementById('status').value = 'aberta';
+    document.getElementById('fichas5').value = '0';
+    document.getElementById('fichas25').value = '0';
+    document.getElementById('fichas100').value = '0';
+    document.getElementById('fichas500').value = '0';
+    document.getElementById('fichas1000').value = '0';
+    document.getElementById('fichas5000').value = '0';
+    document.getElementById('fichas10000').value = '0';
+}
+
+function preencherFormularioMesa(mesa) {
+    document.getElementById('numeroMesa').value = mesa.numero_mesa;
+    document.getElementById('tipoJogo').value = mesa.tipo_jogo;
+    document.getElementById('croupier').value = mesa.croupier || '';
+    document.getElementById('status').value = mesa.status;
+    document.getElementById('fichas5').value = mesa.fichas_5 || 0;
+    document.getElementById('fichas25').value = mesa.fichas_25 || 0;
+    document.getElementById('fichas100').value = mesa.fichas_100 || 0;
+    document.getElementById('fichas500').value = mesa.fichas_500 || 0;
+    document.getElementById('fichas1000').value = mesa.fichas_1000 || 0;
+    document.getElementById('fichas5000').value = mesa.fichas_5000 || 0;
+    document.getElementById('fichas10000').value = mesa.fichas_10000 || 0;
+}
+
+function salvarMesa() {
+    const formData = {
+        numero_mesa: parseInt(document.getElementById('numeroMesa').value),
+        tipo_jogo: document.getElementById('tipoJogo').value,
+        croupier: document.getElementById('croupier').value,
+        status: document.getElementById('status').value,
+        fichas_5: parseInt(document.getElementById('fichas5').value) || 0,
+        fichas_25: parseInt(document.getElementById('fichas25').value) || 0,
+        fichas_100: parseInt(document.getElementById('fichas100').value) || 0,
+        fichas_500: parseInt(document.getElementById('fichas500').value) || 0,
+        fichas_1000: parseInt(document.getElementById('fichas1000').value) || 0,
+        fichas_5000: parseInt(document.getElementById('fichas5000').value) || 0,
+        fichas_10000: parseInt(document.getElementById('fichas10000').value) || 0
+    };
+    
+    // Validação básica
+    if (!formData.numero_mesa || !formData.tipo_jogo) {
+        mostrarModalConfirm('Erro', 'Por favor, preencha todos os campos obrigatórios', 'error');
+        return;
+    }
+    
+    const url = mesaEmEdicao ? `/mesas/api/mesa/${mesaEmEdicao}/editar/` : '/mesas/api/criar/';
+    const method = mesaEmEdicao ? 'POST' : 'POST';
+    
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            mostrarModalConfirm('Sucesso', data.message, 'success');
+            fecharModalCriarMesa();
+            carregarMesas(); // Recarregar a lista de mesas
+        } else {
+            mostrarModalConfirm('Erro', data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao salvar mesa:', error);
+        mostrarModalConfirm('Erro', 'Erro ao salvar mesa. Tente novamente.', 'error');
+    });
+}
+
 function limparFiltros() {
     // Limpar campos dos filtros
     document.getElementById('filtroData').value = '';
-    document.getElementById('filtroStatus').value = '';
+    document.getElementById('filtroStatus').value = 'aberta';  // Manter "Abertas" como padrão
     document.getElementById('filtroTipoJogo').value = '';
     
     // Limpar filtros ativos
     filtrosAtivos = {
         data: '',
-        status: '',
+        status: 'aberta',  // Manter "Abertas" como padrão
         tipoJogo: ''
     };
     
-    // Mostrar todas as mesas
-    mesasFiltradas = [...todasMesas];
-    paginaAtual = 1;
-    renderizarMesas();
+    // Aplicar filtro padrão (mesas abertas)
+    aplicarFiltros();
 }
 </script>
 {% endblock %} 

@@ -1,8 +1,59 @@
 
     // Sidebar functionality is handled in base.html
     
+    // URLs das APIs
+    window.API_URLS = {
+        fecharMesa: '/mesas/api/mesa/0/fechar/',
+        abrirMesa: '/mesas/api/mesa/0/abrir/',
+        encerrarMesa: '/mesas/api/mesa/0/encerrar/',
+        criarMesa: '/mesas/api/mesa/criar/',
+        obterMesa: '/mesas/api/mesa/0/',
+        editarMesa: '/mesas/api/mesa/0/editar/',
+        atualizarMetricas: '/mesas/api/metricas/',
+        listarCroupiers: '/croupiers/api/listar/',
+    };
+    
     // Função para verificar se é mobile
     const isMobile = () => window.innerWidth <= 1024;
+    
+    // Função para carregar croupiers
+    async function carregarCroupiers() {
+        try {
+            const response = await fetch(window.API_URLS.listarCroupiers);
+            const data = await response.json();
+            
+            if (data.success) {
+                return data.croupiers;
+            } else {
+                console.error('Erro ao carregar croupiers:', data.message);
+                return [];
+            }
+        } catch (error) {
+            console.error('Erro ao carregar croupiers:', error);
+            return [];
+        }
+    }
+    
+    // Função para preencher selects de croupiers
+    function preencherSelectCroupiers(selectElement, croupierId = null) {
+        carregarCroupiers().then(croupiers => {
+            // Limpar opções existentes (exceto a primeira)
+            while (selectElement.children.length > 1) {
+                selectElement.removeChild(selectElement.lastChild);
+            }
+            
+            // Adicionar opções dos croupiers
+            croupiers.forEach(croupier => {
+                const option = document.createElement('option');
+                option.value = croupier.id;
+                option.textContent = croupier.nome;
+                if (croupierId && croupier.id === croupierId) {
+                    option.selected = true;
+                }
+                selectElement.appendChild(option);
+            });
+        });
+    }
 
     // Animar contadores
     function animateCounter(element) {
@@ -214,6 +265,12 @@
         // Adicionar proteção contra fechamento acidental
         modalCriarMesa.setAttribute('data-modal-protected', 'true');
         
+        // Carregar croupiers no select
+        const selectCroupier = document.getElementById('croupier');
+        if (selectCroupier) {
+            preencherSelectCroupiers(selectCroupier);
+        }
+        
         // Animar entrada do modal
         setTimeout(() => {
             const modalContent = document.getElementById('modalContentCriar');
@@ -291,6 +348,7 @@
         const data = {
             numero_mesa: parseInt(formData.get('numero_mesa')),
             tipo_jogo: formData.get('tipo_jogo'),
+            croupier: formData.get('croupier') || '',
             status: 'aberta',
             fichas_5: parseInt(formData.get('fichas_5') || '0'),
             fichas_25: parseInt(formData.get('fichas_25') || '0'),
@@ -419,6 +477,7 @@
                     'numeroMesaEditar',
                     'tipoJogoEditar',
                     'statusEditar',
+                    'croupierEditar',
                     'valorInicialEditar',
                     'fichas5Editar',
                     'fichas25Editar',
@@ -462,6 +521,12 @@
                 // Abrir modal
                 modalEditarMesa.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
+                
+                // Carregar croupiers e selecionar o correto
+                const selectCroupierEditar = document.getElementById('croupierEditar');
+                if (selectCroupierEditar) {
+                    preencherSelectCroupiers(selectCroupierEditar, mesaData.croupier_id);
+                }
 
                 // Animar entrada do modal
                 setTimeout(() => {
@@ -537,6 +602,7 @@
             numero_mesa: parseInt(formData.get('numero_mesa')),
             tipo_jogo: formData.get('tipo_jogo'),
             status: formData.get('status'),
+            croupier: formData.get('croupier') || '',
             fichas_5: parseInt(formData.get('fichas_5') || '0'),
             fichas_25: parseInt(formData.get('fichas_25') || '0'),
             fichas_100: parseInt(formData.get('fichas_100') || '0'),
@@ -693,6 +759,7 @@
                 </div>
                 
                 <div class="text-xs text-red-600 font-semibold mb-2">${mesaData.tipo_jogo}</div>
+                ${mesaData.croupier ? `<div class="text-base text-purple-600 font-bold mb-2">Croupier: ${mesaData.croupier}</div>` : ''}
                 
                 <div class="space-y-1 mb-2">
                     <div class="flex justify-between items-center text-xs">
@@ -796,6 +863,26 @@
         const saldoElement = mesaCard.querySelector('.saldo');
         const fichasElement = mesaCard.querySelector('.fichas-total');
         const statusElement = mesaCard.querySelector('.px-2.py-1.rounded.text-xs.font-bold.uppercase');
+        
+        // Atualizar o nome do croupier
+        const croupierElement = mesaCard.querySelector('.text-base.text-purple-600.font-bold.mb-2');
+        if (mesaData.croupier) {
+            if (croupierElement) {
+                croupierElement.textContent = `Croupier: ${mesaData.croupier}`;
+            } else {
+                // Se não existe o elemento, criar após o tipo de jogo
+                const tipoJogoElement = mesaCard.querySelector('.text-xs.text-red-600.font-semibold.mb-2');
+                if (tipoJogoElement) {
+                    const newCroupierElement = document.createElement('div');
+                    newCroupierElement.className = 'text-base text-purple-600 font-bold mb-2';
+                    newCroupierElement.textContent = `Croupier: ${mesaData.croupier}`;
+                    tipoJogoElement.parentNode.insertBefore(newCroupierElement, tipoJogoElement.nextSibling);
+                }
+            }
+        } else if (croupierElement) {
+            // Se não há croupier, remover o elemento
+            croupierElement.remove();
+        }
         
         if (valorTotalElement) {
             valorTotalElement.textContent = `R$ ${parseFloat(mesaData.valor_total).toLocaleString()}`;
@@ -1437,7 +1524,7 @@
 
     function showSuccessModal(message) {
         const modal = document.createElement('div');
-        modal.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in';
+        modal.className = 'fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in';
         
         const handleClose = () => {
             modal.remove();
@@ -1500,7 +1587,7 @@
 
     function showErrorModal(message) {
         const modal = document.createElement('div');
-        modal.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in';
+        modal.className = 'fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in';
         
         const handleClose = () => {
             modal.remove();
@@ -1607,3 +1694,31 @@
             });
         }
     });
+
+    // Registrar saldo da mesa
+    window.registrarSaldoMesa = async function(mesaId) {
+        try {
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const response = await fetch(`/mesas/api/mesa/${mesaId}/registrar-saldo/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({})
+            });
+            
+            if (!response.ok) {
+                throw new Error('Falha ao registrar saldo');
+            }
+            
+            const result = await response.json();
+            if (result.success) {
+                showSuccessModal('Saldo registrado com sucesso.');
+            } else {
+                showErrorModal(result.message || 'Erro ao registrar saldo');
+            }
+        } catch (error) {
+            showErrorModal('Erro: ' + error.message);
+        }
+    }

@@ -36,25 +36,25 @@
                 </div>
                 
                 <!-- Filtro de Datas -->
-                <div class="flex gap-2 mb-4">
-                    <form id="filtroDatas" class="flex flex-col sm:flex-row gap-4 items-end">
-                        <div class="flex flex-col sm:flex-row gap-4">
-                            <div class="space-y-2">
+                <div class="flex mb-4">
+                    <form id="filtroDatas" class="w-full flex flex-col sm:flex-row gap-4 items-end">
+                        <div class="w-full flex flex-col sm:flex-row gap-4">
+                            <div class="space-y-2 w-full sm:w-auto">
                                 <label class="block text-sm font-semibold text-gray-700">Data Início</label>
                                 <input type="date" id="dataInicio" name="data_inicio" 
                                        value="{{ data_inicio|date:'Y-m-d' }}"
-                                       class="px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md">
+                                       class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md">
                             </div>
-                            <div class="space-y-2">
+                            <div class="space-y-2 w-full sm:w-auto">
                                 <label class="block text-sm font-semibold text-gray-700">Data Fim</label>
                                 <input type="date" id="dataFim" name="data_fim" 
                                        value="{{ data_fim|date:'Y-m-d' }}"
-                                       class="px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md">
+                                       class="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-300 bg-white/90 backdrop-blur-sm shadow-sm hover:shadow-md">
                             </div>
                         </div>
                         
-                        <div class="flex gap-2">
-                            <button type="submit" class="px-6 py-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-2">
+                        <div class="w-full sm:w-auto flex gap-2">
+                            <button type="submit" class="w-full sm:w-auto px-6 py-2 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg>
@@ -99,80 +99,35 @@
             </div>
 
             <!-- Gráficos e Estatísticas -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <!-- Top 5 Sanges -->
-                <div class="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-red-500/10">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                        </svg>
-                        Top 5 Sanges - Mais Vendas
-                    </h3>
-                    <div class="space-y-3">
-                        {% for sange in top_sanges %}
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                                    <span class="text-sm font-bold text-red-600">{{ forloop.counter }}</span>
-                                </div>
-                                <div>
-                                    <div class="font-semibold text-gray-800">{{ sange.nome }}</div>
-                                    <div class="text-sm text-gray-600">{{ sange.total_vendas|floatformat:0 }} vendas</div>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <div class="font-bold text-red-600">R$ {{ sange.total_vendas|floatformat:0 }}</div>
-                            </div>
-                        </div>
-                        {% empty %}
-                        <div class="text-center text-gray-500 py-8">
-                            <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                            </svg>
-                            <p>Nenhuma venda registrada ainda</p>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <!-- Top 5 Clientes -->
-                <div class="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-blue-500/10">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                        Top 5 Clientes - Mais Compras
-                    </h3>
-                    <div class="space-y-3">
-                        {% for cliente in top_clientes %}
-                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                    <span class="text-sm font-bold text-blue-600">{{ forloop.counter }}</span>
-                                </div>
-                                <div>
-                                    <div class="font-semibold text-gray-800">{{ cliente.nome_completo }}</div>
-                                    <div class="text-sm text-gray-600">{{ cliente.total_compras|floatformat:0 }} compras</div>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <div class="font-bold text-blue-600">R$ {{ cliente.total_compras|floatformat:0 }}</div>
-                            </div>
-                        </div>
-                        {% empty %}
-                        <div class="text-center text-gray-500 py-8">
-                            <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                            </svg>
-                            <p>Nenhum cliente registrado ainda</p>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
+            
 
             <!-- Gráficos -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <!-- Performance por Croupier (Δ Saldo) -->
+                <div class="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-purple-500/10">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6a2 2 0 012-2h2a2 2 0 012 2v6m-6 0h6"></path>
+                        </svg>
+                        Performance por Croupier (Δ Saldo)
+                    </h3>
+                    <div class="flex flex-wrap gap-2 mb-3">
+                        <select id="filtroSinalCroupier" class="px-2 py-1 border rounded text-xs w-full sm:w-auto">
+                            <option value="todos">Todos</option>
+                            <option value="positivos">Positivos</option>
+                            <option value="negativos">Negativos</option>
+                        </select>
+                        <input id="buscaCroupier" type="text" placeholder="Buscar croupier" class="px-2 py-1 border rounded text-xs w-full sm:w-48" />
+                        <select id="selectCroupiers" multiple class="px-2 py-1 border rounded text-xs w-full sm:w-64 max-h-24 overflow-auto">
+                        </select>
+                        <button id="aplicarFiltroCroupier" class="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-xs rounded w-full sm:w-auto">Aplicar</button>
+                        <button id="limparFiltroCroupier" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-xs rounded w-full sm:w-auto">Limpar</button>
+                    </div>
+                    <div class="h-56 sm:h-64 md:h-80">
+                        <canvas id="chartPerfCroupier"></canvas>
+                    </div>
+                    <div class="text-xs text-gray-500 mt-2">Soma dos deltas de saldo registrados por mesa enquanto o croupier estava ativo.</div>
+                </div>
                 <!-- Vendas por Dia da Semana -->
                 <div class="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-green-500/10">
                     <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
@@ -186,36 +141,10 @@
                     </div>
                 </div>
 
-                <!-- Vendas por Hora -->
-                <div class="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-purple-500/10">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        Vendas por Hora do Dia
-                    </h3>
-                    <div class="h-64">
-                        <canvas id="chartVendasPorHora"></canvas>
-                    </div>
-                </div>
-            </div>
+               
 
             <!-- Vendas por Valor de Ficha -->
-            <div class="bg-white/95 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-orange-500/10">
-                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                    </svg>
-                    Vendas por Valor de Ficha
-                </h3>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                    {% for valor, total in vendas_por_valor.items %}
-                    <div class="text-center p-4 bg-gray-50 rounded-lg">
-                        <div class="text-lg font-bold text-orange-600">R$ {{ valor }}</div>
-                        <div class="text-sm text-gray-600">R$ {{ total|floatformat:0 }}</div>
-                    </div>
-                    {% endfor %}
-                </div>
+          
             </div>
         </div>
     </div>
@@ -227,9 +156,11 @@
 <script src="{% static 'js/dashboard.js' %}"></script>
 <script>
 // Dados para os gráficos
-const vendasPorDia = {{ vendas_por_dia|safe }};
-const vendasPorHora = {{ vendas_por_hora|safe }};
-const diasSemana = {{ dias_semana|safe }};
+const vendasPorDia = JSON.parse('{{ vendas_por_dia_json|escapejs }}');
+const vendasPorHora = JSON.parse('{{ vendas_por_hora_json|escapejs }}');
+const diasSemana = JSON.parse('{{ dias_semana_json|escapejs }}');
+const croupierPerfLabels = JSON.parse('{{ croupier_perf_labels_json|escapejs }}');
+const croupierPerfValues = JSON.parse('{{ croupier_perf_values_json|escapejs }}');
 
 // Gráfico de vendas por dia da semana
 const ctxVendasPorDia = document.getElementById('chartVendasPorDia').getContext('2d');
@@ -266,6 +197,174 @@ new Chart(ctxVendasPorDia, {
     }
 });
 
+// Gráfico Performance por Croupier (Delta Saldo) - BARRAS EM PÉ
+const ctxPerfCroupier = document.getElementById('chartPerfCroupier').getContext('2d');
+// Preparar cores e limites
+var perfBgColors = [];
+var perfBorderColors = [];
+var perfMin = 0;
+var perfMax = 0;
+for (var i = 0; i < croupierPerfValues.length; i++) {
+    var v = croupierPerfValues[i];
+    if (i === 0) { perfMin = v; perfMax = v; }
+    if (v < perfMin) perfMin = v;
+    if (v > perfMax) perfMax = v;
+    if (v >= 0) {
+        perfBgColors.push('rgba(16, 185, 129, 0.8)');
+        perfBorderColors.push('rgba(16, 185, 129, 1)');
+    } else {
+        perfBgColors.push('rgba(239, 68, 68, 0.8)');
+        perfBorderColors.push('rgba(239, 68, 68, 1)');
+    }
+}
+// Expande limites para garantir espaço visual e mostrar negativos
+var padding = Math.max(Math.abs(perfMax), Math.abs(perfMin)) * 0.1;
+var yMin = Math.min(0, perfMin - padding);
+var yMax = Math.max(0, perfMax + padding);
+
+var chartPerfCroupier = new Chart(ctxPerfCroupier, {
+    type: 'bar',
+    data: {
+        labels: croupierPerfLabels,
+        datasets: [{
+            label: 'Delta Saldo (R$)',
+            data: croupierPerfValues,
+            backgroundColor: perfBgColors,
+            borderColor: perfBorderColors,
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false }
+        },
+        scales: {
+            x: {
+                ticks: { autoSkip: false }
+            },
+            y: {
+                beginAtZero: false,
+                min: yMin,
+                max: yMax,
+                grid: {
+                    color: function(ctx) {
+                        var v = ctx.tick && typeof ctx.tick.value !== 'undefined' ? ctx.tick.value : null;
+                        return v === 0 ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.1)';
+                    },
+                    lineWidth: function(ctx) {
+                        var v = ctx.tick && typeof ctx.tick.value !== 'undefined' ? ctx.tick.value : null;
+                        return v === 0 ? 2 : 1;
+                    }
+                },
+                ticks: {
+                    callback: function(value) {
+                        return 'R$ ' + value.toLocaleString();
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Filtros do gráfico de croupiers
+(function() {
+    var filtroSinal = document.getElementById('filtroSinalCroupier');
+    var buscaInput = document.getElementById('buscaCroupier');
+    var selectCroupiers = document.getElementById('selectCroupiers');
+    var btnAplicar = document.getElementById('aplicarFiltroCroupier');
+    var btnLimpar = document.getElementById('limparFiltroCroupier');
+
+    // Popular multiselect com croupiers
+    function popularSelect() {
+        selectCroupiers.innerHTML = '';
+        for (var i = 0; i < croupierPerfLabels.length; i++) {
+            var opt = document.createElement('option');
+            opt.value = croupierPerfLabels[i];
+            opt.textContent = croupierPerfLabels[i];
+            selectCroupiers.appendChild(opt);
+        }
+    }
+    popularSelect();
+
+    function aplicarFiltro() {
+        var sinal = filtroSinal ? filtroSinal.value : 'todos';
+        var busca = (buscaInput ? buscaInput.value : '').toLowerCase();
+        var selecionados = [];
+        if (selectCroupiers) {
+            for (var i = 0; i < selectCroupiers.options.length; i++) {
+                var op = selectCroupiers.options[i];
+                if (op.selected) { selecionados.push(op.value); }
+            }
+        }
+
+        var novasLabels = [];
+        var novosValores = [];
+        var novasCores = [];
+        var novasBordas = [];
+
+        for (var j = 0; j < croupierPerfLabels.length; j++) {
+            var label = croupierPerfLabels[j];
+            var valor = croupierPerfValues[j];
+
+            // Filtro sinal
+            if (sinal === 'positivos' && valor < 0) continue;
+            if (sinal === 'negativos' && valor >= 0) continue;
+
+            // Filtro busca
+            if (busca && label.toLowerCase().indexOf(busca) === -1) continue;
+
+            // Filtro seleção específica
+            if (selecionados.length > 0 && selecionados.indexOf(label) === -1) continue;
+
+            novasLabels.push(label);
+            novosValores.push(valor);
+            if (valor >= 0) {
+                novasCores.push('rgba(16, 185, 129, 0.8)');
+                novasBordas.push('rgba(16, 185, 129, 1)');
+            } else {
+                novasCores.push('rgba(239, 68, 68, 0.8)');
+                novasBordas.push('rgba(239, 68, 68, 1)');
+            }
+        }
+
+        // Recalcular limites
+        var nMin = 0, nMax = 0;
+        for (var k = 0; k < novosValores.length; k++) {
+            var nv = novosValores[k];
+            if (k === 0) { nMin = nv; nMax = nv; }
+            if (nv < nMin) nMin = nv;
+            if (nv > nMax) nMax = nv;
+        }
+        var npad = Math.max(Math.abs(nMax), Math.abs(nMin)) * 0.1;
+        var nyMin = Math.min(0, nMin - npad);
+        var nyMax = Math.max(0, nMax + npad);
+
+        // Atualizar gráfico
+        if (chartPerfCroupier) {
+            chartPerfCroupier.data.labels = novasLabels;
+            chartPerfCroupier.data.datasets[0].data = novosValores;
+            chartPerfCroupier.data.datasets[0].backgroundColor = novasCores;
+            chartPerfCroupier.data.datasets[0].borderColor = novasBordas;
+            chartPerfCroupier.options.scales.y.min = nyMin;
+            chartPerfCroupier.options.scales.y.max = nyMax;
+            chartPerfCroupier.update();
+        }
+    }
+
+    if (btnAplicar) btnAplicar.addEventListener('click', aplicarFiltro);
+    if (btnLimpar) btnLimpar.addEventListener('click', function() {
+        if (filtroSinal) filtroSinal.value = 'todos';
+        if (buscaInput) buscaInput.value = '';
+        if (selectCroupiers) {
+            for (var i = 0; i < selectCroupiers.options.length; i++) {
+                selectCroupiers.options[i].selected = false;
+            }
+        }
+        aplicarFiltro();
+    });
+})();
 // Gráfico de vendas por hora
 const ctxVendasPorHora = document.getElementById('chartVendasPorHora').getContext('2d');
 new Chart(ctxVendasPorHora, {

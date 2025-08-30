@@ -102,10 +102,10 @@
                     </div>
                     
                     <div class="filter-buttons">
-                        <button onclick="filtrarPorSaldo('todos')" class="filter-btn active" data-filter="todos">
+                        <button onclick="filtrarPorSaldo('todos')" class="filter-btn" data-filter="todos">
                             Todos
                         </button>
-                        <button onclick="filtrarPorSaldo('positivo')" class="filter-btn" data-filter="positivo">
+                        <button onclick="filtrarPorSaldo('positivo')" class="filter-btn active" data-filter="positivo">
                             Saldo Positivo
                         </button>
                         <button onclick="filtrarPorSaldo('negativo')" class="filter-btn" data-filter="negativo">
@@ -547,6 +547,8 @@
                 exibirClientes(clientes);
                 atualizarMetricas(clientes);
                 mostrarClientes();
+                // Aplicar filtro padrão (Saldo Positivo)
+                filtrarPorSaldo('positivo');
             } else {
                 console.log('Nenhum cliente encontrado, mostrando estado vazio');
                 mostrarVazio();
@@ -638,7 +640,11 @@
     function filtrarPorSaldo(tipo) {
         // Atualizar botões ativos
         document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
+        // Encontrar e ativar o botão correto
+        const botaoAtivo = document.querySelector(`[data-filter="${tipo}"]`);
+        if (botaoAtivo) {
+            botaoAtivo.classList.add('active');
+        }
 
         const cards = document.querySelectorAll('.cliente-card');
         

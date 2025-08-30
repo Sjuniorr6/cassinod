@@ -21,6 +21,7 @@ urlpatterns = [
     path('sange/', include('sange.urls')),
     path('dashboard/', include('dashboard.urls')),
     path('divulgacao/', include('divulgacao.urls')),
+    path('croupiers/', include('croupiers.urls')),
     path('landing/', landing_page, name='landing_page'),
 ]
 

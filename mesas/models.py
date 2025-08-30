@@ -1,4 +1,5 @@
 from django.db import models
+from croupiers.models import Croupier
 
 class Mesa(models.Model):
     TIPO_JOGO_CHOICES = [
@@ -30,6 +31,14 @@ class Mesa(models.Model):
     
     numero_mesa = models.IntegerField(
         verbose_name='Número da Mesa'
+    )
+    
+    croupier = models.ForeignKey(
+        Croupier,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Croupier'
     )
     
     # Fichas de diferentes valores
@@ -132,3 +141,53 @@ class Mesa(models.Model):
         
         self.saldo = self.valor_total - self.valor_inicial
         super().save(*args, **kwargs) 
+
+
+class RegistroSaldoMesa(models.Model):
+    mesa = models.ForeignKey(
+        Mesa,
+        on_delete=models.CASCADE,
+        related_name='registros_saldo',
+        verbose_name='Mesa'
+    )
+    croupier = models.ForeignKey(
+        Croupier,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Croupier'
+    )
+    valor_inicial = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        verbose_name='Valor Inicial no Momento'
+    )
+    valor_total = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        verbose_name='Valor Total no Momento'
+    )
+    saldo = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        verbose_name='Saldo no Momento'
+    )
+    observacao = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name='Observação'
+    )
+    criado_em = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Registrado em'
+    )
+
+    class Meta:
+        verbose_name = 'Registro de Saldo da Mesa'
+        verbose_name_plural = 'Registros de Saldo das Mesas'
+        ordering = ['-criado_em']
+
+    def __str__(self):
+        mesa_info = f"Mesa {self.mesa.numero_mesa}"
+        croupier_info = self.croupier.nome if self.croupier else 'Sem croupier'
+        return f"{mesa_info} - {croupier_info} - Saldo: {self.saldo} em {self.criado_em:%d/%m/%Y %H:%M}"

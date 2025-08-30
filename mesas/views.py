@@ -7,8 +7,9 @@ from django.db import models
 from django.utils import timezone
 from datetime import datetime, timedelta
 import json
-from .models import Mesa
+from .models import Mesa, RegistroSaldoMesa
 from sange.models import VendaFicha
+from croupiers.models import Croupier
 
 def safe_int(value, default=0):
     """Converter valores para inteiros de forma segura"""
@@ -27,25 +28,29 @@ def safe_int(value, default=0):
 
 @login_required(login_url='/usuarios/login/')
 def mesas_home(request):
-    # Obter parâmetros de data do request
+    # Obter parâmetros de data do request (padrão: hoje)
     data_inicio = request.GET.get('data_inicio')
     data_fim = request.GET.get('data_fim')
     
-    # Obter parâmetros de status do request
-    status_filtro = request.GET.get('status', '')
+    # Obter parâmetros de status do request (padrão: 'aberta')
+    status_filtro = request.GET.get('status', 'aberta')
     
-    # Converter datas apenas se foram fornecidas
-    data_inicio_parsed = None
-    data_fim_parsed = None
+    # Converter datas; se ausentes ou inválidas, usar hoje
+    today = timezone.now().date()
+    data_inicio_parsed = today
+    data_fim_parsed = today
     
     if data_inicio and data_fim:
         try:
             data_inicio_parsed = datetime.strptime(data_inicio, '%Y-%m-%d').date()
             data_fim_parsed = datetime.strptime(data_fim, '%Y-%m-%d').date()
         except ValueError:
-            # Se as datas não são válidas, ignorar o filtro de data
-            data_inicio_parsed = None
-            data_fim_parsed = None
+            data_inicio_parsed = today
+            data_fim_parsed = today
+    else:
+        # Preencher strings para o template
+        data_inicio = today.strftime('%Y-%m-%d')
+        data_fim = today.strftime('%Y-%m-%d')
     
     # Filtrar mesas por status se especificado
     if status_filtro and status_filtro in ['aberta', 'fechada', 'encerrada']:
@@ -280,10 +285,19 @@ def criar_mesa_api(request):
             print(f"DEBUG - Fichas 5000: {data.get('fichas_5000', 0)}")
             print(f"DEBUG - Fichas 10000: {data.get('fichas_10000', 0)}")
             
+            # Buscar o croupier pelo ID se fornecido
+            croupier = None
+            if data.get('croupier'):
+                try:
+                    croupier = Croupier.objects.get(id=data.get('croupier'))
+                except Croupier.DoesNotExist:
+                    pass
+            
             mesa = Mesa.objects.create(
                 numero_mesa=numero_mesa,
                 tipo_jogo=data.get('tipo_jogo'),
                 status=data.get('status', 'aberta'),
+                croupier=croupier,
                 fichas_5=safe_int(data.get('fichas_5'), 0),
                 fichas_25=safe_int(data.get('fichas_25'), 0),
                 fichas_100=safe_int(data.get('fichas_100'), 0),
@@ -307,6 +321,8 @@ def criar_mesa_api(request):
                     'tipo_jogo_display': mesa.get_tipo_jogo_display(),
                     'status': mesa.status,
                     'status_display': mesa.get_status_display(),
+                                        'croupier': mesa.croupier.nome if mesa.croupier else '',
+                    'croupier_id': mesa.croupier.id if mesa.croupier else None,
                     'valor_inicial': float(mesa.valor_inicial),
                     'valor_total': float(mesa.valor_total),
                     'saldo': float(mesa.saldo),
@@ -341,6 +357,8 @@ def listar_mesas_api(request):
             'numero_mesa': mesa.numero_mesa,
             'tipo_jogo': mesa.tipo_jogo,
             'tipo_jogo_display': mesa.get_tipo_jogo_display(),
+                                'croupier': mesa.croupier.nome if mesa.croupier else '',
+                    'croupier_id': mesa.croupier.id if mesa.croupier else None,
             'valor_total': float(mesa.valor_total),
             'saldo': float(mesa.saldo),
             'status': mesa.status,
@@ -367,6 +385,8 @@ def obter_mesa_api(request, mesa_id):
                 'numero_mesa': mesa.numero_mesa,
                 'tipo_jogo': mesa.tipo_jogo,
                 'tipo_jogo_display': mesa.get_tipo_jogo_display(),
+                                    'croupier': mesa.croupier.nome if mesa.croupier else '',
+                    'croupier_id': mesa.croupier.id if mesa.croupier else None,
                 'valor_inicial': float(mesa.valor_inicial),
                 'valor_total': float(mesa.valor_total),
                 'saldo': float(mesa.saldo),
@@ -450,6 +470,8 @@ def fechar_mesa_api(request, mesa_id):
                 'numero_mesa': mesa.numero_mesa,
                 'tipo_jogo': mesa.tipo_jogo,
                 'tipo_jogo_display': mesa.get_tipo_jogo_display(),
+                                    'croupier': mesa.croupier.nome if mesa.croupier else '',
+                    'croupier_id': mesa.croupier.id if mesa.croupier else None,
                 'status': mesa.status,
                 'status_display': mesa.get_status_display(),
                 'valor_inicial': float(mesa.valor_inicial),
@@ -507,6 +529,8 @@ def abrir_mesa_api(request, mesa_id):
                 'numero_mesa': mesa.numero_mesa,
                 'tipo_jogo': mesa.tipo_jogo,
                 'tipo_jogo_display': mesa.get_tipo_jogo_display(),
+                                    'croupier': mesa.croupier.nome if mesa.croupier else '',
+                    'croupier_id': mesa.croupier.id if mesa.croupier else None,
                 'status': mesa.status,
                 'status_display': mesa.get_status_display(),
                 'valor_inicial': float(mesa.valor_inicial),
@@ -580,6 +604,15 @@ def editar_mesa_api(request, mesa_id):
             mesa.tipo_jogo = data.get('tipo_jogo')
             mesa.status = data.get('status')
             
+            # Buscar o croupier pelo ID se fornecido
+            croupier = None
+            if data.get('croupier'):
+                try:
+                    croupier = Croupier.objects.get(id=data.get('croupier'))
+                except Croupier.DoesNotExist:
+                    pass
+            mesa.croupier = croupier
+            
             # Debug: verificar valores antes da conversão
             print(f"DEBUG EDITAR - Valores brutos recebidos:")
             print(f"fichas_5 raw: '{data.get('fichas_5')}' (type: {type(data.get('fichas_5'))})")
@@ -621,6 +654,19 @@ def editar_mesa_api(request, mesa_id):
             print(f"fichas_10000: {mesa.fichas_10000}")
             print(f"valor_total: {mesa.valor_total}")
             print(f"saldo: {mesa.saldo}")
+
+            # Registrar saldo automaticamente (Salvar + Registrar saldo)
+            try:
+                RegistroSaldoMesa.objects.create(
+                    mesa=mesa,
+                    croupier=mesa.croupier,
+                    valor_inicial=mesa.valor_inicial,
+                    valor_total=mesa.valor_total,
+                    saldo=mesa.saldo,
+                    observacao='Registro automático ao salvar a mesa'
+                )
+            except Exception as e:
+                print(f"DEBUG EDITAR - Falha ao registrar saldo automático: {e}")
             
             # Retornar dados atualizados para o frontend
             return JsonResponse({
@@ -633,6 +679,8 @@ def editar_mesa_api(request, mesa_id):
                     'tipo_jogo_display': mesa.get_tipo_jogo_display(),
                     'status': mesa.status,
                     'status_display': mesa.get_status_display(),
+                                        'croupier': mesa.croupier.nome if mesa.croupier else '',
+                    'croupier_id': mesa.croupier.id if mesa.croupier else None,
                     'valor_inicial': float(mesa.valor_inicial),
                     'valor_total': float(mesa.valor_total),
                     'saldo': float(mesa.saldo),
@@ -711,6 +759,8 @@ def testar_mesa_api(request, mesa_id):
                     'id': mesa.id,
                     'numero_mesa': mesa.numero_mesa,
                     'tipo_jogo': mesa.tipo_jogo,
+                                        'croupier': mesa.croupier.nome if mesa.croupier else '',
+                    'croupier_id': mesa.croupier.id if mesa.croupier else None,
                     'status': mesa.status,
                     'valor_inicial': float(mesa.valor_inicial),
                     'valor_total_salvo': float(mesa.valor_total),
@@ -740,6 +790,49 @@ def testar_mesa_api(request, mesa_id):
             }, status=400)
     return JsonResponse({'success': False, 'message': 'Método não permitido'}, status=405) 
 
+
+@csrf_exempt
+@login_required(login_url='/usuarios/login/')
+@require_http_methods(["POST"])
+def registrar_saldo_api(request, mesa_id):
+    try:
+        mesa = Mesa.objects.get(id=mesa_id)
+    except Mesa.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Mesa não encontrada'}, status=404)
+
+    try:
+        data = json.loads(request.body or '{}')
+    except Exception:
+        data = {}
+
+    # Croupier atual da mesa
+    croupier = mesa.croupier
+
+    registro = RegistroSaldoMesa.objects.create(
+        mesa=mesa,
+        croupier=croupier,
+        valor_inicial=mesa.valor_inicial,
+        valor_total=mesa.valor_total,
+        saldo=mesa.saldo,
+        observacao=data.get('observacao', '')[:255]
+    )
+
+    return JsonResponse({
+        'success': True,
+        'message': 'Saldo registrado com sucesso',
+        'registro': {
+            'id': registro.id,
+            'mesa': mesa.id,
+            'numero_mesa': mesa.numero_mesa,
+            'croupier': croupier.nome if croupier else '',
+            'croupier_id': croupier.id if croupier else None,
+            'valor_inicial': float(registro.valor_inicial),
+            'valor_total': float(registro.valor_total),
+            'saldo': float(registro.saldo),
+            'criado_em': registro.criado_em.strftime('%d/%m/%Y %H:%M')
+        }
+    })
+
 @csrf_exempt
 def mesa_detail_api(request, mesa_id):
     if not request.user.is_authenticated:
@@ -754,6 +847,8 @@ def mesa_detail_api(request, mesa_id):
         'numero_mesa': mesa.numero_mesa,
         'tipo_jogo': mesa.tipo_jogo,
         'tipo_jogo_display': mesa.get_tipo_jogo_display(),
+                            'croupier': mesa.croupier.nome if mesa.croupier else '',
+                    'croupier_id': mesa.croupier.id if mesa.croupier else None,
         'status': mesa.status,
         'status_display': mesa.get_status_display(),
         'valor_inicial': float(mesa.valor_inicial),
@@ -880,6 +975,8 @@ def atualizar_metricas_api(request):
                 'numero_mesa': mesa.numero_mesa,
                 'tipo_jogo': mesa.tipo_jogo,
                 'tipo_jogo_display': mesa.get_tipo_jogo_display(),
+                                    'croupier': mesa.croupier.nome if mesa.croupier else '',
+                    'croupier_id': mesa.croupier.id if mesa.croupier else None,
                 'status': mesa.status,
                 'status_display': mesa.get_status_display(),
                 'valor_inicial': float(mesa.valor_inicial),

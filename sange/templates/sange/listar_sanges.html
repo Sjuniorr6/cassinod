@@ -32,6 +32,13 @@
                 </div>
                 
                 <div class="header-right">
+                    <a href="{% url 'sange:historico_movimentos' %}" class="btn-accent" style="margin-right: 8px;">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="hidden sm:inline">Histórico</span>
+                        <span class="sm:hidden">Histórico</span>
+                    </a>
                     <!-- Botão para abrir novo caixa -->
                     <a href="{% url 'sange:nova_sange' %}" class="btn-primary">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -106,6 +113,14 @@
                             
                             <div class="sange-actions">
                                 {% if sange.caixa_atual %}
+                                    <a href="{% url 'sange:detalhes_caixa' sange.caixa_atual.id %}" class="btn-secondary">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12c.75-4.5 6-7.5 9.75-7.5s9 3 9.75 7.5c-.75 4.5-6 7.5-9.75 7.5s-9-3-9.75-7.5z" />
+                                        </svg>
+                                        <span class="hidden sm:inline">Ver Caixa</span>
+                                        <span class="sm:hidden">Caixa</span>
+                                    </a>
                                     <a href="{% url 'sange:vender_fichas' sange.caixa_atual.id %}" class="btn-primary">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>

@@ -15,6 +15,7 @@ urlpatterns = [
     path('api/mesa/<int:mesa_id>/fechar/', views.fechar_mesa_api, name='fechar_mesa_api'),
     path('api/mesa/<int:mesa_id>/abrir/', views.abrir_mesa_api, name='abrir_mesa_api'),
     path('api/mesa/<int:mesa_id>/encerrar/', views.encerrar_mesa_api, name='encerrar_mesa_api'),
+    path('api/mesa/<int:mesa_id>/registrar-saldo/', views.registrar_saldo_api, name='registrar_saldo_api'),
     path('api/mesa/<int:mesa_id>/testar/', views.testar_mesa_api, name='testar_mesa_api'),
     path('api/modelo-info/', views.modelo_info_api, name='modelo_info_api'),
     path('api/atualizar-metricas/', views.atualizar_metricas_api, name='atualizar_metricas_api'),
