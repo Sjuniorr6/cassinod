@@ -6,6 +6,78 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/home.css' %}">
 {% endblock %}
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  function openModal(html) {
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 z-[1000] bg-black/50 flex items-center justify-center p-4';
+    overlay.innerHTML = `<div class="bg-white rounded-xl shadow-xl w-full max-w-md">${html}</div>`;
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+    document.body.appendChild(overlay);
+    return overlay;
+  }
+
+  function renderForm(c) {
+    return `
+      <div class="p-4 sm:p-6">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-lg font-semibold">Editar Croupier</h3>
+          <button type="button" id="closeModalBtn" class="text-gray-500 hover:text-gray-700">✕</button>
+        </div>
+        <form id="formEditarCroupier" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nome</label>
+            <input name="nome" value="${c.nome || ''}" class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+          </div>
+          <div class="flex items-center gap-2">
+            <input id="ativoInput" type="checkbox" ${c.ativo ? 'checked' : ''} class="h-4 w-4 text-purple-600 border-gray-300 rounded">
+            <label for="ativoInput" class="text-sm text-gray-700">Ativo</label>
+          </div>
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" id="cancelBtn" class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200">Cancelar</button>
+            <button type="submit" class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white">Salvar</button>
+          </div>
+        </form>
+      </div>`;
+  }
+
+  async function fetchJson(url, opts) {
+    const res = await fetch(url, opts);
+    if (!res.ok) throw new Error('Erro HTTP');
+    return await res.json();
+  }
+
+  document.querySelectorAll('.btn-editar-croupier').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-id');
+      try {
+        const data = await fetchJson(`/croupiers/api/${id}/`);
+        if (!data.success) throw new Error(data.error || 'Erro ao carregar');
+        const overlay = openModal(renderForm(data.croupier));
+        const close = () => overlay.remove();
+        overlay.querySelector('#closeModalBtn').addEventListener('click', close);
+        overlay.querySelector('#cancelBtn').addEventListener('click', close);
+
+        overlay.querySelector('#formEditarCroupier').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const nome = e.target.nome.value.trim();
+          const ativo = overlay.querySelector('#ativoInput').checked;
+          const save = await fetchJson(`/croupiers/api/${id}/editar/`, {
+            method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome, ativo })
+          });
+          if (!save.success) throw new Error(save.error || 'Erro ao salvar');
+          close();
+          location.reload();
+        });
+      } catch (err) {
+        alert('Erro: ' + err.message);
+      }
+    });
+  });
+});
+</script>
+{% endblock %}
 
 {% block content %}
 <div class="bg-cassino"></div>
@@ -121,10 +193,10 @@
                             </td>
                             <td class="px-3 py-2 sm:px-4 sm:py-3">
                                 <div class="flex items-center gap-1 sm:gap-2">
-                                    <a href="/admin/croupiers/croupier/{{ croupier.id }}/change/" target="_blank" 
-                                       class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2 sm:px-3 py-1 rounded-lg transition-colors duration-200 text-xs sm:text-sm">
+                                    <button type="button" data-id="{{ croupier.id }}" 
+                                       class="btn-editar-croupier text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-2 sm:px-3 py-1 rounded-lg transition-colors duration-200 text-xs sm:text-sm">
                                         Editar
-                                    </a>
+                                    </button>
                                     <a href="/admin/croupiers/croupier/{{ croupier.id }}/delete/" target="_blank" 
                                        class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-2 sm:px-3 py-1 rounded-lg transition-colors duration-200 text-xs sm:text-sm">
                                         Excluir
