@@ -75,6 +75,54 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   });
+
+  // Criar Croupier via modal
+  const novoBtn = document.getElementById('btnNovoCroupier');
+  if (novoBtn) {
+    novoBtn.addEventListener('click', () => {
+      const html = `
+        <div class="p-4 sm:p-6">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-semibold">Novo Croupier</h3>
+            <button type=button id=closeModalBtn class="text-gray-500 hover:text-gray-700">✕</button>
+          </div>
+          <form id=formCriarCroupier class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Nome</label>
+              <input name=nome class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+            </div>
+            <div class="flex items-center gap-2">
+              <input id=ativoNovo type=checkbox checked class="h-4 w-4 text-purple-600 border-gray-300 rounded">
+              <label for=ativoNovo class="text-sm text-gray-700">Ativo</label>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+              <button type=button id=cancelBtn class="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200">Cancelar</button>
+              <button type=submit class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white">Salvar</button>
+            </div>
+          </form>
+        </div>`;
+      const overlay = openModal(html);
+      const close = () => overlay.remove();
+      overlay.querySelector('#closeModalBtn').addEventListener('click', close);
+      overlay.querySelector('#cancelBtn').addEventListener('click', close);
+      overlay.querySelector('#formCriarCroupier').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nome = e.target.nome.value.trim();
+        const ativo = overlay.querySelector('#ativoNovo').checked;
+        try {
+          const res = await fetch('/croupiers/api/criar/', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome, ativo })
+          });
+          const data = await res.json();
+          if (!data.success) throw new Error(data.error || 'Erro ao criar');
+          close();
+          location.reload();
+        } catch (err) {
+          alert('Erro: ' + err.message);
+        }
+      });
+    });
+  }
 });
 </script>
 {% endblock %}
@@ -94,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p class="text-xs sm:text-sm text-white/80">Gerencie os croupiers do cassino</p>
                 </div>
                 <div class="sm:ml-auto">
-                    <a href="/admin/croupiers/croupier/add/" target="_blank" class="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-purple-600 to-purple-500 px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-white shadow hover:from-purple-700 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 w-full sm:w-auto">Novo Croupier</a>
+                    <button type="button" id="btnNovoCroupier" class="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-purple-600 to-purple-500 px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-white shadow hover:from-purple-700 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 w-full sm:w-auto">Novo Croupier</button>
                 </div>
             </div>
         </header>
