@@ -79,12 +79,16 @@ def historico_movimentos(request):
         except Exception:
             total_vendas_valor += Decimal(str(v.valor_total))
     for t in trocas_qs:
+        if t.detalhes:
+            origem_txt = ", ".join([f"{q}x R$ {k}" for k, q in t.detalhes.items()])
+        else:
+            origem_txt = f"1x R$ {t.valor_original}"
         movimentos.append({
             'tipo': 'troca',
             'data': t.data,
             'sange': t.caixa_sange.sange.nome,
             'caixa_id': t.caixa_sange_id,
-            'descricao': f"Troca R$ {t.valor_original} por {t.quantidade_gerada}x R$ {t.valor_ficha_troca}",
+            'descricao': f"Troca {origem_txt} por {t.quantidade_gerada}x R$ {t.valor_ficha_troca}",
             'valor': float(t.valor_original),
             'jogador': '—',
         })
@@ -308,7 +312,7 @@ def trocar_fichas(request, caixa_id):
             valor_total_troca = int(request.POST.get('valor_total_troca'))
             valor_ficha_troca = int(request.POST.get('valor_ficha_troca'))
             
-            # Coleta as quantidades de cada tipo de ficha a ser trocada
+            # Coleta as quantidades de cada tipo de ficha a ser trocada (origem detalhada)
             fichas_trocadas = {}
             valores_fichas = [5, 10, 25, 50, 100, 500, 1000, 5000, 10000]
             total_calculado = 0
@@ -327,9 +331,9 @@ def trocar_fichas(request, caixa_id):
                     'valores_fichas': valores_fichas
                 })
             
-            # Verifica se há fichas suficientes para cada tipo
+            # Verifica se há fichas suficientes para cada tipo (origem)
             for valor, quantidade in fichas_trocadas.items():
-                fichas_disponiveis = caixa.fichas_atuais.get(valor, 0)
+                fichas_disponiveis = caixa.fichas_atuais.get(str(valor), 0)
                 if fichas_disponiveis < quantidade:
                     messages.error(request, f'Fichas de R$ {valor} insuficientes! Disponível: {fichas_disponiveis}, Solicitado: {quantidade}')
                     return render(request, 'sange/trocar_fichas.html', {
@@ -352,10 +356,13 @@ def trocar_fichas(request, caixa_id):
                 caixa_sange=caixa,
                 valor_original=valor_total_troca,
                 valor_ficha_troca=valor_ficha_troca,
-                quantidade_gerada=quantidade_gerada
+                quantidade_gerada=quantidade_gerada,
+                detalhes={str(k): int(v) for k, v in fichas_trocadas.items()}
             )
             
-            messages.success(request, f'Troca registrada: R$ {valor_total_troca} por {quantidade_gerada}x R$ {valor_ficha_troca}')
+            # Mensagem detalhada
+            origem_txt = ", ".join([f"{q}x R$ {k}" for k, q in fichas_trocadas.items()]) or "—"
+            messages.success(request, f"Troca registrada: {origem_txt} por {quantidade_gerada}x R$ {valor_ficha_troca}")
             return redirect('sange:detalhes_caixa', caixa_id=caixa.id)
             
         except Exception as e:

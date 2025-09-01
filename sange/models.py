@@ -84,13 +84,34 @@ class CaixaSange(models.Model):
     def __str__(self):
         return f"Caixa {self.sange.nome} - {self.data_abertura.strftime('%d/%m/%Y %H:%M')}"
 
+    @staticmethod
+    def _normalize_fichas(fichas_dict):
+        """Normaliza as chaves para string e valores para int e remove zeros/negativos."""
+        normalized = {}
+        if fichas_dict:
+            for k, v in fichas_dict.items():
+                try:
+                    qtd = int(v)
+                except Exception:
+                    try:
+                        qtd = int(str(v))
+                    except Exception:
+                        qtd = 0
+                if qtd > 0:
+                    normalized[str(k)] = qtd
+        return normalized
+
     def save(self, *args, **kwargs):
         # Se é uma nova instância, inicializa as fichas atuais
         if not self.pk:
+            self.fichas_iniciais = self._normalize_fichas(self.fichas_iniciais)
             self.fichas_atuais = self.fichas_iniciais.copy()
             self.valor_total_atual = self.valor_total_inicial
         
         # Calcula o valor total inicial se não foi calculado
+        # Sempre normaliza antes de calcular
+        self.fichas_iniciais = self._normalize_fichas(self.fichas_iniciais)
+        self.fichas_atuais = self._normalize_fichas(self.fichas_atuais)
         if self.valor_total_inicial == Decimal('0.00'):
             self.valor_total_inicial = self.calcular_valor_total(self.fichas_iniciais)
             self.valor_total_atual = self.valor_total_inicial
@@ -101,32 +122,47 @@ class CaixaSange(models.Model):
     def calcular_valor_total(fichas_dict):
         """Calcula o valor total baseado no dicionário de fichas"""
         total = Decimal('0.00')
-        for valor, quantidade in fichas_dict.items():
-            if quantidade and valor:
-                total += Decimal(str(valor)) * Decimal(str(quantidade))
+        for valor, quantidade in (fichas_dict or {}).items():
+            try:
+                qtd = int(quantidade)
+                val = int(valor)
+            except Exception:
+                continue
+            if qtd > 0 and val > 0:
+                total += Decimal(str(val)) * Decimal(str(qtd))
         return total
 
     def atualizar_fichas_apos_venda(self, valor_unitario, quantidade):
         """Atualiza as fichas após uma venda"""
+        self.fichas_atuais = self._normalize_fichas(self.fichas_atuais)
         valor_str = str(valor_unitario)
-        if valor_str in self.fichas_atuais:
-            self.fichas_atuais[valor_str] = max(0, self.fichas_atuais[valor_str] - quantidade)
+        atual = int(self.fichas_atuais.get(valor_str, 0))
+        self.fichas_atuais[valor_str] = max(0, atual - int(quantidade))
         self.valor_total_atual = self.calcular_valor_total(self.fichas_atuais)
         self.save()
 
     def atualizar_fichas_apos_troca(self, valor_original, valor_ficha_troca, quantidade_gerada):
-        """Atualiza as fichas após uma troca"""
-        valor_original_str = str(valor_original)
+        """Compat: antiga assinatura. Remove UMA ficha do valor_original e adiciona as novas.
+        Mantida por compatibilidade, mas o recomendado é usar atualizar_fichas_apos_troca_detalhada."""
+        origem_dict = {str(valor_original): 1}
+        self.atualizar_fichas_apos_troca_detalhada(origem_dict, valor_ficha_troca, quantidade_gerada)
+
+    def atualizar_fichas_apos_troca_detalhada(self, fichas_origem, valor_ficha_troca, quantidade_gerada):
+        """Atualiza as fichas considerando o detalhamento completo da origem.
+        fichas_origem: dict como { '5': 2, '25': 1 } indicando quantas de cada valor foram entregues.
+        """
+        # Remover as fichas de origem
+        self.fichas_atuais = self._normalize_fichas(self.fichas_atuais)
+        for valor, quantidade in (fichas_origem or {}).items():
+            valor_str = str(valor)
+            qtd = int(quantidade or 0)
+            atual = int(self.fichas_atuais.get(valor_str, 0))
+            self.fichas_atuais[valor_str] = max(0, atual - qtd)
+
+        # Adicionar as fichas de destino
         valor_ficha_troca_str = str(valor_ficha_troca)
-        
-        # Remove fichas do valor original
-        if valor_original_str in self.fichas_atuais:
-            self.fichas_atuais[valor_original_str] = max(0, self.fichas_atuais[valor_original_str] - 1)
-        
-        # Adiciona fichas do valor de troca
-        if valor_ficha_troca_str in self.fichas_atuais:
-            self.fichas_atuais[valor_ficha_troca_str] = self.fichas_atuais.get(valor_ficha_troca_str, 0) + quantidade_gerada
-        
+        self.fichas_atuais[valor_ficha_troca_str] = int(self.fichas_atuais.get(valor_ficha_troca_str, 0)) + int(quantidade_gerada or 0)
+
         self.valor_total_atual = self.calcular_valor_total(self.fichas_atuais)
         self.save()
 
@@ -199,6 +235,7 @@ class TrocaFicha(models.Model):
         verbose_name="Quantidade Gerada"
     )
     data = models.DateTimeField(auto_now_add=True, verbose_name="Data da Troca")
+    detalhes = models.JSONField(default=dict, verbose_name="Detalhes da Troca (origem)")
 
     class Meta:
         verbose_name = "Troca de Ficha"
@@ -215,10 +252,27 @@ class TrocaFicha(models.Model):
         
         # Se é uma nova instância, atualiza as fichas do caixa
         if not self.pk:
-            self.caixa_sange.atualizar_fichas_apos_troca(
-                self.valor_original, 
-                self.valor_ficha_troca, 
-                self.quantidade_gerada
-            )
+            if self.detalhes:
+                # Normaliza detalhes antes de aplicar
+                norm = {}
+                for k, v in (self.detalhes or {}).items():
+                    try:
+                        qtd = int(v)
+                    except Exception:
+                        qtd = 0
+                    if qtd > 0:
+                        norm[str(k)] = qtd
+                self.detalhes = norm
+                self.caixa_sange.atualizar_fichas_apos_troca_detalhada(
+                    norm,
+                    self.valor_ficha_troca,
+                    self.quantidade_gerada
+                )
+            else:
+                self.caixa_sange.atualizar_fichas_apos_troca(
+                    self.valor_original,
+                    self.valor_ficha_troca,
+                    self.quantidade_gerada
+                )
         
         super().save(*args, **kwargs)
